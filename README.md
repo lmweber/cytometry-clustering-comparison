@@ -1,2 +1,3 @@
-# cytof-clustering-comparison
-R scripts to reproduce analysis in our paper comparing clustering methods for mass cytometry data
+# Contents
+
+This repository contains R scripts to reproduce the analysis in our paper comparing clustering methods for mass cytometry data.
