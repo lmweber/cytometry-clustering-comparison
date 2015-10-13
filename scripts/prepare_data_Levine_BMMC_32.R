@@ -1,7 +1,10 @@
-# R script to prepare data sets "Levine_BMMC_32_H1" and "Levine_BMMC_32_H2" from FCS 
-# files. The processed files are then ready for input to clustering algorithms.
+# R script to prepare data sets "Levine_BMMC_32_H1" and "Levine_BMMC_32_H2"
 # 
-# Source: Levine et al (2015), "benchmark data set 2".
+# Read FCS files, generate labels for manually gated clusters, apply asinh transform, and
+# export in TXT and FCS format. The exported files are then ready for input to clustering
+# algorithms.
+# 
+# Source: Levine et al (2015), "benchmark data set 2"
 # link to paper: http://www.sciencedirect.com/science/article/pii/S0092867415006376
 # link to data: https://www.cytobank.org/cytobank/experiments/46102
 # 
