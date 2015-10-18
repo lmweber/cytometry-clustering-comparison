@@ -1,13 +1,14 @@
 # R script to compare clustering results from different methods, for the data set
 # "Levine_BMMC_32_H1".
 #
-# Lukas M. Weber, October 2015
+# Lukas Weber, October 2015
 
 
 library(flowCore)
 
 
 # load manually gated cluster labels ("truth")
+# --------------------------------------------
 
 file_truth <- "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1.txt"
 data_truth <- read.table(file_truth, header = TRUE, sep = "\t")
@@ -25,8 +26,9 @@ res <- data.frame(truth = clus_truth)
 
 
 # load PhenoGraph clusters
+# ------------------------
 
-file_PhenoGraph <- "../results/Levine_BMMC_32_H1/Levine_BMMC_32_H1_PhenoGraph.fcs"
+file_PhenoGraph <- "../results/Levine_BMMC_32_H1/PhenoGraph/Levine_BMMC_32_H1_PhenoGraph.fcs"
 data_PhenoGraph <- flowCore::exprs(flowCore::read.FCS(file_PhenoGraph, transformation = FALSE))
 head(data_PhenoGraph)
 dim(data_PhenoGraph)
@@ -70,4 +72,53 @@ table(clus_PhenoGraph_matched, clus_truth)
 # store results
 res <- cbind(res, PhenoGraph = clus_PhenoGraph_matched)
 
+
+# load DensVM clusters
+# --------------------
+
+file_DensVM <- "../results/Levine_BMMC_32_H1/DensVM/cytof_tsne_cluster.txt"
+data_DensVM <- read.table(file_DensVM, header = TRUE, sep = "\t")
+head(data_DensVM)
+dim(data_DensVM)
+
+clus_DensVM <- data_DensVM$cluster
+length(clus_DensVM)
+
+table(clus_DensVM)
+max(clus_DensVM)
+
+table(clus_DensVM, clus_truth)  # require labels from subsampled data
+
+
+####### alternatively
+
+# load DensVM FCS output file
+
+file_DensVM <- "../results/Levine_BMMC_32_H1/DensVM/cytof_analyzedFCS/Levine_BMMC_32_H1_notransform.fcs"
+data_DensVM <- flowCore::exprs(flowCore::read.FCS(file_DensVM, transformation = FALSE))
+head(data_DensVM)
+
+clus_DensVM_truth <- data_DensVM[, "label"]
+
+table(clus_DensVM, clus_DensVM_truth)
+## these match very well, although some are combined (DensVM has less resolution than manual gating)
+
+
+
+# ACCENSE
+# -------
+
+file_ACCENSE <- "../results/Levine_BMMC_32_H1/ACCENSE/accense_output.csv"
+data_ACCENSE <- read.csv(file_ACCENSE, header = TRUE)
+head(data_ACCENSE)
+
+clus_ACCENSE <- data_ACCENSE$population
+table(clus_ACCENSE)
+max(clus_ACCENSE)
+
+clus_ACCENSE_truth <- data_ACCENSE$label
+
+table(clus_ACCENSE, clus_ACCENSE_truth)
+## these are pretty good too
+## but neither ACCENSE or DensVM will probably work well for rare cell populations
 

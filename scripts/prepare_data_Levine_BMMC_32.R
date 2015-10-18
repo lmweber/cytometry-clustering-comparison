@@ -8,7 +8,7 @@
 # link to paper: http://www.sciencedirect.com/science/article/pii/S0092867415006376
 # link to data: https://www.cytobank.org/cytobank/experiments/46102
 # 
-# Lukas M. Weber, October 2015
+# Lukas Weber, Oct 2015
 
 
 library(flowCore)
@@ -79,6 +79,8 @@ lapply(labels, length)
 
 # apply asinh transform
 
+data_notransform <- data
+
 asinh_scale <- 5
 data <- lapply(data, function(d) {
   asinh(d / asinh_scale)
@@ -94,9 +96,26 @@ res_H2 <- cbind(data[["H2"]], label = labels[["H2"]])
 head(res_H1)
 head(res_H2)
 
-write.table(res_H1, file = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1.txt", 
+write.table(res_H1, 
+            file = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_H2, file = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2.txt", 
+write.table(res_H2, 
+            file = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+
+# without asinh transform
+
+res_H1_notransform <- cbind(data_notransform[["H1"]], label = labels[["H1"]])
+res_H2_notransform <- cbind(data_notransform[["H2"]], label = labels[["H2"]])
+
+head(res_H1_notransform)
+head(res_H2_notransform)
+
+write.table(res_H1_notransform, 
+            file = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1_notransform.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_H2_notransform, 
+            file = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2_notransform.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
 # save as FCS files
@@ -104,6 +123,18 @@ write.table(res_H2, file = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2.txt",
 res_FCS_H1 <- flowCore::flowFrame(res_H1)
 res_FCS_H2 <- flowCore::flowFrame(res_H2)
 
-flowCore::write.FCS(res_FCS_H1, filename = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1.fcs")
-flowCore::write.FCS(res_FCS_H2, filename = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2.fcs")
+flowCore::write.FCS(res_FCS_H1, 
+                    filename = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1.fcs")
+flowCore::write.FCS(res_FCS_H2, 
+                    filename = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2.fcs")
+
+# without asinh transform
+
+res_FCS_H1_notransform <- flowCore::flowFrame(res_H1_notransform)
+res_FCS_H2_notransform <- flowCore::flowFrame(res_H2_notransform)
+
+flowCore::write.FCS(res_FCS_H1_notransform, 
+                    filename = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1_notransform.fcs")
+flowCore::write.FCS(res_FCS_H2_notransform, 
+                    filename = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2_notransform.fcs")
 

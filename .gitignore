@@ -1,5 +1,9 @@
 **/.DS_Store
 **/._*
+
+C1omics_abstract/**
 data/**
+exploratory_work/**
+paper/**
 raw_data/**
 results/**
