@@ -5,5 +5,6 @@ C1omics_abstract/**
 data/**
 exploratory_work/**
 paper/**
+plots/**
 raw_data/**
 results/**
