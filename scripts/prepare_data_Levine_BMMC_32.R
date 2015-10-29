@@ -1,23 +1,27 @@
-# R script to prepare data sets "Levine_BMMC_32_H1" and "Levine_BMMC_32_H2"
-# 
+#########################################################################################
+# R script to prepare data set "Levine_BMMC_32"
+#
 # Read FCS files, generate labels for manually gated clusters, apply asinh transform, and
 # export in TXT and FCS format. The exported files are then ready for input to clustering
 # algorithms.
-# 
-# Source: Levine et al (2015), "benchmark data set 2"
-# link to paper: http://www.sciencedirect.com/science/article/pii/S0092867415006376
-# link to data: https://www.cytobank.org/cytobank/experiments/46102
-# 
-# Lukas Weber, Oct 2015
+#
+# Source:
+# Levine et al. (2015), "benchmark data set 2", 32-dimensional mass cytometry data set 
+# from healthy human bone marrow samples, from two individuals H1 and H2
+# - link to paper: http://www.sciencedirect.com/science/article/pii/S0092867415006376
+# - link to data: https://www.cytobank.org/cytobank/experiments/46102
+#
+# Lukas M. Weber, October 2015
+#########################################################################################
 
 
 library(flowCore)
 library(magrittr)
 
+
 # read FCS filenames
 
-# there is one FCS file per manually gated cluster, per individual
-# and there are two individuals, H1 and H2
+# one FCS file per manually gated cluster, per individual, for two individuals H1 and H2
 
 DIR <- "../raw_data/Levine_BMMC_32"
 ds <- c("H1\\.fcs$", "H2\\.fcs$")
@@ -29,13 +33,22 @@ files <- lapply(ds, function(p) {
 
 files
 
-# put "unassigned" group (cells without cluster labels) at the end
+# remove "unassigned" groups (cells without cluster labels)
 
 files <- lapply(files, function(f) {
-  f <- c(f[-grep("NotDebrisSinglets", f)], f[grep("NotDebrisSinglets", f)])
+  f <- f[-grep("NotDebrisSinglets", f)]
 })
 
 files
+
+# check files (clusters) are in same order
+
+names_H1 <- gsub("(^.*normalized_)|(_H1.fcs$)", "", files$H1)
+names_H2 <- gsub("(^.*normalized_)|(_H2.fcs$)", "", files$H2)
+names_H1
+names_H2
+all.equal(names_H1, names_H2)
+
 
 # create column names (markers)
 
@@ -49,18 +62,18 @@ cols <- cols[5:36]  # remove non-protein columns
 cols
 length(cols)
 
-# read FCS files and generate cluster labels
-# raw data consists of one FCS file per cluster, per individual
 
-data <- list(matrix(nrow = 0, ncol = length(cols)), 
-             matrix(nrow = 0, ncol = length(cols)))
+# read FCS files individually and generate cluster labels from file number
+
+# raw data consists of one FCS file per manually gated cluster, per individual
+
+data <- list(matrix(nrow = 0, ncol = length(cols)), matrix(nrow = 0, ncol = length(cols)))
 labels <- list(vector(), vector())
-names(data) <- names(files)
-names(labels) <- names(files)
+names(data) <- names(labels) <- names(files)
 
 for (h in names(data)) {
   
-  for (i in seq_along(files[[h]])) {
+  for (i in 1:length(files[[h]])) {
     
     data_i <- flowCore::exprs(flowCore::read.FCS(files[[h]][i], transformation = FALSE))
     if (!all(cols %in% colnames(data_i))) stop("column names do not match")
@@ -74,12 +87,14 @@ for (h in names(data)) {
 
 lapply(data, head)
 lapply(data, dim)
-lapply(labels, table)  # these are the manually gated cluster labels for each data set
+
+lapply(labels, table)  # manually gated cluster labels
 lapply(labels, length)
 
-# apply asinh transform
 
-data_notransform <- data
+# apply asinh transformation
+
+data_notransf <- data  # keep non-transformed data since some methods require it
 
 asinh_scale <- 5
 data <- lapply(data, function(d) {
@@ -88,53 +103,35 @@ data <- lapply(data, function(d) {
 
 lapply(data, head)
 
+
+# combine data and labels from individuals H1 and H2 (previously checked that clusters
+# are in the same order)
+
+res <- rbind(data$H1, data$H2)
+res_notransf <- rbind(data_notransf$H1, data_notransf$H2)
+res_labels <- c(labels$H1, labels$H2)
+
+dim(res)
+dim(res_notransf)
+length(res_labels)
+
+
 # save as tab-delimited text files
 
-res_H1 <- cbind(data[["H1"]], label = labels[["H1"]])
-res_H2 <- cbind(data[["H2"]], label = labels[["H2"]])
-
-head(res_H1)
-head(res_H2)
-
-write.table(res_H1, 
-            file = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_H2, 
-            file = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2.txt", 
+write.table(cbind(res, res_labels), 
+            file = "../data/Levine_BMMC_32/Levine_BMMC_32.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-# without asinh transform
-
-res_H1_notransform <- cbind(data_notransform[["H1"]], label = labels[["H1"]])
-res_H2_notransform <- cbind(data_notransform[["H2"]], label = labels[["H2"]])
-
-head(res_H1_notransform)
-head(res_H2_notransform)
-
-write.table(res_H1_notransform, 
-            file = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1_notransform.txt", 
+write.table(cbind(res_notransf, res_labels), 
+            file = "../data/Levine_BMMC_32/Levine_BMMC_32_notransf.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_H2_notransform, 
-            file = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2_notransform.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
+
 
 # save as FCS files
 
-res_FCS_H1 <- flowCore::flowFrame(res_H1)
-res_FCS_H2 <- flowCore::flowFrame(res_H2)
+flowCore::write.FCS(flowCore::flowFrame(cbind(res, res_labels)), 
+                    filename = "../data/Levine_BMMC_32/Levine_BMMC_32.fcs")
 
-flowCore::write.FCS(res_FCS_H1, 
-                    filename = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1.fcs")
-flowCore::write.FCS(res_FCS_H2, 
-                    filename = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2.fcs")
-
-# without asinh transform
-
-res_FCS_H1_notransform <- flowCore::flowFrame(res_H1_notransform)
-res_FCS_H2_notransform <- flowCore::flowFrame(res_H2_notransform)
-
-flowCore::write.FCS(res_FCS_H1_notransform, 
-                    filename = "../data/Levine_BMMC_32_H1/Levine_BMMC_32_H1_notransform.fcs")
-flowCore::write.FCS(res_FCS_H2_notransform, 
-                    filename = "../data/Levine_BMMC_32_H2/Levine_BMMC_32_H2_notransform.fcs")
+flowCore::write.FCS(flowCore::flowFrame(cbind(res_notransf, res_labels)), 
+                    filename = "../data/Levine_BMMC_32/Levine_BMMC_32_notransf.fcs")
 
