@@ -12,7 +12,7 @@ library(FlowSOM)
 # load data
 
 file <- "../data/Levine_BMMC_32/Levine_BMMC_32.fcs"
-data <- flowCore::read.FCS(file)  # needs to be a flowFrame object
+data <- flowCore::read.FCS(file, transformation = FALSE)  # needs to be a flowFrame object
 
 head(data)
 dim(data)
@@ -26,9 +26,13 @@ set.seed(123)
 
 system.time(
 fSOM <- FlowSOM::ReadInput(data, transform = FALSE, scale = FALSE, silent = FALSE)
+)
 
+system.time(
 fSOM <- FlowSOM::BuildSOM(fSOM, colsToUse = marker_cols)  # very fast
+)
 
+system.time(
 fSOM <- FlowSOM::BuildMST(fSOM)
 )
 
@@ -55,7 +59,7 @@ length(table(clus_FlowSOM))  # number of clusters
 k <- 20  # number of clusters
 
 system.time(
-meta_clustering <- FlowSOMmetaClustering_consensus(fSOM$map$codes, k = k)
+meta_clustering <- FlowSOM::metaClustering_consensus(fSOM$map$codes, k = k)
 )
 meta_clustering
 
