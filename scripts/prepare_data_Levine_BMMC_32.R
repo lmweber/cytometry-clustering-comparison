@@ -7,7 +7,7 @@
 #
 # Source:
 # Levine et al. (2015), "benchmark data set 2", 32-dimensional mass cytometry data set 
-# from healthy human bone marrow samples, from two individuals H1 and H2
+# from healthy human bone marrow samples, 104,184 cells from two individuals H1 and H2
 # - link to paper: http://www.sciencedirect.com/science/article/pii/S0092867415006376
 # - link to data: https://www.cytobank.org/cytobank/experiments/46102
 #
@@ -118,20 +118,20 @@ length(res_labels)
 
 # save as tab-delimited text files
 
-write.table(cbind(res, res_labels), 
+write.table(cbind(res, label = res_labels), 
             file = "../data/Levine_BMMC_32/Levine_BMMC_32.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-write.table(cbind(res_notransf, res_labels), 
+write.table(cbind(res_notransf, label = res_labels), 
             file = "../data/Levine_BMMC_32/Levine_BMMC_32_notransf.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
 
 # save as FCS files
 
-flowCore::write.FCS(flowCore::flowFrame(cbind(res, res_labels)), 
+flowCore::write.FCS(flowCore::flowFrame(cbind(res, label = res_labels)), 
                     filename = "../data/Levine_BMMC_32/Levine_BMMC_32.fcs")
 
-flowCore::write.FCS(flowCore::flowFrame(cbind(res_notransf, res_labels)), 
+flowCore::write.FCS(flowCore::flowFrame(cbind(res_notransf, label = res_labels)), 
                     filename = "../data/Levine_BMMC_32/Levine_BMMC_32_notransf.fcs")
 

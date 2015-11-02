@@ -1,26 +1,41 @@
-# Script to run DensVM on Levine_BMMC_32_H1 data set
-# DensVM is included in the cytofkit R/Bioconductor package
+#########################################################################################
+# R script to run DensVM
 #
-# Lukas Weber, October 2015
+# DensVM is part of the cytofkit R/Bioconductor package
+#
+# Lukas M. Weber, October 2015
+#########################################################################################
 
+
+library(flowCore)
 library(cytofkit)
 
+
 # use main function "cytof_tsne_densvm"
-# there is also a graphical version "cytof_tsne_densvm_GUI"
+# graphical version can also be launched with "cytof_tsne_densvm_GUI()"
 
-?cytof_tsne_densvm
 
-#file <- "../data/Levine_BMMC_32_H1/Levine_BMMC_32/H1.fcs"
-#res_dir <- "../results/Levine_BMMC_32_H1/DensVM"
+# use non-transformed input data, since DensVM will transform automatically
 
-#cytof_tsne_densvm(fcsFile = file, 
-#                  resDir = res_dir, 
-#                  fixedNum = 20000, 
-#                  verbose = TRUE)
-## doesn't work since also needs parameter (marker) names
-## create a txt file with them
+# load data
 
-cytof_tsne_densvm_GUI()
+file <- "../data/Levine_BMMC_32/Levine_BMMC_32_notransf.fcs"
+data <- flowCore::read.FCS(file, transformation = FALSE)
 
-## I think it is doing an extra logicle transformation - should skip since I have already done asinh
-## doesn't seem possible - need to create a non-transformed data file!
+# note DensVM also requires a copy of the input FCS file in the output directory
+
+out_dir <- "../results/Levine_BMMC_32/DensVM"
+
+# select parameters
+
+para <- colnames(data)[-grep("label", colnames(data))]
+length(para)
+
+# run DensVM
+# results are saved to files in output directory
+
+system.time(
+cytofkit::cytof_tsne_densvm(fcsFile = file, resDir = out_dir, para = para, 
+                            fixedNum = 20000, verbose = TRUE)
+)
+
