@@ -61,10 +61,15 @@ k <- 20  # number of clusters
 system.time(
 meta_clustering <- FlowSOM::metaClustering_consensus(fSOM$map$codes, k = k)
 )
+
+# alternatively: select number of clusters automatically (does not perform well)
+#system.time(
+#meta_clustering <- FlowSOM::MetaClustering(fSOM$map$codes, 
+#                                           method = "metaClustering_consensus", max = 30)
+#)
+
 meta_clustering
-
 meta_clustering_per_cell <- meta_clustering[fSOM$map$mapping[, 1]]
-
 clus_FlowSOM_meta <- meta_clustering_per_cell
 
 length(clus_FlowSOM_meta)

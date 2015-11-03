@@ -135,6 +135,45 @@ n_cells_DensVM <- res_DensVM$n_cells
 
 
 
+# =================
+# flowMeans results
+# =================
+
+# load cluster labels
+
+file_flowMeans <- "../results/Levine_BMMC_32/flowMeans/Levine_BMMC_32_flowMeans_labels.txt"
+data_flowMeans <- read.table(file_flowMeans, header = TRUE, sep = "\t")
+
+head(data_flowMeans)
+dim(data_flowMeans)
+
+clus_flowMeans <- data_flowMeans[, "label"]
+
+table(clus_flowMeans, clus_truth)  # contingency table
+
+tbl_flowMeans <- table(clus_flowMeans)  # cluster sizes
+tbl_flowMeans
+n_clus_flowMeans <- length(tbl_flowMeans)  # number of clusters
+n_clus_flowMeans
+
+# match cluster labels by highest F1 score; and calculate precision, recall, and F1 score
+
+res_flowMeans <- match_clusters_and_evaluate(clus_flowMeans, clus_truth)
+
+pr_flowMeans <- res_flowMeans$pr
+re_flowMeans <- res_flowMeans$re
+F1_flowMeans <- res_flowMeans$F1
+
+# matched cluster labels
+
+labels_matched_flowMeans <- res_flowMeans$labels_matched
+
+# number of cells per matched cluster
+
+n_cells_flowMeans <- res_flowMeans$n_cells
+
+
+
 # ===============
 # FlowSOM results
 # ===============

@@ -26,12 +26,15 @@ source("load_results_Levine_BMMC_32.R")
 # Plot heatmaps of precision, recall, and F1 score for each true cluster
 # ======================================================================
 
-res_pr <- cbind(pr_ACCENSE, pr_DensVM, pr_FlowSOM, pr_FlowSOM_meta, pr_immunoClust, pr_immunoClust_all, 
-                pr_kmeans, pr_PhenoGraph, pr_Rclusterpp, pr_SWIFT)
-res_re <- cbind(re_ACCENSE, re_DensVM, re_FlowSOM, re_FlowSOM_meta, re_immunoClust, re_immunoClust_all, 
-                re_kmeans, re_PhenoGraph, re_Rclusterpp, re_SWIFT)
-res_F1 <- cbind(F1_ACCENSE, F1_DensVM, F1_FlowSOM, F1_FlowSOM_meta, F1_immunoClust, F1_immunoClust_all, 
-                F1_kmeans, F1_PhenoGraph, F1_Rclusterpp, F1_SWIFT)
+res_pr <- cbind(pr_ACCENSE, pr_DensVM, pr_flowMeans, pr_FlowSOM, pr_FlowSOM_meta, 
+                pr_immunoClust, pr_immunoClust_all, pr_kmeans, pr_PhenoGraph, 
+                pr_Rclusterpp, pr_SWIFT)
+res_re <- cbind(re_ACCENSE, re_DensVM, re_flowMeans, re_FlowSOM, re_FlowSOM_meta, 
+                re_immunoClust, re_immunoClust_all, re_kmeans, re_PhenoGraph, 
+                re_Rclusterpp, re_SWIFT)
+res_F1 <- cbind(F1_ACCENSE, F1_DensVM, F1_flowMeans, F1_FlowSOM, F1_FlowSOM_meta, 
+                F1_immunoClust, F1_immunoClust_all, F1_kmeans, F1_PhenoGraph, 
+                F1_Rclusterpp, F1_SWIFT)
 
 colnames(res_pr) <- gsub("^pr_", "", colnames(res_pr))
 colnames(res_re) <- gsub("^re_", "", colnames(res_re))
@@ -72,12 +75,21 @@ dev.off()
 #########################
 
 
+# ================================
+# Number of cells per true cluster
+# ================================
+
+n_cells_truth
+
+
+
 # ========================================
 # Number of cells for each matched cluster
 # ========================================
 
 n_cells_matched <- cbind(ACCENSE = n_cells_ACCENSE, 
                          DensVM = n_cells_DensVM, 
+                         flowMeans = n_cells_flowMeans, 
                          FlowSOM = n_cells_FlowSOM, 
                          FlowSOM_meta = n_cells_FlowSOM_meta, 
                          immunoClust = n_cells_immunoClust, 
@@ -87,9 +99,7 @@ n_cells_matched <- cbind(ACCENSE = n_cells_ACCENSE,
                          Rclusterpp = n_cells_Rclusterpp, 
                          SWIFT = n_cells_SWIFT)
 
-n_cells_matched_with_truth <- cbind(manually_gated = n_cells_truth, 
-                                    n_cells_matched)
-
+n_cells_matched_with_truth <- cbind(manually_gated = n_cells_truth, n_cells_matched)
 n_cells_matched_with_truth
 
 
@@ -101,6 +111,7 @@ n_cells_matched_with_truth
 labels_matched <- cbind(manually_gated = 1:n_clus_truth, 
                         ACCENSE = labels_matched_ACCENSE, 
                         DensVM = labels_matched_DensVM, 
+                        flowMeans = labels_matched_flowMeans, 
                         FlowSOM = labels_matched_FlowSOM, 
                         FlowSOM_meta = labels_matched_FlowSOM_meta, 
                         immunoClust = labels_matched_immunoClust, 
@@ -124,6 +135,7 @@ labels_matched
 n_cells_detected <- list(manually_gated = tbl_truth, 
                          ACCENSE = tbl_ACCENSE, 
                          DensVM = tbl_DensVM, 
+                         flowMeans = tbl_flowMeans, 
                          FlowSOM = tbl_FlowSOM, 
                          FlowSOM_meta = tbl_FlowSOM_meta, 
                          immunoClust = tbl_immunoClust, 
@@ -143,6 +155,7 @@ n_cells_detected
 n_clus_detected <- rbind(manually_gated = n_clus_truth, 
                          ACCENSE = n_clus_ACCENSE, 
                          DensVM = n_clus_DensVM, 
+                         flowMeans = n_clus_flowMeans, 
                          FlowSOM = n_clus_FlowSOM, 
                          FlowSOM_meta = n_clus_FlowSOM_meta, 
                          immunoClust = n_clus_immunoClust, 
@@ -163,7 +176,7 @@ sapply(n_cells_detected, length)
 # Mean F1-score (averaged over all true clusters)
 # ===============================================
 
-n_cells_truth_matrix <- matrix(rep(n_cells_truth, 10), nrow = 14)
+n_cells_truth_matrix <- matrix(rep(n_cells_truth, 11), nrow = 14)
 n_cells_truth_matrix
 
 colSums(n_cells_truth_matrix)
