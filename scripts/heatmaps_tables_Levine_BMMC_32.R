@@ -28,13 +28,13 @@ source("load_results_Levine_BMMC_32.R")
 
 res_pr <- cbind(pr_ACCENSE, pr_DensVM, pr_flowMeans, pr_FlowSOM, pr_FlowSOM_meta, 
                 pr_immunoClust, pr_immunoClust_all, pr_kmeans, pr_PhenoGraph, 
-                pr_Rclusterpp, pr_SWIFT)
+                pr_Rclusterpp, pr_SamSPECTRAL, pr_SWIFT)
 res_re <- cbind(re_ACCENSE, re_DensVM, re_flowMeans, re_FlowSOM, re_FlowSOM_meta, 
                 re_immunoClust, re_immunoClust_all, re_kmeans, re_PhenoGraph, 
-                re_Rclusterpp, re_SWIFT)
+                re_Rclusterpp, re_SamSPECTRAL, re_SWIFT)
 res_F1 <- cbind(F1_ACCENSE, F1_DensVM, F1_flowMeans, F1_FlowSOM, F1_FlowSOM_meta, 
                 F1_immunoClust, F1_immunoClust_all, F1_kmeans, F1_PhenoGraph, 
-                F1_Rclusterpp, F1_SWIFT)
+                F1_Rclusterpp, F1_SamSPECTRAL, F1_SWIFT)
 
 colnames(res_pr) <- gsub("^pr_", "", colnames(res_pr))
 colnames(res_re) <- gsub("^re_", "", colnames(res_re))
@@ -97,6 +97,7 @@ n_cells_matched <- cbind(ACCENSE = n_cells_ACCENSE,
                          kmeans = n_cells_kmeans, 
                          PhenoGraph = n_cells_PhenoGraph, 
                          Rclusterpp = n_cells_Rclusterpp, 
+                         SamSPECTRAL = n_cells_SamSPECTRAL, 
                          SWIFT = n_cells_SWIFT)
 
 n_cells_matched_with_truth <- cbind(manually_gated = n_cells_truth, n_cells_matched)
@@ -119,6 +120,7 @@ labels_matched <- cbind(manually_gated = 1:n_clus_truth,
                         kmeans = labels_matched_kmeans, 
                         PhenoGraph = labels_matched_PhenoGraph, 
                         Rclusterpp = labels_matched_Rclusterpp, 
+                        SamSPECTRAL = labels_matched_SamSPECTRAL, 
                         SWIFT = labels_matched_SWIFT)
 labels_matched
 
@@ -143,6 +145,7 @@ n_cells_detected <- list(manually_gated = tbl_truth,
                          kmeans = tbl_kmeans, 
                          PhenoGraph = tbl_PhenoGraph, 
                          Rclusterpp = tbl_Rclusterpp, 
+                         SamSPECTRAL = tbl_SamSPECTRAL, 
                          SWIFT = tbl_SWIFT)
 n_cells_detected
 
@@ -163,6 +166,7 @@ n_clus_detected <- rbind(manually_gated = n_clus_truth,
                          kmeans = n_clus_kmeans, 
                          PhenoGraph = n_clus_PhenoGraph, 
                          Rclusterpp = n_clus_Rclusterpp, 
+                         SamSPECTRAL = n_clus_SamSPECTRAL, 
                          SWIFT = n_clus_SWIFT)
 n_clus_detected
 
@@ -176,7 +180,11 @@ sapply(n_cells_detected, length)
 # Mean F1-score (averaged over all true clusters)
 # ===============================================
 
-n_cells_truth_matrix <- matrix(rep(n_cells_truth, 11), nrow = 14)
+n_methods <- 12
+
+n_clus_truth
+
+n_cells_truth_matrix <- matrix(rep(n_cells_truth, n_methods), nrow = n_clus_truth)
 n_cells_truth_matrix
 
 colSums(n_cells_truth_matrix)
@@ -202,17 +210,5 @@ pheatmap(t(mean_F1),
          display_numbers = TRUE, fontsize_number = 13, cex = 1.5, 
          main = "Mean F1 score: Levine_BMMC_32")
 dev.off()
-
-
-
-# ==================
-# Cluster properties
-# ==================
-
-# pull out a table of average (mean? median?) values along each marker, for each detected
-# cluster as well as truth clusters
-# - how similar to the true clusters are the detected clusters? do the results make
-# sense, i.e. do the clusters correspond to known cell types?
-
 
 

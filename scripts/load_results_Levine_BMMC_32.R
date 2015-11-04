@@ -447,6 +447,45 @@ n_cells_Rclusterpp <- res_Rclusterpp$n_cells
 
 
 
+# ===================
+# SamSPECTRAL results
+# ===================
+
+# load cluster labels
+
+file_SamSPECTRAL <- "../results/Levine_BMMC_32/SamSPECTRAL/Levine_BMMC_32_SamSPECTRAL_labels.txt"
+data_SamSPECTRAL <- read.table(file_SamSPECTRAL, header = TRUE, sep = "\t")
+
+head(data_SamSPECTRAL)
+dim(data_SamSPECTRAL)
+
+clus_SamSPECTRAL <- data_SamSPECTRAL[, "label"]
+
+table(clus_SamSPECTRAL, clus_truth)  # contingency table
+
+tbl_SamSPECTRAL <- table(clus_SamSPECTRAL)  # cluster sizes
+tbl_SamSPECTRAL
+n_clus_SamSPECTRAL <- length(tbl_SamSPECTRAL)  # number of clusters
+n_clus_SamSPECTRAL
+
+# match cluster labels by highest F1 score; and calculate precision, recall, and F1 score
+
+res_SamSPECTRAL <- match_clusters_and_evaluate(clus_SamSPECTRAL, clus_truth)
+
+pr_SamSPECTRAL <- res_SamSPECTRAL$pr
+re_SamSPECTRAL <- res_SamSPECTRAL$re
+F1_SamSPECTRAL <- res_SamSPECTRAL$F1
+
+# matched cluster labels
+
+labels_matched_SamSPECTRAL <- res_SamSPECTRAL$labels_matched
+
+# number of cells per matched cluster
+
+n_cells_SamSPECTRAL <- res_SamSPECTRAL$n_cells
+
+
+
 # =============
 # SWIFT results
 # =============
