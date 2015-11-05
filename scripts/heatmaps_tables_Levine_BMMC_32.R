@@ -26,19 +26,28 @@ source("load_results_Levine_BMMC_32.R")
 # Plot heatmaps of precision, recall, and F1 score for each true cluster
 # ======================================================================
 
+res_F1 <- cbind(F1_ACCENSE, F1_DensVM, F1_flowMeans, F1_FlowSOM, F1_FlowSOM_meta, 
+                F1_immunoClust, F1_immunoClust_all, F1_kmeans, F1_PhenoGraph, 
+                F1_Rclusterpp, F1_SamSPECTRAL, F1_SWIFT)
 res_pr <- cbind(pr_ACCENSE, pr_DensVM, pr_flowMeans, pr_FlowSOM, pr_FlowSOM_meta, 
                 pr_immunoClust, pr_immunoClust_all, pr_kmeans, pr_PhenoGraph, 
                 pr_Rclusterpp, pr_SamSPECTRAL, pr_SWIFT)
 res_re <- cbind(re_ACCENSE, re_DensVM, re_flowMeans, re_FlowSOM, re_FlowSOM_meta, 
                 re_immunoClust, re_immunoClust_all, re_kmeans, re_PhenoGraph, 
                 re_Rclusterpp, re_SamSPECTRAL, re_SWIFT)
-res_F1 <- cbind(F1_ACCENSE, F1_DensVM, F1_flowMeans, F1_FlowSOM, F1_FlowSOM_meta, 
-                F1_immunoClust, F1_immunoClust_all, F1_kmeans, F1_PhenoGraph, 
-                F1_Rclusterpp, F1_SamSPECTRAL, F1_SWIFT)
 
+colnames(res_F1) <- gsub("^F1_", "", colnames(res_F1))
 colnames(res_pr) <- gsub("^pr_", "", colnames(res_pr))
 colnames(res_re) <- gsub("^re_", "", colnames(res_re))
-colnames(res_F1) <- gsub("^F1_", "", colnames(res_F1))
+
+png("../plots/heatmap_F1_Levine_BMMC_32.png", width = 1000, height = 1200)
+pheatmap(res_F1, 
+         color = colorRampPalette(brewer.pal(7, "YlGnBu"))(100), 
+         breaks = seq(0, 1, length.out = 100), 
+         cluster_rows = FALSE, cluster_cols = FALSE, 
+         display_numbers = TRUE, fontsize_number = 13, cex = 1.5, 
+         main = "F1 score: Levine_BMMC_32")
+dev.off()
 
 png("../plots/heatmap_precision_Levine_BMMC_32.png", width = 1000, height = 1200)
 pheatmap(res_pr, 
@@ -57,16 +66,6 @@ pheatmap(res_re,
          display_numbers = TRUE, fontsize_number = 13, cex = 1.5, 
          main = "recall: Levine_BMMC_32")
 dev.off()
-
-png("../plots/heatmap_F1_Levine_BMMC_32.png", width = 1000, height = 1200)
-pheatmap(res_F1, 
-         color = colorRampPalette(brewer.pal(7, "YlGnBu"))(100), 
-         breaks = seq(0, 1, length.out = 100), 
-         cluster_rows = FALSE, cluster_cols = FALSE, 
-         display_numbers = TRUE, fontsize_number = 13, cex = 1.5, 
-         main = "F1 score: Levine_BMMC_32")
-dev.off()
-
 
 
 
@@ -202,7 +201,7 @@ mean_F1
 #mean_F1
 
 
-png("../plots/heatmap_mean_F1_Levine_BMMC_32.png", width = 1000, height = 300)
+png("../plots/heatmap_F1_mean_Levine_BMMC_32.png", width = 1000, height = 300)
 pheatmap(t(mean_F1), 
          color = colorRampPalette(brewer.pal(7, "YlGnBu"))(100), 
          breaks = seq(0, 1, length.out = 100), 

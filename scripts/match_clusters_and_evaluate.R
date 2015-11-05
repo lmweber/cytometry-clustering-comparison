@@ -1,6 +1,6 @@
 #########################################################################################
-# Helper function to match cluster labels with "true" (manually gated) population labels,
-# and calculate precision, recall, and F1 score
+# Function to match cluster labels with "true" (manually gated) population labels, and
+# calculate precision, recall, and F1 score
 #
 # Lukas M. Weber, October 2015
 #########################################################################################
