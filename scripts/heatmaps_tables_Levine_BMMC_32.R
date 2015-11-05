@@ -40,32 +40,32 @@ colnames(res_F1) <- gsub("^F1_", "", colnames(res_F1))
 colnames(res_pr) <- gsub("^pr_", "", colnames(res_pr))
 colnames(res_re) <- gsub("^re_", "", colnames(res_re))
 
-png("../plots/heatmap_F1_Levine_BMMC_32.png", width = 1000, height = 1200)
 pheatmap(res_F1, 
          color = colorRampPalette(brewer.pal(7, "YlGnBu"))(100), 
          breaks = seq(0, 1, length.out = 100), 
          cluster_rows = FALSE, cluster_cols = FALSE, 
-         display_numbers = TRUE, fontsize_number = 13, cex = 1.5, 
-         main = "F1 score: Levine_BMMC_32")
-dev.off()
+         display_numbers = TRUE, 
+         main = "F1 score: Levine_BMMC_32", 
+         filename = "../plots/heatmap_F1_Levine_BMMC_32.pdf", 
+         width = 6, height = 7)
 
-png("../plots/heatmap_precision_Levine_BMMC_32.png", width = 1000, height = 1200)
 pheatmap(res_pr, 
          color = colorRampPalette(brewer.pal(7, "YlGnBu"))(100), 
          breaks = seq(0, 1, length.out = 100), 
          cluster_rows = FALSE, cluster_cols = FALSE, 
-         display_numbers = TRUE, fontsize_number = 13, cex = 1.5, 
-         main = "precision: Levine_BMMC_32")
-dev.off()
+         display_numbers = TRUE, 
+         main = "precision: Levine_BMMC_32", 
+         filename = "../plots/heatmap_precision_Levine_BMMC_32.pdf", 
+         width = 6, height = 7)
 
-png("../plots/heatmap_recall_Levine_BMMC_32.png", width = 1000, height = 1200)
 pheatmap(res_re, 
          color = colorRampPalette(brewer.pal(7, "YlGnBu"))(100), 
          breaks = seq(0, 1, length.out = 100), 
          cluster_rows = FALSE, cluster_cols = FALSE, 
-         display_numbers = TRUE, fontsize_number = 13, cex = 1.5, 
-         main = "recall: Levine_BMMC_32")
-dev.off()
+         display_numbers = TRUE, 
+         main = "recall: Levine_BMMC_32", 
+         filename = "../plots/heatmap_recall_Levine_BMMC_32.pdf", 
+         width = 6, height = 7)
 
 
 
@@ -201,13 +201,14 @@ mean_F1
 #mean_F1
 
 
-png("../plots/heatmap_F1_mean_Levine_BMMC_32.png", width = 1000, height = 300)
 pheatmap(t(mean_F1), 
          color = colorRampPalette(brewer.pal(7, "YlGnBu"))(100), 
          breaks = seq(0, 1, length.out = 100), 
          cluster_rows = FALSE, cluster_cols = FALSE, 
-         display_numbers = TRUE, fontsize_number = 13, cex = 1.5, 
-         main = "Mean F1 score: Levine_BMMC_32")
-dev.off()
+         display_numbers = TRUE, 
+         legend = FALSE, 
+         main = "Mean F1 score: Levine_BMMC_32", 
+         filename = "../plots/heatmap_F1_mean_Levine_BMMC_32.pdf", 
+         width = 6, height = 2)
 
 
