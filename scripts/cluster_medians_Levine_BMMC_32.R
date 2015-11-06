@@ -1,5 +1,6 @@
 #########################################################################################
-# R script to calculate median marker expression values for each cluster
+# R script to identify clusters: calculate median marker expression for each cluster, 
+# then use heatmaps with hierarchical clustering to compare with manual gating results
 #
 # data set "Levine_BMMC_32"
 #
@@ -15,24 +16,17 @@ library(RColorBrewer)
 
 # helper functions
 
-source("match_clusters_and_evaluate.R")
 source("calculate_cluster_medians_scaled.R")
 
+# load results from previous steps
 
-# results
-
-source("load_results_Levine_BMMC_32.R")
 source("heatmaps_tables_Levine_BMMC_32.R")
 
 
-#save.image("../current.RData")
-#load("../current.RData")
 
-
-
-############################################
-### Cluster medians along each dimension ###
-############################################
+#########################################################################################
+### Calculate cluster medians and compare each method with manually gated populations ###
+#########################################################################################
 
 
 # =======================================
@@ -52,21 +46,16 @@ length(clus_truth)
 
 medians_truth <- calculate_cluster_medians_scaled(data_medians, clus_truth)
 
+rownames(medians_truth) <- paste0("manually_gated_", rownames(medians_truth))
+
 # plot
 
-heatmap_truth <- pheatmap(medians_truth, 
-                          color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-                          cluster_rows = TRUE, cluster_cols = TRUE, 
-                          main = "Cluster medians: manually gated", 
-                          filename = "../plots/cluster_medians_truth_Levine_BMMC_32.pdf", 
-                          width = 7, height = 4.5)
-
-# extract column order from heatmap hierarchical clustering
-
-cols_order <- heatmap_truth$tree_col$order
-cols_order
-
-heatmap_truth$tree_col$labels  # alternatively use labels
+pheatmap(medians_truth, 
+         color = colorRampPalette(brewer.pal(9, "Oranges"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         main = "Cluster medians: manually gated", 
+         filename = "../plots/cluster_medians_truth_Levine_BMMC_32.pdf", 
+         width = 8, height = 4.25)
 
 
 
@@ -81,7 +70,7 @@ cols_remove <- c("file", "label", "SNEx", "SNEy", "population")
 data_medians_ACCENSE <- as.data.frame(data_ACCENSE[, -match(cols_remove, colnames(data_ACCENSE))])
 dim(data_medians_ACCENSE)
 
-colnames(data_medians_ACCENSE) <- gsub("^X\\.([A-Za-z0-9]+)\\..*$", "\\1", colnames(data_medians_ACCENSE))
+colnames(data_medians_ACCENSE) <- gsub("(^X\\.)|(\\.[A-Za-z0-9]+\\.Di$)", "", colnames(data_medians_ACCENSE))
 
 table(clus_ACCENSE)
 length(clus_ACCENSE)
@@ -90,18 +79,23 @@ length(clus_ACCENSE)
 
 medians_ACCENSE <- calculate_cluster_medians_scaled(data_medians_ACCENSE, clus_ACCENSE)
 
-# re-order columns
-
-medians_ACCENSE <- medians_ACCENSE[, cols_order]
+rownames(medians_ACCENSE) <- paste0("ACCENSE_", rownames(medians_ACCENSE))
 
 # plot
 
-pheatmap(medians_ACCENSE, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: ACCENSE", 
+data_heatmap <- rbind(medians_truth, medians_ACCENSE)
+annot_row <- data.frame(method = rep(c("manually_gated", "ACCENSE"), 
+                                     times = c(nrow(medians_truth), nrow(medians_ACCENSE))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", ACCENSE = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         main = "Cluster medians: manually gated and ACCENSE", 
          filename = "../plots/cluster_medians_ACCENSE_Levine_BMMC_32.pdf", 
-         width = 7, height = 7)
+         width = 10, height = 10)
 
 
 
@@ -128,18 +122,23 @@ length(clus_DensVM)
 
 medians_DensVM <- calculate_cluster_medians_scaled(data_medians_DensVM, clus_DensVM)
 
-# re-order columns
-
-medians_DensVM <- medians_DensVM[, cols_order]
+rownames(medians_DensVM) <- paste0("DensVM_", rownames(medians_DensVM))
 
 # plot
 
-pheatmap(medians_DensVM, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: DensVM", 
+data_heatmap <- rbind(medians_truth, medians_DensVM)
+annot_row <- data.frame(method = rep(c("manually_gated", "DensVM"), 
+                                     times = c(nrow(medians_truth), nrow(medians_DensVM))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", DensVM = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         main = "Cluster medians: manually gated and DensVM", 
          filename = "../plots/cluster_medians_DensVM_Levine_BMMC_32.pdf", 
-         width = 7, height = 3.5)
+         width = 10, height = 7)
 
 
 
@@ -156,18 +155,23 @@ length(clus_flowMeans)
 
 medians_flowMeans <- calculate_cluster_medians_scaled(data_medians, clus_flowMeans)
 
-# re-order columns
-
-medians_flowMeans <- medians_flowMeans[, cols_order]
+rownames(medians_flowMeans) <- paste0("flowMeans_", rownames(medians_flowMeans))
 
 # plot
 
-pheatmap(medians_flowMeans, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: flowMeans", 
+data_heatmap <- rbind(medians_truth, medians_flowMeans)
+annot_row <- data.frame(method = rep(c("manually_gated", "flowMeans"), 
+                                     times = c(nrow(medians_truth), nrow(medians_flowMeans))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", flowMeans = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         main = "Cluster medians: manually gated and flowMeans", 
          filename = "../plots/cluster_medians_flowMeans_Levine_BMMC_32.pdf", 
-         width = 7, height = 4.5)
+         width = 10, height = 8)
 
 
 
@@ -184,18 +188,24 @@ length(clus_FlowSOM)
 
 medians_FlowSOM <- calculate_cluster_medians_scaled(data_medians, clus_FlowSOM)
 
-# re-order columns
-
-medians_FlowSOM <- medians_FlowSOM[, cols_order]
+rownames(medians_FlowSOM) <- paste0("FlowSOM_", rownames(medians_FlowSOM))
 
 # plot
 
-pheatmap(medians_FlowSOM, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: FlowSOM", 
+data_heatmap <- rbind(medians_truth, medians_FlowSOM)
+annot_row <- data.frame(method = rep(c("manually_gated", "FlowSOM"), 
+                                     times = c(nrow(medians_truth), nrow(medians_FlowSOM))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", FlowSOM = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         fontsize_row = 7, 
+         main = "Cluster medians: manually gated and FlowSOM", 
          filename = "../plots/cluster_medians_FlowSOM_Levine_BMMC_32.pdf", 
-         width = 7, height = 12)
+         width = 10, height = 14)
 
 
 
@@ -212,18 +222,23 @@ length(clus_FlowSOM_meta)
 
 medians_FlowSOM_meta <- calculate_cluster_medians_scaled(data_medians, clus_FlowSOM_meta)
 
-# re-order columns
-
-medians_FlowSOM_meta <- medians_FlowSOM_meta[, cols_order]
+rownames(medians_FlowSOM_meta) <- paste0("FlowSOM_meta_", rownames(medians_FlowSOM_meta))
 
 # plot
 
-pheatmap(medians_FlowSOM_meta, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: FlowSOM_meta", 
+data_heatmap <- rbind(medians_truth, medians_FlowSOM_meta)
+annot_row <- data.frame(method = rep(c("manually_gated", "FlowSOM_meta"), 
+                                     times = c(nrow(medians_truth), nrow(medians_FlowSOM_meta))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", FlowSOM_meta = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         main = "Cluster medians: manually gated and FlowSOM_meta", 
          filename = "../plots/cluster_medians_FlowSOM_meta_Levine_BMMC_32.pdf", 
-         width = 7, height = 5)
+         width = 10, height = 8)
 
 
 
@@ -240,18 +255,24 @@ length(clus_immunoClust)
 
 medians_immunoClust <- calculate_cluster_medians_scaled(data_medians, clus_immunoClust)
 
-# re-order columns
-
-medians_immunoClust <- medians_immunoClust[, cols_order]
+rownames(medians_immunoClust) <- paste0("immunoClust_", rownames(medians_immunoClust))
 
 # plot
 
-pheatmap(medians_immunoClust, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: immunoClust", 
+data_heatmap <- rbind(medians_truth, medians_immunoClust)
+annot_row <- data.frame(method = rep(c("manually_gated", "immunoClust"), 
+                                     times = c(nrow(medians_truth), nrow(medians_immunoClust))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", immunoClust = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         fontsize_row = 8, 
+         main = "Cluster medians: manually gated and immunoClust", 
          filename = "../plots/cluster_medians_immunoClust_Levine_BMMC_32.pdf", 
-         width = 7, height = 10)
+         width = 10, height = 14)
 
 
 
@@ -268,18 +289,24 @@ length(clus_immunoClust_all)
 
 medians_immunoClust_all <- calculate_cluster_medians_scaled(data_medians, clus_immunoClust_all)
 
-# re-order columns
-
-medians_immunoClust_all <- medians_immunoClust_all[, cols_order]
+rownames(medians_immunoClust_all) <- paste0("immunoClust_all_", rownames(medians_immunoClust_all))
 
 # plot
 
-pheatmap(medians_immunoClust_all, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: immunoClust_all", 
+data_heatmap <- rbind(medians_truth, medians_immunoClust_all)
+annot_row <- data.frame(method = rep(c("manually_gated", "immunoClust_all"), 
+                                     times = c(nrow(medians_truth), nrow(medians_immunoClust_all))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", immunoClust_all = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         fontsize_row = 8, 
+         main = "Cluster medians: manually gated and immunoClust_all", 
          filename = "../plots/cluster_medians_immunoClust_all_Levine_BMMC_32.pdf", 
-         width = 7, height = 10)
+         width = 10, height = 14)
 
 
 
@@ -296,18 +323,23 @@ length(clus_kmeans)
 
 medians_kmeans <- calculate_cluster_medians_scaled(data_medians, clus_kmeans)
 
-# re-order columns
-
-medians_kmeans <- medians_kmeans[, cols_order]
+rownames(medians_kmeans) <- paste0("kmeans_", rownames(medians_kmeans))
 
 # plot
 
-pheatmap(medians_kmeans, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: kmeans", 
+data_heatmap <- rbind(medians_truth, medians_kmeans)
+annot_row <- data.frame(method = rep(c("manually_gated", "kmeans"), 
+                                     times = c(nrow(medians_truth), nrow(medians_kmeans))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", kmeans = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         main = "Cluster medians: manually gated and kmeans", 
          filename = "../plots/cluster_medians_kmeans_Levine_BMMC_32.pdf", 
-         width = 7, height = 4)
+         width = 10, height = 8)
 
 
 
@@ -324,18 +356,23 @@ length(clus_PhenoGraph)
 
 medians_PhenoGraph <- calculate_cluster_medians_scaled(data_medians, clus_PhenoGraph)
 
-# re-order columns
-
-medians_PhenoGraph <- medians_PhenoGraph[, cols_order]
+rownames(medians_PhenoGraph) <- paste0("PhenoGraph_", rownames(medians_PhenoGraph))
 
 # plot
 
-pheatmap(medians_PhenoGraph, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: PhenoGraph", 
+data_heatmap <- rbind(medians_truth, medians_PhenoGraph)
+annot_row <- data.frame(method = rep(c("manually_gated", "PhenoGraph"), 
+                                     times = c(nrow(medians_truth), nrow(medians_PhenoGraph))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", PhenoGraph = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         main = "Cluster medians: manually gated and PhenoGraph", 
          filename = "../plots/cluster_medians_PhenoGraph_Levine_BMMC_32.pdf", 
-         width = 7, height = 5)
+         width = 10, height = 8.5)
 
 
 
@@ -352,18 +389,23 @@ length(clus_Rclusterpp)
 
 medians_Rclusterpp <- calculate_cluster_medians_scaled(data_medians, clus_Rclusterpp)
 
-# re-order columns
-
-medians_Rclusterpp <- medians_Rclusterpp[, cols_order]
+rownames(medians_Rclusterpp) <- paste0("Rclusterpp_", rownames(medians_Rclusterpp))
 
 # plot
 
-pheatmap(medians_Rclusterpp, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: Rclusterpp", 
+data_heatmap <- rbind(medians_truth, medians_Rclusterpp)
+annot_row <- data.frame(method = rep(c("manually_gated", "Rclusterpp"), 
+                                     times = c(nrow(medians_truth), nrow(medians_Rclusterpp))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", Rclusterpp = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         main = "Cluster medians: manually gated and Rclusterpp", 
          filename = "../plots/cluster_medians_Rclusterpp_Levine_BMMC_32.pdf", 
-         width = 7, height = 5)
+         width = 10, height = 8)
 
 
 
@@ -380,18 +422,23 @@ length(clus_SamSPECTRAL)
 
 medians_SamSPECTRAL <- calculate_cluster_medians_scaled(data_medians, clus_SamSPECTRAL)
 
-# re-order columns
-
-medians_SamSPECTRAL <- medians_SamSPECTRAL[, cols_order]
+rownames(medians_SamSPECTRAL) <- paste0("SamSPECTRAL_", rownames(medians_SamSPECTRAL))
 
 # plot
 
-pheatmap(medians_SamSPECTRAL, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         main = "Cluster medians: SamSPECTRAL", 
+data_heatmap <- rbind(medians_truth, medians_SamSPECTRAL)
+annot_row <- data.frame(method = rep(c("manually_gated", "SamSPECTRAL"), 
+                                     times = c(nrow(medians_truth), nrow(medians_SamSPECTRAL))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", SamSPECTRAL = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         main = "Cluster medians: manually gated and SamSPECTRAL", 
          filename = "../plots/cluster_medians_SamSPECTRAL_Levine_BMMC_32.pdf", 
-         width = 7, height = 3)
+         width = 10, height = 6.5)
 
 
 
@@ -408,18 +455,23 @@ length(clus_SWIFT)
 
 medians_SWIFT <- calculate_cluster_medians_scaled(data_medians, clus_SWIFT)
 
-# re-order columns
-
-medians_SWIFT <- medians_SWIFT[, cols_order]
+rownames(medians_SWIFT) <- paste0("SWIFT_", rownames(medians_SWIFT))
 
 # plot
 
-pheatmap(medians_SWIFT, 
-         color = colorRampPalette(brewer.pal(7, "YlGn"))(100), 
-         cluster_rows = TRUE, cluster_cols = FALSE,  # note no column clustering
-         labels_row = rep("", nrow(medians_SWIFT)), 
-         main = "Cluster medians: SWIFT", 
+data_heatmap <- rbind(medians_truth, medians_SWIFT)
+annot_row <- data.frame(method = rep(c("manually_gated", "SWIFT"), 
+                                     times = c(nrow(medians_truth), nrow(medians_SWIFT))))
+rownames(annot_row) <- rownames(data_heatmap)
+annot_colors <- list(method = c(manually_gated = "red", SWIFT = "blue"))
+
+pheatmap(data_heatmap, 
+         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
+         cluster_rows = TRUE, cluster_cols = TRUE, 
+         annotation_row = annot_row, annotation_colors = annot_colors, 
+         fontsize_row = 2, 
+         main = "Cluster medians: manually gated and SWIFT", 
          filename = "../plots/cluster_medians_SWIFT_Levine_BMMC_32.pdf", 
-         width = 7, height = 12)
+         width = 10, height = 14)
 
 

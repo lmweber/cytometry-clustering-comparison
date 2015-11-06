@@ -11,7 +11,12 @@ library(flowCore)
 library(pheatmap)
 library(RColorBrewer)
 
+
+# helper functions
+
 source("match_clusters_and_evaluate.R")
+
+# load results from previous steps
 
 source("load_results_Levine_BMMC_32.R")
 
