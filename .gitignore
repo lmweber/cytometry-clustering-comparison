@@ -1,13 +1,11 @@
 **/.DS_Store
 **/._*
 
+**/archive/**
+
 C1omics_abstract/**
-data/**
-exploratory_work/**
 paper/**
 plots/**
-raw_data/**
 results/**
 
-**/archive/**
-**/*.RData
+**/.RData

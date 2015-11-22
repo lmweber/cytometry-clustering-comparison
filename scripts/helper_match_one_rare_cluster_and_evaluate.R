@@ -1,0 +1,67 @@
+#########################################################################################
+# Function to match cluster label for a single rare cluster, and calculate precision,
+# recall, and F1 score
+#
+# Lukas M. Weber, October 2015
+#########################################################################################
+
+
+# arguments:
+# - clus_algorithm: cluster labels from algorithm
+# - clus_truth: true cluster labels (1 = rare cluster of interest, 0 = all others)
+# (for both arguments: length = number of cells; names = cluster labels (integers))
+helper_match_one_rare_cluster_and_evaluate <- function(clus_algorithm, clus_truth) {
+  
+  tbl_algorithm <- table(clus_algorithm)
+  tbl_truth <- table(clus_truth)
+  
+  pr_mat <- re_mat <- F1_mat <- matrix(NA, nrow = length(tbl_algorithm), ncol = 1)
+  
+  for (i in 1:length(tbl_algorithm)) {
+    i_int <- as.integer(names(tbl_algorithm))[i]  # cluster number from algorithm
+    
+    j_int <- 1  # true cluster number of the rare population of interest
+    
+    true_positives <- sum(clus_algorithm == i_int & clus_truth == j_int, na.rm = TRUE)
+    detected <- sum(clus_algorithm == i_int, na.rm = TRUE)
+    truth <- sum(clus_truth == j_int, na.rm = TRUE)
+    
+    # calculate precision, recall, and F1 score
+    
+    precision_ij <- true_positives / detected
+    recall_ij <- true_positives / truth
+    F1_ij <- 2 * (precision_ij * recall_ij) / (precision_ij + recall_ij)
+    
+    if (F1_ij == "NaN") F1_ij <- 0
+    
+    pr_mat[i, j_int] <- precision_ij
+    re_mat[i, j_int] <- recall_ij
+    F1_mat[i, j_int] <- F1_ij
+  }
+  
+  # put back cluster labels
+  
+  rownames(pr_mat) <- rownames(re_mat) <- rownames(F1_mat) <- names(tbl_algorithm)
+  colnames(pr_mat) <- colnames(re_mat) <- colnames(F1_mat) <- "1"  # one column only
+  
+  # match labels using highest F1 score (note duplicates are allowed)
+  
+  labels_matched <- apply(F1_mat, 2, which.max)
+  
+  # precision, recall, F1 score, and number of cells for each matched cluster
+  
+  pr <- re <- F1 <- n_cells_matched <- rep(NA, ncol(F1_mat))
+  names(pr) <- names(re) <- names(F1) <- names(n_cells_matched) <- names(labels_matched)
+  
+  for (i in 1:ncol(F1_mat)) {
+    pr[i] <- pr_mat[labels_matched[i], as.integer(names(labels_matched[i]))]
+    re[i] <- re_mat[labels_matched[i], as.integer(names(labels_matched[i]))]
+    F1[i] <- F1_mat[labels_matched[i], as.integer(names(labels_matched[i]))]
+    
+    n_cells_matched[i] <- sum(clus_algorithm == labels_matched[i], na.rm = TRUE)
+  }
+  
+  return(list(pr = pr, re = re, F1 = F1, 
+              labels_matched = labels_matched, n_cells_matched = n_cells_matched))
+}
+

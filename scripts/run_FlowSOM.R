@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run FlowSOM and FlowSOM_meta
 #
-# Lukas M. Weber, October 2015
+# Lukas M. Weber, November 2015
 #########################################################################################
 
 
@@ -9,84 +9,201 @@ library(flowCore)
 library(FlowSOM)
 
 
-# load data
 
-file <- "../data/Levine_BMMC_32/Levine_BMMC_32.fcs"
-data <- flowCore::read.FCS(file, transformation = FALSE)  # needs to be a flowFrame object
+#################
+### LOAD DATA ###
+#################
 
-head(data)
-dim(data)
+DATA_DIR <- "../../benchmark_data_sets"
 
-marker_cols <- (1:ncol(data))[-grep("label", colnames(data))]  # columns to use to calculate SOM
+file_Levine <- file.path(DATA_DIR, "Levine_2015_marrow_32/data/Levine_2015_marrow_32.fcs")
+file_Mosmann <- file.path(DATA_DIR, "Mosmann_2014_rare/data/Mosmann_2014_rare.fcs")
 
+# FlowSOM requires input data as flowFrame objects
+
+data_Levine <- flowCore::read.FCS(file_Levine, transformation = FALSE)
+data_Mosmann <- flowCore::read.FCS(file_Mosmann, transformation = FALSE)
+
+head(data_Levine)
+head(data_Mosmann)
+
+dim(data_Levine)
+dim(data_Mosmann)
+
+# indices of protein marker columns
+
+marker_cols_Levine <- 5:36
+marker_cols_Mosmann <- 7:21
+
+length(marker_cols_Levine)
+length(marker_cols_Mosmann)
+
+
+
+###################
+### Run FlowSOM ###
+###################
 
 # run FlowSOM
 
 set.seed(123)
+runtime_FlowSOM_Levine <- system.time({
+  fSOM_Levine <- FlowSOM::ReadInput(data_Levine, transform = FALSE, scale = FALSE)
+  fSOM_Levine <- FlowSOM::BuildSOM(fSOM_Levine, colsToUse = marker_cols_Levine)
+  fSOM_Levine <- FlowSOM::BuildMST(fSOM_Levine)
+})
 
-system.time(
-fSOM <- FlowSOM::ReadInput(data, transform = FALSE, scale = FALSE, silent = FALSE)
-)
+set.seed(123)
+runtime_FlowSOM_Mosmann <- system.time({
+  fSOM_Mosmann <- FlowSOM::ReadInput(data_Mosmann, transform = FALSE, scale = FALSE)
+  fSOM_Mosmann <- FlowSOM::BuildSOM(fSOM_Mosmann, colsToUse = marker_cols_Mosmann)
+  fSOM_Mosmann <- FlowSOM::BuildMST(fSOM_Mosmann)
+})
 
-system.time(
-fSOM <- FlowSOM::BuildSOM(fSOM, colsToUse = marker_cols)  # very fast
-)
+# plots
 
-system.time(
-fSOM <- FlowSOM::BuildMST(fSOM)
-)
-
-FlowSOM::PlotStars(fSOM)
-
+FlowSOM::PlotStars(fSOM_Levine)
+FlowSOM::PlotStars(fSOM_Mosmann)
 
 # extract cluster labels
 
-str(fSOM$map)
+str(fSOM_Levine$map)
 
-head(fSOM$map$mapping)
-dim(fSOM$map$mapping)
+head(fSOM_Levine$map$mapping)
+dim(fSOM_Levine$map$mapping)
 
-clus_FlowSOM <- fSOM$map$mapping[, 1]  # cluster labels
+clus_FlowSOM_Levine <- fSOM_Levine$map$mapping[, 1]
+clus_FlowSOM_Mosmann <- fSOM_Mosmann$map$mapping[, 1]
 
-length(clus_FlowSOM)
+length(clus_FlowSOM_Levine)
+length(clus_FlowSOM_Mosmann)
 
-table(clus_FlowSOM)
-length(table(clus_FlowSOM))  # number of clusters
+# cluster sizes and number of clusters
 
+table(clus_FlowSOM_Levine)
+table(clus_FlowSOM_Mosmann)
 
-# optional metaclustering step ("FlowSOM_meta")
-
-k <- 20  # number of clusters
-
-system.time(
-meta_clustering <- FlowSOM::metaClustering_consensus(fSOM$map$codes, k = k)
-)
-
-# alternatively: select number of clusters automatically (does not perform well)
-#system.time(
-#meta_clustering <- FlowSOM::MetaClustering(fSOM$map$codes, 
-#                                           method = "metaClustering_consensus", max = 30)
-#)
-
-meta_clustering
-meta_clustering_per_cell <- meta_clustering[fSOM$map$mapping[, 1]]
-clus_FlowSOM_meta <- meta_clustering_per_cell
-
-length(clus_FlowSOM_meta)
-
-table(clus_FlowSOM_meta)
-length(table(clus_FlowSOM_meta))  # number of clusters
+length(table(clus_FlowSOM_Levine))
+length(table(clus_FlowSOM_Mosmann))
 
 
-# save files
 
-res_FlowSOM <- data.frame(label = clus_FlowSOM)
+########################
+### Run FlowSOM_meta ###
+########################
 
-write.table(data.frame(label = clus_FlowSOM), 
-            file = "../results/Levine_BMMC_32/FlowSOM/Levine_BMMC_32_FlowSOM_labels.txt", 
+# run optional metaclustering step (FlowSOM_meta)
+
+# set number of clusters
+k_Levine <- 20
+k_Mosmann <- 50
+
+set.seed(123)
+runtime_FlowSOM_meta_Levine <- system.time({
+  meta_clustering_Levine <- FlowSOM::metaClustering_consensus(fSOM_Levine$map$codes, k = k_Levine)
+})
+
+set.seed(123)
+runtime_FlowSOM_meta_Mosmann <- system.time({
+  meta_clustering_Mosmann <- FlowSOM::metaClustering_consensus(fSOM_Mosmann$map$codes, k = k_Mosmann)
+})
+
+
+# alternatively: set number of clusters automatically (does not perform well)
+
+# set.seed(123)
+# runtime_FlowSOM_meta_Levine <- system.time({
+#   meta_clustering_Levine <- FlowSOM::MetaClustering(fSOM_Levine$map$codes, 
+#                                                     method = "metaClustering_consensus", 
+#                                                     max = 50)
+# })
+# 
+# set.seed(123)
+# runtime_FlowSOM_meta_Mosmann <- system.time({
+#   meta_clustering_Mosmann <- FlowSOM::MetaClustering(fSOM_Mosmann$map$codes, 
+#                                                     method = "metaClustering_consensus", 
+#                                                     max = 50)
+# })
+
+
+# combine runtime
+
+runtime_FlowSOM_meta_Levine <- runtime_FlowSOM_Levine + runtime_FlowSOM_meta_Levine
+runtime_FlowSOM_meta_Mosmann <- runtime_FlowSOM_Mosmann + runtime_FlowSOM_meta_Mosmann
+
+# extract cluster labels
+
+meta_clustering_Levine
+meta_clustering_Mosmann
+
+clus_FlowSOM_meta_Levine <- meta_clustering_Levine[fSOM_Levine$map$mapping[, 1]]
+clus_FlowSOM_meta_Mosmann <- meta_clustering_Mosmann[fSOM_Mosmann$map$mapping[, 1]]
+
+length(clus_FlowSOM_meta_Levine)
+length(clus_FlowSOM_meta_Mosmann)
+
+# cluster sizes and number of clusters
+
+table(clus_FlowSOM_meta_Levine)
+table(clus_FlowSOM_meta_Mosmann)
+
+length(table(clus_FlowSOM_meta_Levine))
+length(table(clus_FlowSOM_meta_Mosmann))
+
+
+
+####################
+### SAVE RESULTS ###
+####################
+
+# save cluster labels
+
+res_FlowSOM_Levine <- data.frame(label = clus_FlowSOM_Levine)
+res_FlowSOM_Mosmann <- data.frame(label = clus_FlowSOM_Mosmann)
+
+res_FlowSOM_meta_Levine <- data.frame(label = clus_FlowSOM_meta_Levine)
+res_FlowSOM_meta_Mosmann <- data.frame(label = clus_FlowSOM_meta_Mosmann)
+
+
+write.table(res_FlowSOM_Levine, 
+            file = "../results/FlowSOM/FlowSOM_labels_Levine_2015_marrow_32.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_Mosmann, 
+            file = "../results/FlowSOM/FlowSOM_labels_Mosmann_2014_rare.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-write.table(data.frame(label = clus_FlowSOM_meta), 
-            file = "../results/Levine_BMMC_32/FlowSOM_meta/Levine_BMMC_32_FlowSOM_meta_labels.txt", 
+write.table(res_FlowSOM_meta_Levine, 
+            file = "../results/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_32.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_meta_Mosmann, 
+            file = "../results/FlowSOM_meta/FlowSOM_meta_labels_Mosmann_2014_rare.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+
+
+# save runtime
+
+runtime_FlowSOM <- t(data.frame(
+  Levine_2015_marrow_32 = runtime_FlowSOM_Levine["elapsed"], 
+  Mosmann_2014_rare = runtime_FlowSOM_Mosmann["elapsed"], 
+  row.names = "runtime"))
+
+runtime_FlowSOM_meta <- t(data.frame(
+  Levine_2015_marrow_32 = runtime_FlowSOM_meta_Levine["elapsed"], 
+  Mosmann_2014_rare = runtime_FlowSOM_meta_Mosmann["elapsed"], 
+  row.names = "runtime"))
+
+write.table(runtime_FlowSOM, file = "../results/runtime/runtime_FlowSOM.txt", quote = FALSE, sep = "\t")
+
+write.table(runtime_FlowSOM_meta, file = "../results/runtime/runtime_FlowSOM_meta.txt", quote = FALSE, sep = "\t")
+
+# save session information
+
+sink(file = "../results/session_info/FlowSOM_and_FlowSOM_meta_session_info.txt")
+sessionInfo()
+sink()
+
+# save R objects
+
+save.image(file = "../results/RData_files/FlowSOM_and_FlowSOM_meta_results.RData")
+
 

@@ -10,7 +10,7 @@
 # - clus_algorithm: cluster labels from algorithm
 # - clus_truth: true cluster labels
 # (for both arguments: length = number of cells; names = cluster labels (integers))
-match_clusters_and_evaluate <- function(clus_algorithm, clus_truth) {
+helper_match_clusters_and_evaluate <- function(clus_algorithm, clus_truth) {
   
   tbl_algorithm <- table(clus_algorithm)
   tbl_truth <- table(clus_truth)
@@ -62,7 +62,7 @@ match_clusters_and_evaluate <- function(clus_algorithm, clus_truth) {
     n_cells_matched[i] <- sum(clus_algorithm == labels_matched[i], na.rm = TRUE)
   }
   
-  return(list(labels_matched = labels_matched, n_cells_matched = n_cells_matched, 
-              pr = pr, re = re, F1 = F1))
+  return(list(pr = pr, re = re, F1 = F1, 
+              labels_matched = labels_matched, n_cells_matched = n_cells_matched))
 }
 
