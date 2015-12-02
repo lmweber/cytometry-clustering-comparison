@@ -212,8 +212,8 @@ ggsave("../plots/Levine_2015_marrow_32/results_number_of_cells_Levine2015marrow3
 
 ggplot(n_cells_truth_Levine_13_tidy, aes(x = population, y = value)) + 
   geom_bar(stat = "identity", fill = "darkgray") + 
-  geom_text(aes(label = value, y = value + 700, angle = 90), size = 3.5) + 
-  ylim(0, 15000) + 
+  geom_text(aes(label = value, y = value + 1300, angle = 90), size = 3.5) + 
+  ylim(0, 28000) + 
   xlab("manually gated population") + 
   ylab("number of cells") + 
   ggtitle("Manually gated populations: Levine_2015_marrow_13") + 
