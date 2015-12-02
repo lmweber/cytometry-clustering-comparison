@@ -2,7 +2,7 @@
 # Function to match cluster labels with "true" (manually gated) population labels, and
 # calculate precision, recall, and F1 score
 #
-# Lukas M. Weber, October 2015
+# Lukas M. Weber, December 2015
 #########################################################################################
 
 
@@ -55,9 +55,10 @@ helper_match_clusters_and_evaluate <- function(clus_algorithm, clus_truth) {
   names(pr) <- names(re) <- names(F1) <- names(n_cells_matched) <- names(labels_matched)
   
   for (i in 1:ncol(F1_mat)) {
-    pr[i] <- pr_mat[labels_matched[i], as.integer(names(labels_matched[i]))]
-    re[i] <- re_mat[labels_matched[i], as.integer(names(labels_matched[i]))]
-    F1[i] <- F1_mat[labels_matched[i], as.integer(names(labels_matched[i]))]
+    # use character names for column indices in case subsampling completely removes some true clusters
+    pr[i] <- pr_mat[labels_matched[i], names(labels_matched[i])]
+    re[i] <- re_mat[labels_matched[i], names(labels_matched[i])]
+    F1[i] <- F1_mat[labels_matched[i], names(labels_matched[i])]
     
     n_cells_matched[i] <- sum(clus_algorithm == labels_matched[i], na.rm = TRUE)
   }

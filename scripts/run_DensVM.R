@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run DensVM (cytofkit R/Bioconductor package)
 #
-# Lukas M. Weber, November 2015
+# Lukas M. Weber, December 2015
 #########################################################################################
 
 
@@ -22,42 +22,52 @@ INIT_DIR <- getwd()
 
 DATA_DIR <- "../../benchmark_data_sets"
 
-file_Levine <- file.path(DATA_DIR, "Levine_2015_marrow_32/data/Levine_2015_marrow_32_notransf.fcs")
-file_Mosmann <- file.path(DATA_DIR, "Mosmann_2014_rare/data/Mosmann_2014_rare_notransf.fcs")
+file_Levine_32 <- file.path(DATA_DIR, "Levine_2015_marrow_32/data/Levine_2015_marrow_32_notransform.fcs")
+file_Levine_13 <- file.path(DATA_DIR, "Levine_2015_marrow_13/data/Levine_2015_marrow_13_notransform.fcs")
+file_Mosmann <- file.path(DATA_DIR, "Mosmann_2014_rare/data/Mosmann_2014_rare_notransform.fcs")
 
-data_Levine <- flowCore::read.FCS(file_Levine, transformation = FALSE)
+data_Levine_32 <- flowCore::read.FCS(file_Levine_32, transformation = FALSE)
+data_Levine_13 <- flowCore::read.FCS(file_Levine_13, transformation = FALSE)
 data_Mosmann <- flowCore::read.FCS(file_Mosmann, transformation = FALSE)
 
-head(data_Levine)
+head(data_Levine_32)
+head(data_Levine_13)
 head(data_Mosmann)
 
-dim(data_Levine)
+dim(data_Levine_32)
+dim(data_Levine_13)
 dim(data_Mosmann)
 
 # note DensVM also requires a copy of the input FCS file in the output directory
 
-out_dir_Levine <- "../results/DensVM/Levine_2015_marrow_32"
+out_dir_Levine_32 <- "../results/DensVM/Levine_2015_marrow_32"
+out_dir_Levine_13 <- "../results/DensVM/Levine_2015_marrow_13"
 out_dir_Mosmann <- "../results/DensVM/Mosmann_2014_rare"
 
 # indices of protein marker columns
 
-marker_cols_Levine <- 5:36
+marker_cols_Levine_32 <- 5:36
+marker_cols_Levine_13 <- 1:13
 marker_cols_Mosmann <- 7:21
 
-length(marker_cols_Levine)
+length(marker_cols_Levine_32)
+length(marker_cols_Levine_13)
 length(marker_cols_Mosmann)
 
 # select parameters (protein names) for DensVM
 
-para_Levine <- colnames(data_Levine)[marker_cols_Levine]
+para_Levine_32 <- colnames(data_Levine_32)[marker_cols_Levine_32]
+para_Levine_13 <- colnames(data_Levine_13)[marker_cols_Levine_13]
 para_Mosmann <- colnames(data_Mosmann)[marker_cols_Mosmann]
 
-length(para_Levine)
+length(para_Levine_32)
+length(para_Levine_13)
 length(para_Mosmann)
 
 # number of points to subsample
 
-n_sub_Levine <- 20000
+n_sub_Levine_32 <- 20000
+n_sub_Levine_13 <- 20000
 n_sub_Mosmann <- 20000
 
 
@@ -72,9 +82,17 @@ n_sub_Mosmann <- 20000
 # results will be saved to files in the output directories
 
 set.seed(123)
-runtime_Levine <- system.time({
-  cytofkit::cytof_tsne_densvm(fcsFile = file_Levine, resDir = out_dir_Levine, 
-                              para = para_Levine, fixedNum = n_sub_Levine, verbose = TRUE)
+runtime_Levine_32 <- system.time({
+  cytofkit::cytof_tsne_densvm(fcsFile = file_Levine_32, resDir = out_dir_Levine_32, 
+                              para = para_Levine_32, fixedNum = n_sub_Levine_32, verbose = TRUE)
+})
+setwd(INIT_DIR)  # reset working directory
+
+
+set.seed(123)
+runtime_Levine_13 <- system.time({
+  cytofkit::cytof_tsne_densvm(fcsFile = file_Levine_13, resDir = out_dir_Levine_13, 
+                              para = para_Levine_13, fixedNum = n_sub_Levine_13, verbose = TRUE)
 })
 setwd(INIT_DIR)  # reset working directory
 
@@ -95,7 +113,8 @@ setwd(INIT_DIR)  # reset working directory
 # save runtime
 
 runtime_DensVM <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_Levine["elapsed"], 
+  Levine_2015_marrow_32 = runtime_Levine_32["elapsed"], 
+  Levine_2015_marrow_13 = runtime_Levine_13["elapsed"], 
   Mosmann_2014_rare = runtime_Mosmann["elapsed"], 
   row.names = "runtime"))
 

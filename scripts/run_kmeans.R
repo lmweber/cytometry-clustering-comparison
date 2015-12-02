@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run k-means
 #
-# Lukas M. Weber, November 2015
+# Lukas M. Weber, December 2015
 #########################################################################################
 
 
@@ -15,32 +15,40 @@ library(flowCore)
 
 DATA_DIR <- "../../benchmark_data_sets"
 
-file_Levine <- file.path(DATA_DIR, "Levine_2015_marrow_32/data/Levine_2015_marrow_32.fcs")
+file_Levine_32 <- file.path(DATA_DIR, "Levine_2015_marrow_32/data/Levine_2015_marrow_32.fcs")
+file_Levine_13 <- file.path(DATA_DIR, "Levine_2015_marrow_13/data/Levine_2015_marrow_13.fcs")
 file_Mosmann <- file.path(DATA_DIR, "Mosmann_2014_rare/data/Mosmann_2014_rare.fcs")
 
-data_Levine <- flowCore::exprs(flowCore::read.FCS(file_Levine, transformation = FALSE))
+data_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_Levine_32, transformation = FALSE))
+data_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_Levine_13, transformation = FALSE))
 data_Mosmann <- flowCore::exprs(flowCore::read.FCS(file_Mosmann, transformation = FALSE))
 
-head(data_Levine)
+head(data_Levine_32)
+head(data_Levine_13)
 head(data_Mosmann)
 
-dim(data_Levine)
+dim(data_Levine_32)
+dim(data_Levine_13)
 dim(data_Mosmann)
 
 # indices of protein marker columns
 
-marker_cols_Levine <- 5:36
+marker_cols_Levine_32 <- 5:36
+marker_cols_Levine_13 <- 1:13
 marker_cols_Mosmann <- 7:21
 
-length(marker_cols_Levine)
+length(marker_cols_Levine_32)
+length(marker_cols_Levine_13)
 length(marker_cols_Mosmann)
 
 # subset data
 
-data_Levine <- data_Levine[, marker_cols_Levine]
+data_Levine_32 <- data_Levine_32[, marker_cols_Levine_32]
+data_Levine_13 <- data_Levine_13[, marker_cols_Levine_13]
 data_Mosmann <- data_Mosmann[, marker_cols_Mosmann]
 
-dim(data_Levine)
+dim(data_Levine_32)
+dim(data_Levine_13)
 dim(data_Mosmann)
 
 
@@ -51,7 +59,8 @@ dim(data_Mosmann)
 
 # number of clusters
 
-k_Levine <- 20
+k_Levine_32 <- 20
+k_Levine_13 <- 30
 k_Mosmann <- 50
 
 
@@ -59,8 +68,13 @@ k_Mosmann <- 50
 # note: does not converge for some random seeds
 
 set.seed(1234)
-runtime_Levine <- system.time({
-  out_kmeans_Levine <- kmeans(data_Levine, k_Levine)
+runtime_Levine_32 <- system.time({
+  out_kmeans_Levine_32 <- kmeans(data_Levine_32, k_Levine_32)
+})
+
+set.seed(1234)
+runtime_Levine_13 <- system.time({
+  out_kmeans_Levine_13 <- kmeans(data_Levine_13, k_Levine_13)
 })
 
 set.seed(1000)
@@ -71,19 +85,23 @@ runtime_Mosmann <- system.time({
 
 # extract cluster labels
 
-clus_kmeans_Levine <- out_kmeans_Levine$cluster
+clus_kmeans_Levine_32 <- out_kmeans_Levine_32$cluster
+clus_kmeans_Levine_13 <- out_kmeans_Levine_13$cluster
 clus_kmeans_Mosmann <- out_kmeans_Mosmann$cluster
 
-length(clus_kmeans_Levine)
+length(clus_kmeans_Levine_32)
+length(clus_kmeans_Levine_13)
 length(clus_kmeans_Mosmann)
 
 
 # cluster sizes and number of clusters
 
-table(clus_kmeans_Levine)
+table(clus_kmeans_Levine_32)
+table(clus_kmeans_Levine_13)
 table(clus_kmeans_Mosmann)
 
-length(table(clus_kmeans_Levine))
+length(table(clus_kmeans_Levine_32))
+length(table(clus_kmeans_Levine_13))
 length(table(clus_kmeans_Mosmann))
 
 
@@ -94,11 +112,15 @@ length(table(clus_kmeans_Mosmann))
 
 # save cluster labels
 
-res_kmeans_Levine <- data.frame(label = clus_kmeans_Levine)
+res_kmeans_Levine_32 <- data.frame(label = clus_kmeans_Levine_32)
+res_kmeans_Levine_13 <- data.frame(label = clus_kmeans_Levine_13)
 res_kmeans_Mosmann <- data.frame(label = clus_kmeans_Mosmann)
 
-write.table(res_kmeans_Levine, 
+write.table(res_kmeans_Levine_32, 
             file = "../results/kmeans/kmeans_labels_Levine_2015_marrow_32.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_kmeans_Levine_13, 
+            file = "../results/kmeans/kmeans_labels_Levine_2015_marrow_13.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_kmeans_Mosmann, 
             file = "../results/kmeans/kmeans_labels_Mosmann_2014_rare.txt", 
@@ -108,7 +130,8 @@ write.table(res_kmeans_Mosmann,
 # save runtime
 
 runtime_kmeans <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_Levine["elapsed"], 
+  Levine_2015_marrow_32 = runtime_Levine_32["elapsed"], 
+  Levine_2015_marrow_13 = runtime_Levine_13["elapsed"], 
   Mosmann_2014_rare = runtime_Mosmann["elapsed"], 
   row.names = "runtime"))
 
