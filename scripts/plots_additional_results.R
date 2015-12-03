@@ -103,12 +103,12 @@ titles_Levine_13 <- c("F1 score by true cluster size: Levine_2015_marrow_13",
                       "Precision by true cluster size: Levine_2015_marrow_13", 
                       "Recall by true cluster size: Levine_2015_marrow_13")
 
-filenames_Levine_32 <- c("../plots/Levine_2015_marrow_32/results_F1_score_by_cluster_size_Levine2015marrow32.pdf", 
-                         "../plots/Levine_2015_marrow_32/results_precision_by_cluster_size_Levine2015marrow32.pdf", 
-                         "../plots/Levine_2015_marrow_32/results_recall_by_cluster_size_Levine2015marrow32.pdf")
-filenames_Levine_13 <- c("../plots/Levine_2015_marrow_13/results_F1_score_by_cluster_size_Levine2015marrow13.pdf", 
-                         "../plots/Levine_2015_marrow_13/results_precision_by_cluster_size_Levine2015marrow13.pdf", 
-                         "../plots/Levine_2015_marrow_13/results_recall_by_cluster_size_Levine2015marrow13.pdf")
+filenames_Levine_32 <- c("../plots/Levine_2015_marrow_32/results_lines_F1_score_by_cluster_size_Levine2015marrow32.pdf", 
+                         "../plots/Levine_2015_marrow_32/results_lines_precision_by_cluster_size_Levine2015marrow32.pdf", 
+                         "../plots/Levine_2015_marrow_32/results_lines_recall_by_cluster_size_Levine2015marrow32.pdf")
+filenames_Levine_13 <- c("../plots/Levine_2015_marrow_13/results_lines_F1_score_by_cluster_size_Levine2015marrow13.pdf", 
+                         "../plots/Levine_2015_marrow_13/results_lines_precision_by_cluster_size_Levine2015marrow13.pdf", 
+                         "../plots/Levine_2015_marrow_13/results_lines_recall_by_cluster_size_Levine2015marrow13.pdf")
 
 
 for (i in 1:length(plot_df_Levine_32_ord_size_tidy)) {
