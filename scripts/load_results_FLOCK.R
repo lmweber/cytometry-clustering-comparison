@@ -24,18 +24,22 @@ source("load_results_truth.R")
 
 file_FLOCK_Levine_32 <- "../results/FLOCK/flock_results_Levine_2015_marrow_32.txt"
 file_FLOCK_Levine_13 <- "../results/FLOCK/flock_results_Levine_2015_marrow_13.txt"
-file_FLOCK_Mosmann <- "../results/FLOCK/flock_results_Mosmann_2014_rare.txt"
+file_FLOCK_Nilsson <- "../results/FLOCK/flock_results_Nilsson_2013_HSC.txt"
+file_FLOCK_Mosmann <- "../results/FLOCK/flock_results_Mosmann_2014_activ.txt"
 
 data_FLOCK_Levine_32 <- read.table(file_FLOCK_Levine_32, header = TRUE, sep = "\t")
 data_FLOCK_Levine_13 <- read.table(file_FLOCK_Levine_13, header = TRUE, sep = "\t")
+data_FLOCK_Nilsson <- read.table(file_FLOCK_Nilsson, header = TRUE, sep = "\t")
 data_FLOCK_Mosmann <- read.table(file_FLOCK_Mosmann, header = TRUE, sep = "\t")
 
 head(data_FLOCK_Levine_32)
 head(data_FLOCK_Levine_13)
+head(data_FLOCK_Nilsson)
 head(data_FLOCK_Mosmann)
 
 dim(data_FLOCK_Levine_32)
 dim(data_FLOCK_Levine_13)
+dim(data_FLOCK_Nilsson)
 dim(data_FLOCK_Mosmann)
 
 
@@ -43,10 +47,12 @@ dim(data_FLOCK_Mosmann)
 
 clus_FLOCK_Levine_32 <- data_FLOCK_Levine_32[, "Population"]
 clus_FLOCK_Levine_13 <- data_FLOCK_Levine_13[, "Population"]
+clus_FLOCK_Nilsson <- data_FLOCK_Nilsson[, "Population"]
 clus_FLOCK_Mosmann <- data_FLOCK_Mosmann[, "Population"]
 
 length(clus_FLOCK_Levine_32)
 length(clus_FLOCK_Levine_13)
+length(clus_FLOCK_Nilsson)
 length(clus_FLOCK_Mosmann)
 
 
@@ -54,6 +60,7 @@ length(clus_FLOCK_Mosmann)
 
 table(clus_FLOCK_Levine_32, clus_truth_Levine_32)
 table(clus_FLOCK_Levine_13, clus_truth_Levine_13)
+table(clus_FLOCK_Nilsson, clus_truth_Nilsson)
 table(clus_FLOCK_Mosmann, clus_truth_Mosmann)
 
 
@@ -61,14 +68,17 @@ table(clus_FLOCK_Mosmann, clus_truth_Mosmann)
 
 tbl_FLOCK_Levine_32 <- table(clus_FLOCK_Levine_32)
 tbl_FLOCK_Levine_13 <- table(clus_FLOCK_Levine_13)
+tbl_FLOCK_Nilsson <- table(clus_FLOCK_Nilsson)
 tbl_FLOCK_Mosmann <- table(clus_FLOCK_Mosmann)
 
 tbl_FLOCK_Levine_32
 tbl_FLOCK_Levine_13
+tbl_FLOCK_Nilsson
 tbl_FLOCK_Mosmann
 
 length(tbl_FLOCK_Levine_32)
 length(tbl_FLOCK_Levine_13)
+length(tbl_FLOCK_Nilsson)
 length(tbl_FLOCK_Mosmann)
 
 
@@ -77,10 +87,12 @@ length(tbl_FLOCK_Mosmann)
 
 res_FLOCK_Levine_32 <- helper_match_clusters_and_evaluate(clus_FLOCK_Levine_32, clus_truth_Levine_32)
 res_FLOCK_Levine_13 <- helper_match_clusters_and_evaluate(clus_FLOCK_Levine_13, clus_truth_Levine_13)
+res_FLOCK_Nilsson <- helper_match_one_rare_cluster_and_evaluate(clus_FLOCK_Nilsson, clus_truth_Nilsson)
 res_FLOCK_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_FLOCK_Mosmann, clus_truth_Mosmann)
 
 res_FLOCK_Levine_32
 res_FLOCK_Levine_13
+res_FLOCK_Nilsson
 res_FLOCK_Mosmann
 
 

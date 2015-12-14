@@ -59,6 +59,20 @@ res_Levine_13 <- list(ACCENSE = res_ACCENSE_Levine_13,
                       SamSPECTRAL = res_SamSPECTRAL_Levine_13, 
                       SWIFT = res_SWIFT_Levine_13)
 
+res_Nilsson <- list(ACCENSE = res_ACCENSE_Nilsson, 
+                    DensVM = res_DensVM_Nilsson, 
+                    FLOCK = res_FLOCK_Nilsson, 
+                    flowMeans = res_flowMeans_Nilsson, 
+                    FlowSOM = res_FlowSOM_Nilsson, 
+                    FlowSOM_meta = res_FlowSOM_meta_Nilsson, 
+                    immunoClust = res_immunoClust_Nilsson, 
+                    immunoClust_all = res_immunoClust_all_Nilsson, 
+                    kmeans = res_kmeans_Nilsson, 
+                    PhenoGraph = res_PhenoGraph_Nilsson, 
+                    Rclusterpp = res_Rclusterpp_Nilsson, 
+                    SamSPECTRAL = res_SamSPECTRAL_Nilsson, 
+                    SWIFT = res_SWIFT_Nilsson)
+
 res_Mosmann <- list(ACCENSE = res_ACCENSE_Mosmann, 
                     DensVM = res_DensVM_Mosmann, 
                     FLOCK = res_FLOCK_Mosmann, 
@@ -78,22 +92,27 @@ res_Mosmann <- list(ACCENSE = res_ACCENSE_Mosmann,
 
 precision_df_Levine_32 <- sapply(res_Levine_32, function(res) res$pr)
 precision_df_Levine_13 <- collapse_data_frame_zeros(sapply(res_Levine_13, function(res) res$pr))
+precision_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$pr))
 precision_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$pr))
 
 recall_df_Levine_32 <- sapply(res_Levine_32, function(res) res$re)
 recall_df_Levine_13 <- collapse_data_frame_zeros(sapply(res_Levine_13, function(res) res$re))
+recall_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$re))
 recall_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$re))
 
 F1_df_Levine_32 <- sapply(res_Levine_32, function(res) res$F1)
 F1_df_Levine_13 <- collapse_data_frame_zeros(sapply(res_Levine_13, function(res) res$F1))
+F1_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$F1))
 F1_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$F1))
 
 labels_matched_df_Levine_32 <- sapply(res_Levine_32, function(res) res$labels_matched)
 labels_matched_df_Levine_13 <- collapse_data_frame_NAs(sapply(res_Levine_13, function(res) res$labels_matched))  # NA = no match
+labels_matched_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$labels_matched))
 labels_matched_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$labels_matched))
 
 n_cells_df_Levine_32 <- sapply(res_Levine_32, function(res) res$n_cells)
 n_cells_df_Levine_13 <- collapse_data_frame_zeros(sapply(res_Levine_13, function(res) res$n_cells))
+n_cells_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$n_cells))
 n_cells_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$n_cells))
 
 
@@ -175,7 +194,7 @@ ggsave("../plots/Levine_2015_marrow_13/results_mean_F1_score_Levine2015marrow13.
 ### MEAN F1 SCORE: WEIGHTED BY NUMBER OF CELLS PER TRUE CLUSTER ###
 ###################################################################
 
-### continued from above ###
+### continued from above
 
 
 # number of cells per true clusters
@@ -332,7 +351,7 @@ ggsave("../plots/Levine_2015_marrow_13/results_mean_F1_precision_recall_Levine20
 ### MEAN F1 SCORE, PRECISION, AND RECALL: WEIGHTED BY NUMBER OF CELLS PER TRUE CLUSTER ###
 ##########################################################################################
 
-### continued from above ###
+### continued from above
 
 
 # mean precision and mean recall across all true clusters (weighted by number of cells in true cluster)
@@ -521,19 +540,35 @@ for (i in 1:length(df_Levine_13)) {
 ### DETECTION OF RARE CELL POPULATION: F1 SCORE, PRECISION, AND RECALL ###
 ##########################################################################
 
-### for data sets with a single rare cell population of interest (Mosmann_2014_rare)
+### for data sets with a single rare cell population of interest (Nilsson_2013_HSC, Mosmann_2014_activ)
 
 
 # arrange by F1 score
 
+ord_Nilsson <- rev(order(F1_df_Nilsson))
 ord_Mosmann <- rev(order(F1_df_Mosmann))
 
+
+precision_df_Nilsson_ord <- unlist(precision_df_Nilsson[ord_Nilsson])
 precision_df_Mosmann_ord <- unlist(precision_df_Mosmann[ord_Mosmann])
+
+recall_df_Nilsson_ord <- unlist(recall_df_Nilsson[ord_Nilsson])
 recall_df_Mosmann_ord <- unlist(recall_df_Mosmann[ord_Mosmann])
+
+F1_df_Nilsson_ord <- unlist(F1_df_Nilsson[ord_Nilsson])
 F1_df_Mosmann_ord <- unlist(F1_df_Mosmann[ord_Mosmann])
 
 
 # tidy data format (for ggplot)
+
+plot_data_Nilsson <- data.frame(precision = precision_df_Nilsson_ord, 
+                                recall = recall_df_Nilsson_ord, 
+                                F1_score = F1_df_Nilsson_ord)
+plot_data_Nilsson["method"] <- factor(rownames(plot_data_Nilsson), 
+                                      levels = rownames(plot_data_Nilsson))
+plot_data_Nilsson <- melt(plot_data_Nilsson, 
+                          id.vars = "method", 
+                          measure.vars = c("F1_score", "precision", "recall"))
 
 plot_data_Mosmann <- data.frame(precision = precision_df_Mosmann_ord, 
                                 recall = recall_df_Mosmann_ord, 
@@ -546,16 +581,29 @@ plot_data_Mosmann <- melt(plot_data_Mosmann,
 
 # bar plots
 
-ggplot(plot_data_Mosmann, aes(x = method, y = value, group = variable, fill = variable)) + 
+ggplot(plot_data_Nilsson, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
   ylim(0, 1) + 
-  ggtitle("Rare cell population: Mosmann_2014_rare") + 
+  ggtitle("Rare cell population: Nilsson_2013_HSC") + 
   theme_bw() + 
   theme(axis.title.x = element_blank()) + 
   theme(axis.title.y = element_blank()) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
   theme(legend.title = element_blank())
 
-ggsave("../plots/Mosmann_2014_rare/results_F1_precision_recall_Mosmann2014rare.pdf", height = 6, width = 7)
+ggsave("../plots/Nilsson_2013_HSC/results_F1_precision_recall_Nilsson2013HSC.pdf", height = 6, width = 7)
+
+
+ggplot(plot_data_Mosmann, aes(x = method, y = value, group = variable, fill = variable)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  ylim(0, 1) + 
+  ggtitle("Rare cell population: Mosmann_2014_activ") + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
+  theme(legend.title = element_blank())
+
+ggsave("../plots/Mosmann_2014_activ/results_F1_precision_recall_Mosmann2014activ.pdf", height = 6, width = 7)
 
 

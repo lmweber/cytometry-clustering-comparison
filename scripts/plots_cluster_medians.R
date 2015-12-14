@@ -121,7 +121,7 @@ medians_Levine_32 <- list()
 medians_Levine_13 <- list()
 
 
-### calculate cluster medians for ACCENSE ###
+### calculate cluster medians for ACCENSE
 
 # note ACCENSE used subsampling, so need to use data matrix with subsampled points only
 
@@ -144,7 +144,7 @@ medians_Levine_32[[1]] <- medians_ACCENSE_Levine_32
 medians_Levine_13[[1]] <- medians_ACCENSE_Levine_13
 
 
-### calculate cluster medians for DensVM ###
+### calculate cluster medians for DensVM
 
 # note DensVM used subsampling, so need to use data matrix with subsampled points only
 
@@ -173,7 +173,7 @@ medians_Levine_32[[2]] <- medians_DensVM_Levine_32
 medians_Levine_13[[2]] <- medians_DensVM_Levine_13
 
 
-### calculate cluster medians for all other methods ###
+### calculate cluster medians for all other methods
 
 for (i in 3:n_methods_Levine_32) {
   # calculate cluster medians
@@ -197,7 +197,7 @@ names(medians_Levine_32) <- names(clus_Levine_32)
 names(medians_Levine_13) <- names(clus_Levine_13)
 
 
-### generate plots ###
+### generate plots
 
 # plot each method together with manually gated clusters
 

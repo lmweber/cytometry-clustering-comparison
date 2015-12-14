@@ -23,18 +23,22 @@ source("helper_match_one_rare_cluster_and_evaluate.R")
 
 file_ACCENSE_Levine_32 <- "../results/ACCENSE/accense_output_Levine_2015_marrow_32.csv"
 file_ACCENSE_Levine_13 <- "../results/ACCENSE/accense_output_Levine_2015_marrow_13.csv"
-file_ACCENSE_Mosmann <- "../results/ACCENSE/accense_output_Mosmann_2014_rare.csv"
+file_ACCENSE_Nilsson <- "../results/ACCENSE/accense_output_Nilsson_2013_HSC.csv"
+file_ACCENSE_Mosmann <- "../results/ACCENSE/accense_output_Mosmann_2014_activ.csv"
 
 data_ACCENSE_Levine_32 <- read.csv(file_ACCENSE_Levine_32)
 data_ACCENSE_Levine_13 <- read.csv(file_ACCENSE_Levine_13)
+data_ACCENSE_Nilsson <- read.csv(file_ACCENSE_Nilsson)
 data_ACCENSE_Mosmann <- read.csv(file_ACCENSE_Mosmann)
 
 head(data_ACCENSE_Levine_32)
 head(data_ACCENSE_Levine_13)
+head(data_ACCENSE_Nilsson)
 head(data_ACCENSE_Mosmann)
 
 dim(data_ACCENSE_Levine_32)
 dim(data_ACCENSE_Levine_13)
+dim(data_ACCENSE_Nilsson)
 dim(data_ACCENSE_Mosmann)
 
 
@@ -42,14 +46,17 @@ dim(data_ACCENSE_Mosmann)
 
 clus_truth_Levine_32_subsampled <- data_ACCENSE_Levine_32[, "label"]
 clus_truth_Levine_13_subsampled <- data_ACCENSE_Levine_13[, "label"]
+clus_truth_Nilsson_subsampled <- data_ACCENSE_Nilsson[, "label"]
 clus_truth_Mosmann_subsampled <- data_ACCENSE_Mosmann[, "label"]
 
 table(clus_truth_Levine_32_subsampled)
 table(clus_truth_Levine_13_subsampled)
+table(clus_truth_Nilsson_subsampled)
 table(clus_truth_Mosmann_subsampled)  # note: too few cells; subsampling is not suitable for rare cell types
 
 length(clus_truth_Levine_32_subsampled)
 length(clus_truth_Levine_13_subsampled)
+length(clus_truth_Nilsson_subsampled)
 length(clus_truth_Mosmann_subsampled)
 
 
@@ -57,10 +64,12 @@ length(clus_truth_Mosmann_subsampled)
 
 clus_ACCENSE_Levine_32 <- data_ACCENSE_Levine_32[, "population"]
 clus_ACCENSE_Levine_13 <- data_ACCENSE_Levine_13[, "population"]
+clus_ACCENSE_Nilsson <- data_ACCENSE_Nilsson[, "population"]
 clus_ACCENSE_Mosmann <- data_ACCENSE_Mosmann[, "population"]
 
 length(clus_ACCENSE_Levine_32)
 length(clus_ACCENSE_Levine_13)
+length(clus_ACCENSE_Nilsson)
 length(clus_ACCENSE_Mosmann)
 
 
@@ -68,6 +77,7 @@ length(clus_ACCENSE_Mosmann)
 
 table(clus_ACCENSE_Levine_32, clus_truth_Levine_32_subsampled)
 table(clus_ACCENSE_Levine_13, clus_truth_Levine_13_subsampled)
+table(clus_ACCENSE_Nilsson, clus_truth_Nilsson_subsampled)
 table(clus_ACCENSE_Mosmann, clus_truth_Mosmann_subsampled)
 
 
@@ -75,14 +85,17 @@ table(clus_ACCENSE_Mosmann, clus_truth_Mosmann_subsampled)
 
 tbl_ACCENSE_Levine_32 <- table(clus_ACCENSE_Levine_32)
 tbl_ACCENSE_Levine_13 <- table(clus_ACCENSE_Levine_13)
+tbl_ACCENSE_Nilsson <- table(clus_ACCENSE_Nilsson)
 tbl_ACCENSE_Mosmann <- table(clus_ACCENSE_Mosmann)
 
 tbl_ACCENSE_Levine_32
 tbl_ACCENSE_Levine_13
+tbl_ACCENSE_Nilsson
 tbl_ACCENSE_Mosmann
 
 length(tbl_ACCENSE_Levine_32)
 length(tbl_ACCENSE_Levine_13)
+length(tbl_ACCENSE_Nilsson)
 length(tbl_ACCENSE_Mosmann)
 
 
@@ -91,10 +104,12 @@ length(tbl_ACCENSE_Mosmann)
 
 res_ACCENSE_Levine_32 <- helper_match_clusters_and_evaluate(clus_ACCENSE_Levine_32, clus_truth_Levine_32_subsampled)
 res_ACCENSE_Levine_13 <- helper_match_clusters_and_evaluate(clus_ACCENSE_Levine_13, clus_truth_Levine_13_subsampled)
+res_ACCENSE_Nilsson <- helper_match_one_rare_cluster_and_evaluate(clus_ACCENSE_Nilsson, clus_truth_Nilsson_subsampled)
 res_ACCENSE_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_ACCENSE_Mosmann, clus_truth_Mosmann_subsampled)
 
 res_ACCENSE_Levine_32
 res_ACCENSE_Levine_13
+res_ACCENSE_Nilsson
 res_ACCENSE_Mosmann
 
 

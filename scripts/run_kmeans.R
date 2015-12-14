@@ -17,39 +17,50 @@ DATA_DIR <- "../../benchmark_data_sets"
 
 file_Levine_32 <- file.path(DATA_DIR, "Levine_2015_marrow_32/data/Levine_2015_marrow_32.fcs")
 file_Levine_13 <- file.path(DATA_DIR, "Levine_2015_marrow_13/data/Levine_2015_marrow_13.fcs")
-file_Mosmann <- file.path(DATA_DIR, "Mosmann_2014_rare/data/Mosmann_2014_rare.fcs")
+file_Nilsson <- file.path(DATA_DIR, "Nilsson_2013_HSC/data/Nilsson_2013_HSC.fcs")
+file_Mosmann <- file.path(DATA_DIR, "Mosmann_2014_activ/data/Mosmann_2014_activ.fcs")
 
 data_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_Levine_32, transformation = FALSE))
 data_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_Levine_13, transformation = FALSE))
+data_Nilsson <- flowCore::exprs(flowCore::read.FCS(file_Nilsson, transformation = FALSE))
 data_Mosmann <- flowCore::exprs(flowCore::read.FCS(file_Mosmann, transformation = FALSE))
 
 head(data_Levine_32)
 head(data_Levine_13)
+head(data_Nilsson)
 head(data_Mosmann)
 
 dim(data_Levine_32)
 dim(data_Levine_13)
+dim(data_Nilsson)
 dim(data_Mosmann)
+
 
 # indices of protein marker columns
 
 marker_cols_Levine_32 <- 5:36
 marker_cols_Levine_13 <- 1:13
+marker_cols_Nilsson <- c(5:7, 9:18)
 marker_cols_Mosmann <- 7:21
 
 length(marker_cols_Levine_32)
 length(marker_cols_Levine_13)
+length(marker_cols_Nilsson)
 length(marker_cols_Mosmann)
+
 
 # subset data
 
 data_Levine_32 <- data_Levine_32[, marker_cols_Levine_32]
 data_Levine_13 <- data_Levine_13[, marker_cols_Levine_13]
+data_Nilsson <- data_Nilsson[, marker_cols_Nilsson]
 data_Mosmann <- data_Mosmann[, marker_cols_Mosmann]
 
 dim(data_Levine_32)
 dim(data_Levine_13)
+dim(data_Nilsson)
 dim(data_Mosmann)
+
 
 
 
@@ -61,11 +72,12 @@ dim(data_Mosmann)
 
 k_Levine_32 <- 20
 k_Levine_13 <- 30
+k_Nilsson <- 50
 k_Mosmann <- 50
 
 
 # run k-means
-# note: does not converge for some random seeds
+# note: larger number of iterations required for convergence for some random seeds
 
 set.seed(1234)
 runtime_Levine_32 <- system.time({
@@ -77,9 +89,14 @@ runtime_Levine_13 <- system.time({
   out_kmeans_Levine_13 <- kmeans(data_Levine_13, k_Levine_13)
 })
 
-set.seed(1000)
+set.seed(1234)
+runtime_Nilsson <- system.time({
+  out_kmeans_Nilsson <- kmeans(data_Nilsson, k_Nilsson, iter.max = 50)
+})
+
+set.seed(1234)
 runtime_Mosmann <- system.time({
-  out_kmeans_Mosmann <- kmeans(data_Mosmann, k_Mosmann)
+  out_kmeans_Mosmann <- kmeans(data_Mosmann, k_Mosmann, iter.max = 50)
 })
 
 
@@ -87,10 +104,12 @@ runtime_Mosmann <- system.time({
 
 clus_kmeans_Levine_32 <- out_kmeans_Levine_32$cluster
 clus_kmeans_Levine_13 <- out_kmeans_Levine_13$cluster
+clus_kmeans_Nilsson <- out_kmeans_Nilsson$cluster
 clus_kmeans_Mosmann <- out_kmeans_Mosmann$cluster
 
 length(clus_kmeans_Levine_32)
 length(clus_kmeans_Levine_13)
+length(clus_kmeans_Nilsson)
 length(clus_kmeans_Mosmann)
 
 
@@ -98,11 +117,14 @@ length(clus_kmeans_Mosmann)
 
 table(clus_kmeans_Levine_32)
 table(clus_kmeans_Levine_13)
+table(clus_kmeans_Nilsson)
 table(clus_kmeans_Mosmann)
 
 length(table(clus_kmeans_Levine_32))
 length(table(clus_kmeans_Levine_13))
+length(table(clus_kmeans_Nilsson))
 length(table(clus_kmeans_Mosmann))
+
 
 
 
@@ -114,6 +136,7 @@ length(table(clus_kmeans_Mosmann))
 
 res_kmeans_Levine_32 <- data.frame(label = clus_kmeans_Levine_32)
 res_kmeans_Levine_13 <- data.frame(label = clus_kmeans_Levine_13)
+res_kmeans_Nilsson <- data.frame(label = clus_kmeans_Nilsson)
 res_kmeans_Mosmann <- data.frame(label = clus_kmeans_Mosmann)
 
 write.table(res_kmeans_Levine_32, 
@@ -122,8 +145,11 @@ write.table(res_kmeans_Levine_32,
 write.table(res_kmeans_Levine_13, 
             file = "../results/kmeans/kmeans_labels_Levine_2015_marrow_13.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_kmeans_Nilsson, 
+            file = "../results/kmeans/kmeans_labels_Nilsson_2013_HSC.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_kmeans_Mosmann, 
-            file = "../results/kmeans/kmeans_labels_Mosmann_2014_rare.txt", 
+            file = "../results/kmeans/kmeans_labels_Mosmann_2014_activ.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
 
@@ -132,7 +158,8 @@ write.table(res_kmeans_Mosmann,
 runtime_kmeans <- t(data.frame(
   Levine_2015_marrow_32 = runtime_Levine_32["elapsed"], 
   Levine_2015_marrow_13 = runtime_Levine_13["elapsed"], 
-  Mosmann_2014_rare = runtime_Mosmann["elapsed"], 
+  Nilsson_2013_HSC = runtime_Nilsson["elapsed"], 
+  Mosmann_2014_activ = runtime_Mosmann["elapsed"], 
   row.names = "runtime"))
 
 write.table(runtime_kmeans, file = "../results/runtime/runtime_kmeans.txt", quote = FALSE, sep = "\t")
