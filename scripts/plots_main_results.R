@@ -22,6 +22,9 @@ source("load_results_SWIFT.R")
 source("load_results_truth.R")
 source("load_results_all_other_methods.R")
 
+# load runtime results
+source("results_runtime.R")
+
 
 
 
@@ -605,5 +608,170 @@ ggplot(plot_data_Mosmann, aes(x = method, y = value, group = variable, fill = va
   theme(legend.title = element_blank())
 
 ggsave("../plots/Mosmann_2014_activ/results_F1_precision_recall_Mosmann2014activ.pdf", height = 6, width = 7)
+
+
+
+
+##########################
+### RUNTIME: BAR PLOTS ###
+##########################
+
+### runtime results are loaded with a separate script (sourced at the beginning of this script)
+
+
+# convert data frames to tidy data format (for ggplot)
+
+runtime_Levine_32_tidy <- data.frame(value = runtime_Levine_32_ord)
+runtime_Levine_32_tidy["method"] <- factor(rownames(runtime_Levine_32_tidy), 
+                                           levels = rownames(runtime_Levine_32_tidy))
+
+runtime_Levine_13_tidy <- data.frame(value = runtime_Levine_13_ord)
+runtime_Levine_13_tidy["method"] <- factor(rownames(runtime_Levine_13_tidy), 
+                                           levels = rownames(runtime_Levine_13_tidy))
+
+runtime_Nilsson_tidy <- data.frame(value = runtime_Nilsson_ord)
+runtime_Nilsson_tidy["method"] <- factor(rownames(runtime_Nilsson_tidy), 
+                                         levels = rownames(runtime_Nilsson_tidy))
+
+runtime_Mosmann_tidy <- data.frame(value = runtime_Mosmann_ord)
+runtime_Mosmann_tidy["method"] <- factor(rownames(runtime_Mosmann_tidy), 
+                                         levels = rownames(runtime_Mosmann_tidy))
+
+
+# single or multiple cores used
+
+runtime_Levine_32_tidy$cores <- "single"
+runtime_Levine_32_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple"
+
+runtime_Levine_13_tidy$cores <- "single"
+runtime_Levine_13_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple"
+
+runtime_Nilsson_tidy$cores <- "single"
+runtime_Nilsson_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple"
+
+# no Rclusterpp
+runtime_Mosmann_tidy$cores <- "single"
+runtime_Mosmann_tidy[c("SWIFT"), "cores"] <- "multiple"
+
+
+# check
+
+runtime_Levine_32_tidy
+runtime_Levine_13_tidy
+runtime_Nilsson_tidy
+runtime_Mosmann_tidy
+
+
+# bar plots
+
+ggplot(runtime_Levine_32_tidy, aes(x = method, y = value)) + 
+  geom_bar(stat = "identity", fill = "purple3") + 
+  geom_text(aes(label = round(value, 0), y = value + 500), size = 3.5) + 
+  ggtitle("Runtime: Levine_2015_marrow_32") + 
+  ylim(0, 21000) + 
+  ylab("seconds") + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggsave("../plots/Levine_2015_marrow_32/runtime_Levine2015marrow32.pdf", height = 6, width = 5.5)
+
+
+ggplot(runtime_Levine_13_tidy, aes(x = method, y = value)) + 
+  geom_bar(stat = "identity", fill = "purple3") + 
+  geom_text(aes(label = round(value, 0), y = value + 500), size = 3.5) + 
+  ggtitle("Runtime: Levine_2015_marrow_13") + 
+  ylim(0, 21000) + 
+  ylab("seconds") + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggsave("../plots/Levine_2015_marrow_13/runtime_Levine2015marrow13.pdf", height = 6, width = 5.5)
+
+
+ggplot(runtime_Nilsson_tidy, aes(x = method, y = value)) + 
+  geom_bar(stat = "identity", fill = "purple3") + 
+  geom_text(aes(label = round(value, 0), y = value + 500), size = 3.5) + 
+  ggtitle("Runtime: Nilsson_2013_HSC") + 
+  ylim(0, 21000) + 
+  ylab("seconds") + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggsave("../plots/Nilsson_2013_HSC/runtime_Nilsson2013HSC.pdf", height = 6, width = 5.5)
+
+
+ggplot(runtime_Mosmann_tidy, aes(x = method, y = value)) + 
+  geom_bar(stat = "identity", fill = "purple3") + 
+  geom_text(aes(label = round(value, 0), y = value + 500), size = 3.5) + 
+  ggtitle("Runtime: Mosmann_2014_activ") + 
+  ylim(0, 21000) + 
+  ylab("seconds") + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggsave("../plots/Mosmann_2014_activ/runtime_Mosmann2014activ.pdf", height = 6, width = 5.25)
+
+
+
+
+##########################################################
+### RUNTIME: SCATTER PLOTS (RUNTIME VS. MEAN F1 SCORE) ###
+##########################################################
+
+### for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
+
+
+# create tidy data frames
+
+runtime_vs_F1_Levine_32_tidy <- runtime_Levine_32_tidy
+colnames(runtime_vs_F1_Levine_32_tidy)[1] <- "runtime"
+runtime_vs_F1_Levine_32_tidy$mean_F1 <- mean_F1_Levine_32[rownames(runtime_vs_F1_Levine_32_tidy)]
+
+runtime_vs_F1_Levine_13_tidy <- runtime_Levine_13_tidy
+colnames(runtime_vs_F1_Levine_13_tidy)[1] <- "runtime"
+runtime_vs_F1_Levine_13_tidy$mean_F1 <- mean_F1_Levine_13[rownames(runtime_vs_F1_Levine_13_tidy)]
+
+# check
+
+runtime_vs_F1_Levine_32_tidy
+runtime_vs_F1_Levine_13_tidy
+
+
+# scatter plots
+
+x_text_Lev32 <- c(-0.07, 0, 0.12, 0, 0, 0, 0, 0, 0, 0.09, -0.07, 0, 0)
+y_text_Lev32 <- c(0, -700, 0, -700, 600, 600, 700, 700, 700, 700, 700, 700, 700)
+
+ggplot(runtime_vs_F1_Levine_32_tidy, aes(x = mean_F1, y = runtime)) + 
+  geom_point(shape = 18, size = 4, color = "purple3") + 
+  geom_text(aes(label = method, x = mean_F1 + x_text_Lev32, y = runtime + y_text_Lev32), size = 3) + 
+  xlim(0, 1) + 
+  ylim(-700, 19000) + 
+  ggtitle("Runtime vs. mean F1: Levine_2015_marrow_32") + 
+  xlab("mean F1 score") + 
+  ylab("runtime (seconds)") + 
+  theme_bw()
+
+ggsave("../plots/Levine_2015_marrow_32/runtime_vs_mean_F1_Levine2015marrow32.pdf", height = 6, width = 6)
+
+
+x_text_Lev13 <- c(-0.03, -0.08, 0, 0.12, 0.03, 0.07, -0.085, 0, -0.065, 0.13, -0.105, 0, 0)
+y_text_Lev13 <- c(-350, -100, -700, 0, -450, 350, 100, 400, 0, 0, 0, 400, 400)
+
+ggplot(runtime_vs_F1_Levine_13_tidy, aes(x = mean_F1, y = runtime)) + 
+  geom_point(shape = 18, size = 4, color = "purple3") + 
+  geom_text(aes(label = method, x = mean_F1 + x_text_Lev13, y = runtime + y_text_Lev13), size = 3) + 
+  xlim(0, 1) + 
+  ylim(-700, 10500) + 
+  ggtitle("Runtime vs. mean F1: Levine_2015_marrow_13") + 
+  xlab("mean F1 score") + 
+  ylab("runtime (seconds)") + 
+  theme_bw()
+
+ggsave("../plots/Levine_2015_marrow_13/runtime_vs_mean_F1_Levine2015marrow13.pdf", height = 6, width = 6)
 
 

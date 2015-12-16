@@ -8,5 +8,6 @@ drafts/**
 paper/**
 plots/**
 results/**
+templates/**
 
 **/.RData
