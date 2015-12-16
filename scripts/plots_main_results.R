@@ -744,13 +744,13 @@ runtime_vs_F1_Levine_13_tidy
 # scatter plots
 
 x_text_Lev32 <- c(-0.07, 0, 0.12, 0, 0, 0, 0, 0, 0, 0.09, -0.07, 0, 0)
-y_text_Lev32 <- c(0, -700, 0, -700, 600, 600, 700, 700, 700, 700, 700, 700, 700)
+y_text_Lev32 <- c(0, -700, 0, -700, 600, 600, 700, 700, 700, 700, 700, 700, -700)
 
 ggplot(runtime_vs_F1_Levine_32_tidy, aes(x = mean_F1, y = runtime)) + 
   geom_point(shape = 18, size = 4, color = "purple3") + 
   geom_text(aes(label = method, x = mean_F1 + x_text_Lev32, y = runtime + y_text_Lev32), size = 3) + 
   xlim(0, 1) + 
-  ylim(-700, 19000) + 
+  ylim(-700, 18500) + 
   ggtitle("Runtime vs. mean F1: Levine_2015_marrow_32") + 
   xlab("mean F1 score") + 
   ylab("runtime (seconds)") + 
@@ -760,13 +760,13 @@ ggsave("../plots/Levine_2015_marrow_32/runtime_vs_mean_F1_Levine2015marrow32.pdf
 
 
 x_text_Lev13 <- c(-0.03, -0.08, 0, 0.12, 0.03, 0.07, -0.085, 0, -0.065, 0.13, -0.105, 0, 0)
-y_text_Lev13 <- c(-350, -100, -700, 0, -450, 350, 100, 400, 0, 0, 0, 400, 400)
+y_text_Lev13 <- c(-350, -100, -700, 0, -450, 350, 100, 400, 0, 0, 0, 350, -350)
 
 ggplot(runtime_vs_F1_Levine_13_tidy, aes(x = mean_F1, y = runtime)) + 
   geom_point(shape = 18, size = 4, color = "purple3") + 
   geom_text(aes(label = method, x = mean_F1 + x_text_Lev13, y = runtime + y_text_Lev13), size = 3) + 
   xlim(0, 1) + 
-  ylim(-700, 10500) + 
+  ylim(-700, 9500) + 
   ggtitle("Runtime vs. mean F1: Levine_2015_marrow_13") + 
   xlab("mean F1 score") + 
   ylab("runtime (seconds)") + 
