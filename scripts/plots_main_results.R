@@ -775,3 +775,56 @@ ggplot(runtime_vs_F1_Levine_13_tidy, aes(x = mean_F1, y = runtime)) +
 ggsave("../plots/Levine_2015_marrow_13/runtime_vs_mean_F1_Levine2015marrow13.pdf", height = 6, width = 6)
 
 
+
+### for data sets with a single rare cell population of interest (Nilsson_2013_HSC, Mosmann_2014_activ)
+
+runtime_vs_F1_Nilsson_tidy <- runtime_Nilsson_tidy
+colnames(runtime_vs_F1_Nilsson_tidy)[1] <- "runtime"
+runtime_vs_F1_Nilsson_tidy$F1 <- F1_df_Nilsson_ord[rownames(runtime_vs_F1_Nilsson_tidy)]
+
+runtime_vs_F1_Mosmann_tidy <- runtime_Mosmann_tidy
+colnames(runtime_vs_F1_Mosmann_tidy)[1] <- "runtime"
+runtime_vs_F1_Mosmann_tidy$F1 <- F1_df_Mosmann_ord[rownames(runtime_vs_F1_Mosmann_tidy)]
+
+# check
+
+runtime_vs_F1_Nilsson_tidy
+runtime_vs_F1_Mosmann_tidy
+
+
+# scatter plots
+
+x_text_Nilsson <- c(-0.04, 0, 0, 0, 0.07, 0.04, 0.06, 0.04, 0, 0.06, 0, 0, 0)
+y_text_Nilsson <- c(-300, -300, -300, -600, -300, -650, 350, 350, 350, 350, 350, 350, -350)
+
+ggplot(runtime_vs_F1_Nilsson_tidy, aes(x = F1, y = runtime)) + 
+  geom_point(shape = 18, size = 4, color = "purple3") + 
+  geom_text(aes(label = method, x = F1 + x_text_Nilsson, y = runtime + y_text_Nilsson), size = 3) + 
+  xlim(0, 1) + 
+  ylim(-600, 10000) + 
+  ggtitle("Runtime vs. mean F1: Nilsson_2013_HSC") + 
+  xlab("F1 score") + 
+  ylab("runtime (seconds)") + 
+  theme_bw()
+
+ggsave("../plots/Nilsson_2013_HSC/runtime_vs_F1_Nilsson2013HSC.pdf", height = 6, width = 6)
+
+
+# note no Rclusterpp
+x_text_Mosmann <- c(0, 0.082, 0.12, 0, 0, 0.04, 0.04, 0, 0, 0, 0.075, 0)
+y_text_Mosmann <- c(-1700, 250, -250, -1300, -1000, -600, 450, 600, -650, 650, 0, -650)
+
+ggplot(runtime_vs_F1_Mosmann_tidy, aes(x = F1, y = runtime)) + 
+  geom_point(shape = 18, size = 4, color = "purple3") + 
+  geom_text(aes(label = method, x = F1 + x_text_Mosmann, y = runtime + y_text_Mosmann), size = 3) + 
+  xlim(0, 1) + 
+  ylim(-1700, 17500) + 
+  ggtitle("Runtime vs. mean F1: Mosmann_2014_activ") + 
+  xlab("F1 score") + 
+  ylab("runtime (seconds)") + 
+  theme_bw()
+
+ggsave("../plots/Mosmann_2014_activ/runtime_vs_F1_Mosmann2014activ.pdf", height = 6, width = 6)
+
+
+
