@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to generate main plots of results
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, January 2016
 #########################################################################################
 
 
@@ -189,6 +189,67 @@ ggplot(mean_F1_Levine_13_tidy, aes(x = method, y = value)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
 ggsave("../plots/Levine_2015_marrow_13/results_mean_F1_score_Levine2015marrow13.pdf", height = 6, width = 5.5)
+
+
+
+
+###########################
+### F1 SCORE: BOX PLOTS ###
+###########################
+
+### as above but showing box plots instead of means
+
+
+# arrange in same order as above
+
+F1_df_Levine_32_ord <- F1_df_Levine_32[, ord_Levine_32]
+F1_df_Levine_13_ord <- F1_df_Levine_13[, ord_Levine_13]
+
+F1_df_Levine_32_ord
+F1_df_Levine_13_ord
+
+
+# tidy data format (for ggplot)
+
+F1_df_Levine_32_tidy <- data.frame(value = as.vector(F1_df_Levine_32_ord))
+F1_df_Levine_32_tidy["method"] <- rep(factor(colnames(F1_df_Levine_32_ord), 
+                                             levels = colnames(F1_df_Levine_32_ord)), 
+                                      each = nrow(F1_df_Levine_32_ord))
+F1_df_Levine_32_tidy
+
+F1_df_Levine_13_tidy <- data.frame(value = as.vector(as.matrix(F1_df_Levine_13_ord)))
+F1_df_Levine_13_tidy["method"] <- rep(factor(colnames(F1_df_Levine_13_ord), 
+                                             levels = colnames(F1_df_Levine_13_ord)), 
+                                      each = nrow(F1_df_Levine_13_ord))
+F1_df_Levine_13_tidy
+
+
+# box plots
+
+ggplot(F1_df_Levine_32_tidy, aes(x = method, y = value)) + 
+  geom_boxplot(col = "gray50", fill = "aliceblue") + 
+  geom_point(col = "darkblue") + 
+  ylim(0, 1) + 
+  ylab("F1 score") + 
+  ggtitle("F1 score: Levine_2015_marrow_32") + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggsave("../plots/Levine_2015_marrow_32/results_F1_score_boxplots_Levine2015marrow32.pdf", height = 6, width = 5.5)
+
+
+ggplot(F1_df_Levine_13_tidy, aes(x = method, y = value)) + 
+  geom_boxplot(col = "gray50", fill = "aliceblue") + 
+  geom_point(col = "darkblue") + 
+  ylim(0, 1) + 
+  ylab("F1 score") + 
+  ggtitle("F1 score: Levine_2015_marrow_13") + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggsave("../plots/Levine_2015_marrow_13/results_F1_score_boxplots_Levine2015marrow13.pdf", height = 6, width = 5.5)
 
 
 
