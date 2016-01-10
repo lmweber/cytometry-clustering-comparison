@@ -4,10 +4,10 @@
 **/archive/**
 
 C1omics_abstract/**
-drafts/**
+drafts_slides_notes/**
 paper/**
 plots/**
 results/**
-templates/**
+template/**
 
 **/.RData
