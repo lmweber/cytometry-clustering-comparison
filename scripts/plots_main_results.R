@@ -337,9 +337,8 @@ barplot_mean_F1_pr_re_Levine_32 <-
         axis.title.x = element_blank(), 
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.75, 0.96), 
+        legend.position = c(0.87, 0.92), 
         legend.key.size = unit(3, "mm"), 
-        legend.direction = "horizontal", 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
         legend.background = element_blank())
@@ -359,9 +358,8 @@ barplot_mean_F1_pr_re_Levine_13 <-
         axis.title.x = element_blank(), 
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.72, 0.95), 
-        legend.key.size = unit(4, "mm"), 
-        legend.direction = "horizontal", 
+        legend.position = c(0.87, 0.92), 
+        legend.key.size = unit(3, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
         legend.background = element_blank())
@@ -480,9 +478,8 @@ barplot_F1_pr_re_Nilsson <-
         axis.title.x = element_blank(), 
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.5, 0.96), 
+        legend.position = c(0.1, 0.92), 
         legend.key.size = unit(4, "mm"), 
-        legend.direction = "horizontal", 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
         legend.background = element_blank())
@@ -502,9 +499,8 @@ barplot_F1_pr_re_Mosmann <-
         axis.title.x = element_blank(), 
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.9, 0.9), 
-        legend.key.size = unit(5, "mm"), 
-        legend.direction = "vertical", 
+        legend.position = c(0.87, 0.92), 
+        legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
         legend.background = element_blank())
@@ -838,5 +834,19 @@ ggdraw() +
 
 ggplot2::ggsave("../plots/Mosmann_2014_activ/plots_multi_panel_Mosmann2014activ.pdf", 
                 width = 12, height = 9)
+
+
+
+
+####################
+### SESSION INFO ###
+####################
+
+# session information for plots
+
+sink(file = "../plots/session_info_plots_main_results.txt")
+sessionInfo()
+sink()
+
 
 
