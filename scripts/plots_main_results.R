@@ -170,7 +170,7 @@ mean_F1_Levine_13_tidy
 barplot_mean_F1_Levine_32 <- 
   ggplot(mean_F1_Levine_32_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", fill = "blue") + 
-  geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.075, angle = 90), size = 3.5) + 
+  geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
   ylim(0, 1) + 
   ylab("mean F1 score") + 
   ggtitle("Mean F1 score: Levine_2015_marrow_32") + 
@@ -187,7 +187,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/results_barplot_mean_F1_Levine20
 barplot_mean_F1_Levine_13 <- 
   ggplot(mean_F1_Levine_13_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", fill = "blue") + 
-  geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.075, angle = 90), size = 3.5) + 
+  geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
   ylim(0, 1) + 
   ylab("mean F1 score") + 
   ggtitle("Mean F1 score: Levine_2015_marrow_13") + 
@@ -338,7 +338,7 @@ barplot_mean_F1_pr_re_Levine_32 <-
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
         legend.position = c(0.87, 0.92), 
-        legend.key.size = unit(3, "mm"), 
+        legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
         legend.background = element_blank())
@@ -358,8 +358,8 @@ barplot_mean_F1_pr_re_Levine_13 <-
         axis.title.x = element_blank(), 
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.87, 0.92), 
-        legend.key.size = unit(3, "mm"), 
+        legend.position = c(0.87, 0.9), 
+        legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
         legend.background = element_blank())
@@ -392,7 +392,7 @@ colnames(n_cells_truth_Levine_13_tidy) <- c("population", "value")
 plot_n_cells_Levine_32 <- 
   ggplot(n_cells_truth_Levine_32_tidy, aes(x = population, y = value)) + 
   geom_bar(stat = "identity", fill = "darkgray") + 
-  geom_text(aes(label = value, y = value + 1800, angle = 90), size = 3.5) + 
+  geom_text(aes(label = value, y = value + 2000, angle = 90), size = 3.5) + 
   ylim(0, 29000) + 
   xlab("manually gated population") + 
   ylab("number of cells") + 
@@ -408,13 +408,14 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/results_no_of_cells_Levine2015ma
 plot_n_cells_Levine_13 <- 
   ggplot(n_cells_truth_Levine_13_tidy, aes(x = population, y = value)) + 
   geom_bar(stat = "identity", fill = "darkgray") + 
-  geom_text(aes(label = value, y = value + 850, angle = 90), size = 3.5) + 
-  ylim(0, 15000) + 
+  geom_text(aes(label = value, y = value + 1000, angle = 90), size = 3.5) + 
+  ylim(0, 15500) + 
   xlab("manually gated population") + 
   ylab("number of cells") + 
   ggtitle("Manually gated populations: Levine_2015_marrow_13") + 
   theme_bw() + 
-  theme(plot.title = element_text(size = 12))
+  theme(plot.title = element_text(size = 12), 
+        axis.text.x = element_text(size = 9))
 
 plot_n_cells_Levine_13
 ggplot2::ggsave("../plots/Levine_2015_marrow_13/results_no_of_cells_Levine2015marrow13.pdf", 
@@ -542,20 +543,24 @@ runtime_Mosmann_tidy["method"] <- factor(rownames(runtime_Mosmann_tidy),
 
 runtime_Levine_32_tidy$cores <- "single core"
 runtime_Levine_32_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple cores"
-runtime_Levine_32_tidy$cores <- factor(runtime_Levine_32_tidy$cores, levels = c("single core", "multiple cores"))
+runtime_Levine_32_tidy$cores <- factor(runtime_Levine_32_tidy$cores, 
+                                       levels = c("single core", "multiple cores"))
 
 runtime_Levine_13_tidy$cores <- "single core"
 runtime_Levine_13_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple cores"
-runtime_Levine_13_tidy$cores <- factor(runtime_Levine_13_tidy$cores, levels = c("single core", "multiple cores"))
+runtime_Levine_13_tidy$cores <- factor(runtime_Levine_13_tidy$cores, 
+                                       levels = c("single core", "multiple cores"))
 
 runtime_Nilsson_tidy$cores <- "single core"
 runtime_Nilsson_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple cores"
-runtime_Nilsson_tidy$cores <- factor(runtime_Nilsson_tidy$cores, levels = c("single core", "multiple cores"))
+runtime_Nilsson_tidy$cores <- factor(runtime_Nilsson_tidy$cores, 
+                                     levels = c("single core", "multiple cores"))
 
 # no Rclusterpp
 runtime_Mosmann_tidy$cores <- "single core"
 runtime_Mosmann_tidy[c("SWIFT"), "cores"] <- "multiple cores"
-runtime_Mosmann_tidy$cores <- factor(runtime_Mosmann_tidy$cores, levels = c("single core", "multiple cores"))
+runtime_Mosmann_tidy$cores <- factor(runtime_Mosmann_tidy$cores, 
+                                     levels = c("single core", "multiple cores"))
 
 
 # check
@@ -618,9 +623,9 @@ runtime_barplot_Nilsson <-
   ggplot(runtime_Nilsson_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", aes(fill = cores)) + 
   scale_fill_manual(values = c("purple4", "darkblue")) + 
-  geom_text(aes(label = round(value, 0), y = value + 750, angle = 90), size = 3.5) + 
+  geom_text(aes(label = round(value, 0), y = value + 850, angle = 90), size = 3.5) + 
   ggtitle("Runtime: Nilsson_2013_HSC") + 
-  ylim(0, 11000) + 
+  ylim(0, 11500) + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
@@ -690,8 +695,8 @@ runtime_vs_F1_Levine_13_tidy
 runtime_scatterplot_Levine_32 <- 
   ggplot(runtime_vs_F1_Levine_32_tidy, aes(x = mean_F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 5) + 
-  xlim(0.1, 0.85) + 
+  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 7) + 
+  xlim(0.1, 0.82) + 
   ylim(-1000, 18500) + 
   ggtitle("Runtime vs. mean F1: Levine_2015_marrow_32") + 
   xlab("mean F1 score") + 
@@ -707,8 +712,8 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/runtime_scatterplot_Levine2015ma
 runtime_scatterplot_Levine_13 <- 
   ggplot(runtime_vs_F1_Levine_13_tidy, aes(x = mean_F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 5) + 
-  xlim(0.25, 0.65) + 
+  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 7) + 
+  xlim(0.1, 0.82) + 
   ylim(-1000, 9500) + 
   ggtitle("Runtime vs. mean F1: Levine_2015_marrow_13") + 
   xlab("mean F1 score") + 
@@ -743,8 +748,8 @@ runtime_scatterplot_Nilsson <-
   ggplot(runtime_vs_F1_Nilsson_tidy, aes(x = F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
   geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 5) + 
-  xlim(0, 0.6) + 
-  ylim(-1000, 10000) + 
+  xlim(-0.05, 0.65) + 
+  ylim(-1000, 10500) + 
   ggtitle("Runtime vs. F1: Nilsson_2013_HSC") + 
   xlab("F1 score") + 
   ylab("runtime (seconds)") + 
@@ -759,9 +764,9 @@ ggplot2::ggsave("../plots/Nilsson_2013_HSC/runtime_scatterplot_Nilsson2013HSC.pd
 runtime_scatterplot_Mosmann <- 
   ggplot(runtime_vs_F1_Mosmann_tidy, aes(x = F1, y = runtime)) +  # note no Rclusterpp
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 5) + 
-  xlim(-0.05, 0.7) + 
-  ylim(-1000, 17500) + 
+  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 10) + 
+  xlim(-0.05, 0.65) + 
+  ylim(-1000, 18000) + 
   ggtitle("Runtime vs. F1: Mosmann_2014_activ") + 
   xlab("F1 score") + 
   ylab("runtime (seconds)") + 
@@ -794,7 +799,7 @@ ggdraw() +
                   c(0, 0.5, 0, 0.5, 0, 0.5), c(0.99, 0.99, 0.66, 0.66, 0.33, 0.33), size = 16)
 
 ggplot2::ggsave("../plots/Levine_2015_marrow_32/plots_multi_panel_Levine2015marrow32.pdf", 
-                width = 12, height = 15)
+                width = 13, height = 14.5)
 
 
 # Levine_2015_marrow_13
@@ -809,31 +814,31 @@ ggdraw() +
                   c(0, 0.5, 0, 0.5, 0, 0.5), c(0.99, 0.99, 0.66, 0.66, 0.33, 0.33), size = 16)
 
 ggplot2::ggsave("../plots/Levine_2015_marrow_13/plots_multi_panel_Levine2015marrow13.pdf", 
-                width = 12, height = 15)
+                width = 13, height = 14.5)
 
 
 # Nilsson_2013_HSC
 ggdraw() + 
   draw_plot(barplot_F1_pr_re_Nilsson, 0, 0.16, 0.5, 0.66) + 
-  draw_plot(runtime_barplot_Nilsson, 0.56, 0.5, 0.38, 0.5) + 
-  draw_plot(runtime_scatterplot_Nilsson, 0.56, 0.05, 0.38, 0.45) + 
+  draw_plot(runtime_barplot_Nilsson, 0.56, 0.47, 0.38, 0.53) + 
+  draw_plot(runtime_scatterplot_Nilsson, 0.56, 0, 0.38, 0.46) + 
   draw_plot_label(LETTERS[1:3], 
-                  c(0, 0.55, 0.55), c(0.83, 1, 0.5), size = 16)
+                  c(0, 0.55, 0.55), c(0.83, 1, 0.46), size = 16)
 
 ggplot2::ggsave("../plots/Nilsson_2013_HSC/plots_multi_panel_Nilsson2013HSC.pdf", 
-                width = 12, height = 9)
+                width = 12, height = 8.5)
 
 
 # Mosmann_2014_activ
 ggdraw() + 
   draw_plot(barplot_F1_pr_re_Mosmann, 0, 0.16, 0.5, 0.66) + 
-  draw_plot(runtime_barplot_Mosmann, 0.56, 0.5, 0.38, 0.5) + 
-  draw_plot(runtime_scatterplot_Mosmann, 0.56, 0.05, 0.38, 0.45) + 
+  draw_plot(runtime_barplot_Mosmann, 0.56, 0.47, 0.38, 0.53) + 
+  draw_plot(runtime_scatterplot_Mosmann, 0.56, 0, 0.38, 0.46) + 
   draw_plot_label(LETTERS[1:3], 
-                  c(0, 0.55, 0.55), c(0.83, 1, 0.5), size = 16)
+                  c(0, 0.55, 0.55), c(0.83, 1, 0.46), size = 16)
 
 ggplot2::ggsave("../plots/Mosmann_2014_activ/plots_multi_panel_Mosmann2014activ.pdf", 
-                width = 12, height = 9)
+                width = 12, height = 8.5)
 
 
 
