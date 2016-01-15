@@ -1,8 +1,8 @@
 #########################################################################################
-# R script to calculate and plot median marker expression for each cluster, and compare 
-# against manually gated (truth)
+# R script to plot cluster median expression values and compare against manually gated
+# populations (truth)
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, January 2016
 #########################################################################################
 
 
@@ -24,11 +24,14 @@ source("load_results_all_other_methods.R")
 
 
 
-######################
-### DATA FOR PLOTS ###
-######################
+####################
+### PREPARE DATA ###
+####################
 
-# data frames containing expression columns only
+# only for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
+
+
+# create data frames containing expression columns only
 
 marker_cols_Levine_32 <- 5:36
 marker_cols_Levine_13 <- 1:13
@@ -229,7 +232,9 @@ for (i in 1:n_methods_Levine_32) {
            annotation_colors = annot_colors, 
            fontsize = 9, 
            fontsize_row = fontsize_row_Levine_32[i], 
-           filename = paste0("../plots/Levine_2015_marrow_32/cluster_medians_", names(medians_Levine_32)[i], "_Levine2015marrow32.pdf"), 
+           filename = paste0("../plots/Levine_2015_marrow_32/cluster_medians_", 
+                             names(medians_Levine_32)[i], 
+                             "_Levine2015marrow32.pdf"), 
            width = 10, 
            height = plot_heights_Levine_32[i])
 }
@@ -256,7 +261,9 @@ for (i in 1:n_methods_Levine_13) {
            annotation_colors = annot_colors, 
            fontsize = 9, 
            fontsize_row = fontsize_row_Levine_13[i], 
-           filename = paste0("../plots/Levine_2015_marrow_13/cluster_medians_", names(medians_Levine_13)[i], "_Levine2015marrow13.pdf"), 
+           filename = paste0("../plots/Levine_2015_marrow_13/cluster_medians_", 
+                             names(medians_Levine_13)[i], 
+                             "_Levine2015marrow13.pdf"), 
            width = 6.75, 
            height = plot_heights_Levine_13[i])
 }
