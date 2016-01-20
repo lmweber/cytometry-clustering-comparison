@@ -10,5 +10,7 @@ paper/**
 plots/**
 results/**
 template/**
+tex_file_from_Gosia/**
+tex_file_from_Charlotte/**
 
 **/.RData
