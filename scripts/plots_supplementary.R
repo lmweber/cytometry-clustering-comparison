@@ -1,12 +1,11 @@
 #########################################################################################
 # R script to generate supplementary figures
 #
-# Lukas M. Weber, January 2016
+# Lukas M. Weber, February 2016
 #########################################################################################
 
 
-### before running this script, run the code in "plots_main_results.R" to load all the
-### necessary packages and objects
+### before running this script, run the code in "plots_main_results.R" to load results
 
 
 
