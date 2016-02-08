@@ -449,3 +449,50 @@ ggplot2::ggsave("../plots/Mosmann_2014_activ/ensemble_clustering/results_barplot
 
 
 
+
+#########################
+### MULTI-PANEL PLOTS ###
+#########################
+
+# combine into one multi-panel plot for each data set
+
+
+# Levine_2015_marrow_32
+ggdraw() + 
+  draw_plot(barplot_mean_F1_Levine_32_ensemble, 0.3, 0.66, 0.4, 0.33) + 
+  draw_plot(boxplots_F1_Levine_32_ensemble, 0.3, 0.33, 0.4, 0.33) + 
+  draw_plot(barplot_mean_F1_pr_re_Levine_32_ensemble, 0.3, 0, 0.4, 0.33) + 
+  draw_plot_label(LETTERS[1:3], c(0.25, 0.25, 0.25), c(0.99, 0.66, 0.33), size = 16)
+
+ggplot2::ggsave("../plots/Levine_2015_marrow_32/ensemble_clustering/plots_multi_panel_Levine2015marrow32_ensemble.pdf", 
+                width = 13, height = 14.5)
+
+
+# Levine_2015_marrow_13
+ggdraw() + 
+  draw_plot(barplot_mean_F1_Levine_13_ensemble, 0.3, 0.66, 0.4, 0.33) + 
+  draw_plot(boxplots_F1_Levine_13_ensemble, 0.3, 0.33, 0.4, 0.33) + 
+  draw_plot(barplot_mean_F1_pr_re_Levine_13_ensemble, 0.3, 0, 0.4, 0.33) + 
+  draw_plot_label(LETTERS[1:3], c(0.25, 0.25, 0.25), c(0.99, 0.66, 0.33), size = 16)
+
+ggplot2::ggsave("../plots/Levine_2015_marrow_13/ensemble_clustering/plots_multi_panel_Levine2015marrow13_ensemble.pdf", 
+                width = 13, height = 14.5)
+
+
+# Nilsson_2013_HSC
+ggdraw() + 
+  draw_plot(barplot_F1_pr_re_Nilsson_ensemble, 0.3, 0, 0.4, 1)
+
+ggplot2::ggsave("../plots/Nilsson_2013_HSC/ensemble_clustering/plots_multi_panel_Nilsson2013HSC_ensemble.pdf", 
+                width = 13, height = 4.9)
+
+
+# Mosmann_2014_activ
+ggdraw() + 
+  draw_plot(barplot_F1_pr_re_Mosmann_ensemble, 0.3, 0, 0.4, 1)
+
+ggplot2::ggsave("../plots/Mosmann_2014_activ/ensemble_clustering/plots_multi_panel_Mosmann2014activ_ensemble.pdf", 
+                width = 13, height = 4.9)
+
+
+
