@@ -1,12 +1,10 @@
 #########################################################################################
 # R script to generate main plots of results
 #
-# Lukas M. Weber, January 2016
+# Lukas M. Weber, February 2016
 #########################################################################################
 
 
-library(pheatmap)
-library(RColorBrewer)
 library(ggplot2)
 library(reshape2)
 library(cowplot)  # note masks ggplot2::ggsave
