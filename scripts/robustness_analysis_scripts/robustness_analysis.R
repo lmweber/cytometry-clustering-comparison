@@ -409,7 +409,7 @@ write.table(res_robust_Nilsson, file = file.path(RESULTS_DIR, "PhenoGraph", "rob
 write.table(res_robust_Mosmann, file = file.path(RESULTS_DIR, "PhenoGraph", "robustness_PhenoGraph_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-# save session information (not relevant here since PhenoGraph is a Python package)
+# save session information (not necessary here since PhenoGraph is a Python package)
 
 # sink(file = file.path(RESULTS_DIR, "PhenoGraph", "session_info_robustness_PhenoGraph.txt"))
 # sessionInfo()
