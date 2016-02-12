@@ -23,13 +23,10 @@ RESULTS_DIR <- "../../results/robustness_analysis"
 ### FLOCK ###
 #############
 
-# helper functions
-source("../helper_match_clusters_and_evaluate.R")
-source("../helper_match_one_rare_cluster_and_evaluate.R")
+### note: run on Mac instead of Linux server, since FLOCK C code did not compile on the server
 
-# true (manually gated) cluster labels for robustness analysis
-source("load_results_truth_robustness.R")
 
+set.seed(1234)
 
 # data sets with multiple populations
 res_robust_Levine_32 <- res_robust_Levine_13 <- 
@@ -39,94 +36,16 @@ res_robust_Levine_32 <- res_robust_Levine_13 <-
 res_robust_Nilsson <- res_robust_Mosmann <- 
   matrix(NA, nrow = n, ncol = 4, dimnames = list(NULL, c("F1", "pr", "re", "runtime")))
 
-
-# load results for FLOCK (see script "run_FLOCK_robustness.R"; FLOCK is not available as an R package)
-
-FLOCK_DIR <- "../../../FLOCK"
+# run clustering method n times
 
 for (i in 1:n) {
+  source("run_FLOCK_robustness.R")
   
-  # note: need to run this code here instead of in a separate script since FLOCK runs
-  # externally from the command line
-  
-  # filenames
-  file_FLOCK_Levine_32 <- paste0(FLOCK_DIR, "/robustness_analysis/Levine_2015_marrow_32/flock_results_Levine_2015_marrow_32_iteration_", i, ".txt")
-  file_FLOCK_Levine_13 <- paste0(FLOCK_DIR, "/robustness_analysis/Levine_2015_marrow_13/flock_results_Levine_2015_marrow_13_iteration_", i, ".txt")
-  file_FLOCK_Nilsson <- paste0(FLOCK_DIR, "/robustness_analysis/Nilsson_2013_HSC/flock_results_Nilsson_2013_HSC_iteration_", i, ".txt")
-  file_FLOCK_Mosmann <- paste0(FLOCK_DIR, "/robustness_analysis/Mosmann_2014_activ/flock_results_Mosmann_2014_activ_iteration_", i, ".txt")
-  
-  file_runtime_FLOCK_Levine_32 <- paste0(FLOCK_DIR, "/robustness_analysis/Levine_2015_marrow_32/runtime_Levine_2015_marrow_32_iteration_", i, ".txt")
-  file_runtime_FLOCK_Levine_13 <- paste0(FLOCK_DIR, "/robustness_analysis/Levine_2015_marrow_13/runtime_Levine_2015_marrow_13_iteration_", i, ".txt")
-  file_runtime_FLOCK_Nilsson <- paste0(FLOCK_DIR, "/robustness_analysis/Nilsson_2013_HSC/runtime_Nilsson_2013_HSC_iteration_", i, ".txt")
-  file_runtime_FLOCK_Mosmann <- paste0(FLOCK_DIR, "/robustness_analysis/Mosmann_2014_activ/runtime_Mosmann_2014_activ_iteration_", i, ".txt")
-  
-  # data
-  data_FLOCK_Levine_32 <- read.table(file_FLOCK_Levine_32, header = TRUE, sep = "\t")
-  data_FLOCK_Levine_13 <- read.table(file_FLOCK_Levine_13, header = TRUE, sep = "\t")
-  data_FLOCK_Nilsson <- read.table(file_FLOCK_Nilsson, header = TRUE, sep = "\t")
-  data_FLOCK_Mosmann <- read.table(file_FLOCK_Mosmann, header = TRUE, sep = "\t")
-  
-  clus_FLOCK_Levine_32 <- data_FLOCK_Levine_32[, "Population"]
-  clus_FLOCK_Levine_13 <- data_FLOCK_Levine_13[, "Population"]
-  clus_FLOCK_Nilsson <- data_FLOCK_Nilsson[, "Population"]
-  clus_FLOCK_Mosmann <- data_FLOCK_Mosmann[, "Population"]
-  
-  # runtime
-  runtime_FLOCK_Levine_32 <- read.table(file_runtime_FLOCK_Levine_32, header = TRUE, sep = "\t")
-  runtime_FLOCK_Levine_13 <- read.table(file_runtime_FLOCK_Levine_13, header = TRUE, sep = "\t")
-  runtime_FLOCK_Nilsson <- read.table(file_runtime_FLOCK_Nilsson, header = TRUE, sep = "\t")
-  runtime_FLOCK_Mosmann <- read.table(file_runtime_FLOCK_Mosmann, header = TRUE, sep = "\t")
-  
-  # calculate results
-  
-  # match cluster labels by highest F1 score and calculate results
-  # precision, recall, F1 score, matched cluster labels, number of cells per matched cluster
-  res_FLOCK_Levine_32 <- helper_match_clusters_and_evaluate(clus_FLOCK_Levine_32, clus_truth_Levine_32)
-  res_FLOCK_Levine_13 <- helper_match_clusters_and_evaluate(clus_FLOCK_Levine_13, clus_truth_Levine_13)
-  res_FLOCK_Nilsson <- helper_match_one_rare_cluster_and_evaluate(clus_FLOCK_Nilsson, clus_truth_Nilsson)
-  res_FLOCK_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_FLOCK_Mosmann, clus_truth_Mosmann)
-  
-  # output results
-  
-  # data sets with multiple populations (Levine_32, Levine_13)
-  # output mean F1 score, mean precision, mean recall, runtime
-  res_robust_FLOCK_Levine_32 <- list(
-    mean_F1 = mean(res_FLOCK_Levine_32$F1), 
-    mean_pr = mean(res_FLOCK_Levine_32$pr), 
-    mean_re = mean(res_FLOCK_Levine_32$re), 
-    runtime = runtime_FLOCK_Levine_32[, "x"]
-  )
-  
-  res_robust_FLOCK_Levine_13 <- list(
-    mean_F1 = mean(res_FLOCK_Levine_13$F1), 
-    mean_pr = mean(res_FLOCK_Levine_13$pr), 
-    mean_re = mean(res_FLOCK_Levine_13$re), 
-    runtime = runtime_FLOCK_Levine_13[, "x"]
-  )
-  
-  # data sets with a single rare population of interest (Nilsson, Mosmann)
-  # output F1 score, precision, recall (for population of interest), and runtime
-  res_robust_FLOCK_Nilsson <- list(
-    F1 = as.numeric(res_FLOCK_Nilsson$F1), 
-    pr = as.numeric(res_FLOCK_Nilsson$pr), 
-    re = as.numeric(res_FLOCK_Nilsson$re), 
-    runtime = runtime_FLOCK_Nilsson[, "x"]
-  )
-  
-  res_robust_FLOCK_Mosmann <- list(
-    F1 = as.numeric(res_FLOCK_Mosmann$F1), 
-    pr = as.numeric(res_FLOCK_Mosmann$pr), 
-    re = as.numeric(res_FLOCK_Mosmann$re), 
-    runtime = runtime_FLOCK_Mosmann[, "x"]
-  )
-  
-  # store results
   res_robust_Levine_32[i, ] <- unlist(res_robust_FLOCK_Levine_32)
   res_robust_Levine_13[i, ] <- unlist(res_robust_FLOCK_Levine_13)
   res_robust_Nilsson[i, ] <- unlist(res_robust_FLOCK_Nilsson)
   res_robust_Mosmann[i, ] <- unlist(res_robust_FLOCK_Mosmann)
 }
-
 
 # save results to files
 
@@ -139,11 +58,11 @@ write.table(res_robust_Nilsson, file = file.path(RESULTS_DIR, "FLOCK", "robustne
 write.table(res_robust_Mosmann, file = file.path(RESULTS_DIR, "FLOCK", "robustness_FLOCK_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-# save session information
+# save session information (not relevant here since FLOCK is a command-line program)
 
-sink(file = file.path(RESULTS_DIR, "FLOCK", "session_info_robustness_FLOCK.txt"))
-sessionInfo()
-sink()
+# sink(file = file.path(RESULTS_DIR, "FLOCK", "session_info_robustness_FLOCK.txt"))
+# sessionInfo()
+# sink()
 
 
 
@@ -409,7 +328,7 @@ write.table(res_robust_Nilsson, file = file.path(RESULTS_DIR, "PhenoGraph", "rob
 write.table(res_robust_Mosmann, file = file.path(RESULTS_DIR, "PhenoGraph", "robustness_PhenoGraph_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-# save session information (not necessary here since PhenoGraph is a Python package)
+# save session information (not relevant here since PhenoGraph is a Python package)
 
 # sink(file = file.path(RESULTS_DIR, "PhenoGraph", "session_info_robustness_PhenoGraph.txt"))
 # sessionInfo()
