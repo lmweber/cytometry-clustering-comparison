@@ -55,7 +55,7 @@ communities_Mosmann, graph_Mosmann, Q_Mosmann = phenograph.cluster(data_Mosmann,
 
 # export results as tab-delimited text file
 
-OUT_DIR = "../../results/PhenoGraph"
+OUT_DIR = "../../results/robustness_analysis/PhenoGraph"
 
 file_out_Mosmann = OUT_DIR + "/python_out_Mosmann.txt"
 

@@ -49,12 +49,12 @@ runtime_Mosmann <- system.time(
 
 # load cluster labels
 
-OUT_DIR <- "../../results/PhenoGraph"
+OUT_DIR <- "../../results/robustness_analysis/PhenoGraph"
 
 file_out_Levine_32 <- file.path(OUT_DIR, "python_out_Levine_32.txt")
-file_out_Levine_13 <- file.path(OUT_DIR, "/python_out_Levine_13.txt")
-file_out_Nilsson <- file.path(OUT_DIR, "/python_out_Nilsson.txt")
-file_out_Mosmann <- file.path(OUT_DIR, "/python_out_Mosmann.txt")
+file_out_Levine_13 <- file.path(OUT_DIR, "python_out_Levine_13.txt")
+file_out_Nilsson <- file.path(OUT_DIR, "python_out_Nilsson.txt")
+file_out_Mosmann <- file.path(OUT_DIR, "python_out_Mosmann.txt")
 
 
 # load cluster labels

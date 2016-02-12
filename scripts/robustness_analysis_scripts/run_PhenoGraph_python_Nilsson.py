@@ -55,7 +55,7 @@ communities_Nilsson, graph_Nilsson, Q_Nilsson = phenograph.cluster(data_Nilsson,
 
 # export results as tab-delimited text file
 
-OUT_DIR = "../../results/PhenoGraph"
+OUT_DIR = "../../results/robustness_analysis/PhenoGraph"
 
 file_out_Nilsson = OUT_DIR + "/python_out_Nilsson.txt"
 

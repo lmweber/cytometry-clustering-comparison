@@ -55,7 +55,7 @@ communities_Levine_13, graph_Levine_13, Q_Levine_13 = phenograph.cluster(data_Le
 
 # export results as tab-delimited text file
 
-OUT_DIR = "../../results/PhenoGraph"
+OUT_DIR = "../../results/robustness_analysis/PhenoGraph"
 
 file_out_Levine_13 = OUT_DIR + "/python_out_Levine_13.txt"
 
