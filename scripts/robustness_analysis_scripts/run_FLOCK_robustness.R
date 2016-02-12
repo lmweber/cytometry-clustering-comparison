@@ -47,6 +47,8 @@ file_Mosmann <- "Mosmann_2014_activ_markers_only.txt"
 # run FLOCK once for each data set and read in results as R objects (FLOCK overwrites the
 # results file "flock_results.txt" each time)
 
+
+# switch to FLOCK working directory
 setwd(FLOCK_DIR)
 
 
@@ -78,6 +80,7 @@ res_FLOCK_Mosmann <- read.table("flock_results.txt", header = TRUE, sep = "\t")
 clus_FLOCK_Mosmann <- res_FLOCK_Mosmann[, "Population"]
 
 
+# reset working directory
 setwd(ORIGINAL_DIR)
 
 
