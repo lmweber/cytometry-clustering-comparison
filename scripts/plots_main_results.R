@@ -574,7 +574,7 @@ runtime_Mosmann_tidy
 runtime_barplot_Levine_32 <- 
   ggplot(runtime_Levine_32_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", aes(fill = cores)) + 
-  scale_fill_manual(values = c("purple4", "darkblue")) + 
+  scale_fill_manual(values = c("purple4", "gray30")) + 
   geom_text(aes(label = round(value, 0), y = value + 1400, angle = 90), size = 3.5) + 
   ggtitle("Runtime: Levine_2015_marrow_32") + 
   ylim(0, 20500) + 
@@ -597,7 +597,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/runtime_barplot_Levine2015marrow
 runtime_barplot_Levine_13 <- 
   ggplot(runtime_Levine_13_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", aes(fill = cores)) + 
-  scale_fill_manual(values = c("purple4", "darkblue")) + 
+  scale_fill_manual(values = c("purple4", "gray30")) + 
   geom_text(aes(label = round(value, 0), y = value + 650, angle = 90), size = 3.5) + 
   ggtitle("Runtime: Levine_2015_marrow_13") + 
   ylim(0, 10500) + 
@@ -620,7 +620,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_13/runtime_barplot_Levine2015marrow
 runtime_barplot_Nilsson <- 
   ggplot(runtime_Nilsson_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", aes(fill = cores)) + 
-  scale_fill_manual(values = c("purple4", "darkblue")) + 
+  scale_fill_manual(values = c("purple4", "gray30")) + 
   geom_text(aes(label = round(value, 0), y = value + 850, angle = 90), size = 3.5) + 
   ggtitle("Runtime: Nilsson_2013_HSC") + 
   ylim(0, 11500) + 
@@ -643,7 +643,7 @@ ggplot2::ggsave("../plots/Nilsson_2013_HSC/runtime_barplot_Nilsson2013HSC.pdf",
 runtime_barplot_Mosmann <- 
   ggplot(runtime_Mosmann_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", aes(fill = cores)) + 
-  scale_fill_manual(values = c("purple4", "darkblue")) + 
+  scale_fill_manual(values = c("purple4", "gray30")) + 
   geom_text(aes(label = round(value, 0), y = value + 1600, angle = 90), size = 3.5) + 
   ggtitle("Runtime: Mosmann_2014_activ") + 
   ylim(0, 20000) + 
