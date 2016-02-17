@@ -693,7 +693,7 @@ runtime_vs_F1_Levine_13_tidy
 runtime_scatterplot_Levine_32 <- 
   ggplot(runtime_vs_F1_Levine_32_tidy, aes(x = mean_F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 7) + 
+  geom_text_repel(aes(label = method), size = 2.5) + 
   xlim(0.1, 0.82) + 
   ylim(-1000, 18500) + 
   ggtitle("Runtime vs. mean F1: Levine_2015_marrow_32") + 
@@ -710,7 +710,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/runtime_scatterplot_Levine2015ma
 runtime_scatterplot_Levine_13 <- 
   ggplot(runtime_vs_F1_Levine_13_tidy, aes(x = mean_F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 7) + 
+  geom_text_repel(aes(label = method), size = 2.5) + 
   xlim(0.1, 0.82) + 
   ylim(-1000, 9500) + 
   ggtitle("Runtime vs. mean F1: Levine_2015_marrow_13") + 
@@ -745,7 +745,7 @@ runtime_vs_F1_Mosmann_tidy
 runtime_scatterplot_Nilsson <- 
   ggplot(runtime_vs_F1_Nilsson_tidy, aes(x = F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 5) + 
+  geom_text_repel(aes(label = method), size = 2.5) + 
   xlim(-0.05, 0.65) + 
   ylim(-1000, 10500) + 
   ggtitle("Runtime vs. F1: Nilsson_2013_HSC") + 
@@ -762,7 +762,7 @@ ggplot2::ggsave("../plots/Nilsson_2013_HSC/runtime_scatterplot_Nilsson2013HSC.pd
 runtime_scatterplot_Mosmann <- 
   ggplot(runtime_vs_F1_Mosmann_tidy, aes(x = F1, y = runtime)) +  # note no Rclusterpp
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.6, "lines"), force = 10) + 
+  geom_text_repel(aes(label = method), size = 2.5) + 
   xlim(-0.05, 0.65) + 
   ylim(-1000, 18000) + 
   ggtitle("Runtime vs. F1: Mosmann_2014_activ") + 
