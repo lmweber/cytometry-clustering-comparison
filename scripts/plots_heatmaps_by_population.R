@@ -43,13 +43,13 @@ titles_Levine_13 <- c("(A)   F1 score: Levine_2015_marrow_13",
                       "(C)   Recall: Levine_2015_marrow_13")
 
 
-filenames_Levine_32 <- c("../plots/Levine_2015_marrow_32/results_heatmap_F1_Levine2015marrow32.pdf", 
-                         "../plots/Levine_2015_marrow_32/results_heatmap_precision_Levine2015marrow32.pdf", 
-                         "../plots/Levine_2015_marrow_32/results_heatmap_recall_Levine2015marrow32.pdf")
+filenames_Levine_32 <- c("../plots/Levine_2015_marrow_32/heatmaps/results_heatmap_F1_Levine2015marrow32.pdf", 
+                         "../plots/Levine_2015_marrow_32/heatmaps/results_heatmap_precision_Levine2015marrow32.pdf", 
+                         "../plots/Levine_2015_marrow_32/heatmaps/results_heatmap_recall_Levine2015marrow32.pdf")
 
-filenames_Levine_13 <- c("../plots/Levine_2015_marrow_13/results_heatmap_F1_Levine2015marrow13.pdf", 
-                         "../plots/Levine_2015_marrow_13/results_heatmap_precision_Levine2015marrow13.pdf", 
-                         "../plots/Levine_2015_marrow_13/results_heatmap_recall_Levine2015marrow13.pdf")
+filenames_Levine_13 <- c("../plots/Levine_2015_marrow_13/heatmaps/results_heatmap_F1_Levine2015marrow13.pdf", 
+                         "../plots/Levine_2015_marrow_13/heatmaps/results_heatmap_precision_Levine2015marrow13.pdf", 
+                         "../plots/Levine_2015_marrow_13/heatmaps/results_heatmap_recall_Levine2015marrow13.pdf")
 
 
 # heatmaps of F1 score, precision, and recall for each true population
