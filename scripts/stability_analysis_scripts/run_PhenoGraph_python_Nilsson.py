@@ -41,11 +41,11 @@ data_Nilsson = data_Nilsson[:, marker_cols_Nilsson]
 ### Run PhenoGraph ###
 ######################
 
-# set n_jobs = 1 to use 1 core only, for comparability with main results
+# note: tried setting n_jobs = 1 for comparability with main results, but doesn't appear to work
 
 import phenograph
 
-communities_Nilsson, graph_Nilsson, Q_Nilsson = phenograph.cluster(data_Nilsson, n_jobs = 1)
+communities_Nilsson, graph_Nilsson, Q_Nilsson = phenograph.cluster(data_Nilsson)
 
 
 

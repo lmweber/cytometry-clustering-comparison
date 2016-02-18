@@ -41,11 +41,11 @@ data_Mosmann = data_Mosmann[:, marker_cols_Mosmann]
 ### Run PhenoGraph ###
 ######################
 
-# set n_jobs = 1 to use 1 core only, for comparability with main results
+# note: tried setting n_jobs = 1 for comparability with main results, but doesn't appear to work
 
 import phenograph
 
-communities_Mosmann, graph_Mosmann, Q_Mosmann = phenograph.cluster(data_Mosmann, n_jobs = 1)
+communities_Mosmann, graph_Mosmann, Q_Mosmann = phenograph.cluster(data_Mosmann)
 
 
 

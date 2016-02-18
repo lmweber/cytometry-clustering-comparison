@@ -41,11 +41,11 @@ data_Levine_13 = data_Levine_13[:, marker_cols_Levine_13]
 ### Run PhenoGraph ###
 ######################
 
-# set n_jobs = 1 to use 1 core only, for comparability with main results
+# note: tried setting n_jobs = 1 for comparability with main results, but doesn't appear to work
 
 import phenograph
 
-communities_Levine_13, graph_Levine_13, Q_Levine_13 = phenograph.cluster(data_Levine_13, n_jobs = 1)
+communities_Levine_13, graph_Levine_13, Q_Levine_13 = phenograph.cluster(data_Levine_13)
 
 
 

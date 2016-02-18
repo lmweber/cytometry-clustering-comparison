@@ -239,22 +239,6 @@ df_stability_runtime_Mosmann_tidy <- melt(df_stability_runtime_Mosmann_tidy,
                                           id.vars = "method", measure.vars = "runtime")
 
 
-# remove PhenoGraph (not comparable since used Python implementation and multiple cores)
-# note: ggplot2 doesn't require fixing unused factor levels or re-numbering rows
-
-df_stability_runtime_Levine_32_tidy <- 
-  df_stability_runtime_Levine_32_tidy[df_stability_runtime_Levine_32_tidy$method != "PhenoGraph", ]
-
-df_stability_runtime_Levine_13_tidy <- 
-  df_stability_runtime_Levine_13_tidy[df_stability_runtime_Levine_13_tidy$method != "PhenoGraph", ]
-
-df_stability_runtime_Nilsson_tidy <- 
-  df_stability_runtime_Nilsson_tidy[df_stability_runtime_Nilsson_tidy$method != "PhenoGraph", ]
-
-df_stability_runtime_Mosmann_tidy <- 
-  df_stability_runtime_Mosmann_tidy[df_stability_runtime_Mosmann_tidy$method != "PhenoGraph", ]
-
-
 
 
 ##############################################
