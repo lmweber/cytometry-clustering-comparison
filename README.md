@@ -1,24 +1,32 @@
 # Comparison of clustering methods for high-dimensional single-cell flow and mass cytometry data
 
+This repository contains R scripts to reproduce the analysis and figures in our paper on comparing clustering methods for high-dimensional single-cell flow and mass cytometry data.
+
+(reference and link to bioRxiv preprint here when submitted)
+
+
 ## Overview
 
-This repository contains R scripts to reproduce the analysis in our paper on comparing clustering methods for high-dimensional single-cell flow and mass cytometry data.
+In this study, we compared the performance of 13 clustering methods (11 distinct methods and two variations) for automatically detecting clusters representing cell populations in high-dimensional flow and mass cytometry data sets. A list of the clustering methods can be found in Table 1 in the paper.
 
-We compared 13 clustering methods (including two variations of methods), using four publicly available, real data sets from experiments in immunology. The data sets are:
+We tested the clustering methods using four publicly available, real data sets from high-dimensional flow and mass cytometry experiments in immunology. A summary of the data sets is provided in Table 2 in the paper.
 
-- Levine_2015_marrow_32: a 32-dimensional mass cytometry data set containing 14 major immune cell populations, from Levine et al. (2015).
-
-- Levine_2015_marrow_13: a 13-dimensional mass cytometry data set containing 24 major immune cell populations, from Levine et al. (2015).
-
-- Nilsson_2013_HSC: a 13-dimensional flow cytometry data set, containing a single rare cell population of interest, from Nilsson et al. (2013). The rare population consists of hematopoietic stem cells (HSCs), and accounts for 0.8% of total cells in the data set.
-
-- Mosmann_2014_activ: a 15-dimensional flow cytometry data set, containing a single rare cell population of interest, from Mosmann et al. (2014). The rare population consists of activated (cytokine-producing) memory CD4 T cells, and accounts for 0.03% of total cells in the data set.
+(sentence on main results)
 
 
 ## Contents
 
-R scripts are saved in the [scripts](scripts/) folder.
+All R scripts are saved in the [scripts](scripts/) folder.
 
-R scripts to prepare the benchmark data sets are saved in [scripts/data_preparation_scripts](scripts/data_preparation_scripts).
+Each script contains comments explaining the overall purpose of the script, as well as the individual steps within it.
 
-Currently, the repository contains R scripts only. The final version will also include PDF files of all figures included in the paper, as well as additional information in the README.
+The main R script to reproduce the figures shown in the paper is [scripts/plots_main_results.R](scripts/plots_main_results.R). R scripts to reproduce the data preprocessing steps are saved in [scripts/data_preparation_scripts](scripts/data_preparation_scripts/).
+
+
+## Data files
+
+Preprocessed data files required to reproduce the analysis and figures are available from FlowRepository (repository FR-FCM-ZZPH).
+
+Original data files are publicly available from the references listed in Table 2 in the paper.
+
+
