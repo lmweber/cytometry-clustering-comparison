@@ -7,6 +7,7 @@
 
 library(ggplot2)
 library(reshape2)
+library(cowplot)  # note masks ggplot2::ggsave
 
 
 
@@ -48,8 +49,8 @@ files_PhenoGraph <- list.files(file.path(STABILITY_DIR, "PhenoGraph"), "^stabili
 files_PhenoGraph <- files_PhenoGraph[c(2, 1, 4, 3)]
 res_stability_PhenoGraph <- lapply(files_PhenoGraph, function(f) read.table(f, header = TRUE, sep = "\t"))
 
-files_SamSPECTRAL <- list.files(file.path(STABILITY_DIR, "SamSPECTRAL_without_Mosmann"), "^stability", full.names = TRUE)
-files_SamSPECTRAL <- files_SamSPECTRAL[c(2, 1, 3)]  # Mosmann not complete yet
+files_SamSPECTRAL <- list.files(file.path(STABILITY_DIR, "SamSPECTRAL"), "^stability", full.names = TRUE)
+files_SamSPECTRAL <- files_SamSPECTRAL[c(2, 1, 4, 3)]
 res_stability_SamSPECTRAL <- lapply(files_SamSPECTRAL, function(f) read.table(f, header = TRUE, sep = "\t"))
 
 
@@ -88,8 +89,8 @@ res_stability_Mosmann <- list(FLOCK = res_stability_FLOCK[[4]],
                               FlowSOM_meta = res_stability_FlowSOM_meta[[4]], 
                               immunoClust = res_stability_immunoClust[[4]], 
                               immunoClust_all = res_stability_immunoClust_all[[4]], 
-                              PhenoGraph = res_stability_PhenoGraph[[4]]) #, 
-                              #SamSPECTRAL = res_stability_SamSPECTRAL[[4]])  # not complete yet
+                              PhenoGraph = res_stability_PhenoGraph[[4]], 
+                              SamSPECTRAL = res_stability_SamSPECTRAL[[4]])
 
 
 # collapse into data frames
@@ -120,7 +121,7 @@ df_stability_runtime_Mosmann <- as.data.frame(sapply(res_stability_Mosmann, func
 ord_stability_Levine_32 <- c(4, 2, 1, 7, 3, 8, 6, 5)
 ord_stability_Levine_13 <- c(4, 7, 2, 1, 8, 3, 6, 5)
 ord_stability_Nilsson <- c(2, 4, 3, 7, 6, 1, 8, 5)
-ord_stability_Mosmann <- c(7, 4, 3, 2, 1, 6, 5)  # SamSPECTRAL not included yet
+ord_stability_Mosmann <- c(8, 7, 4, 3, 2, 1, 6, 5)
 
 df_stability_F1_Levine_32 <- df_stability_F1_Levine_32[, ord_stability_Levine_32]
 df_stability_F1_Levine_13 <- df_stability_F1_Levine_13[, ord_stability_Levine_13]
@@ -430,6 +431,55 @@ boxplots_stability_runtime_Mosmann <-
 boxplots_stability_runtime_Mosmann
 ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_boxplots_runtime_Mosmann2014activ.pdf", 
                 width = 5, height = 5)
+
+
+
+
+#########################
+### MULTI-PANEL PLOTS ###
+#########################
+
+# combine into one multi-panel plot for each data set
+
+
+# Levine_32
+ggdraw() + 
+  draw_plot(boxplots_stability_Levine_32, 0.05, 0, 0.4, 1) + 
+  draw_plot(boxplots_stability_runtime_Levine_32, 0.55, 0, 0.4, 1) +
+  draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
+
+ggplot2::ggsave("../plots/Levine_2015_marrow_32/stability_analysis/stability_multi_panel_Levine2015marrow32.pdf", 
+                width = 13, height = 5)
+
+
+# Levine_13
+ggdraw() + 
+  draw_plot(boxplots_stability_Levine_13, 0.05, 0, 0.4, 1) + 
+  draw_plot(boxplots_stability_runtime_Levine_13, 0.55, 0, 0.4, 1) +
+  draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
+
+ggplot2::ggsave("../plots/Levine_2015_marrow_13/stability_analysis/stability_multi_panel_Levine2015marrow13.pdf", 
+                width = 13, height = 5)
+
+
+# Nilsson
+ggdraw() + 
+  draw_plot(boxplots_stability_Nilsson, 0.05, 0, 0.4, 1) + 
+  draw_plot(boxplots_stability_runtime_Nilsson, 0.55, 0, 0.4, 1) +
+  draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
+
+ggplot2::ggsave("../plots/Nilsson_2013_HSC/stability_analysis/stability_multi_panel_Nilsson2013HSC.pdf", 
+                width = 13, height = 5)
+
+
+# Mosmann
+ggdraw() + 
+  draw_plot(boxplots_stability_Mosmann, 0.05, 0, 0.4, 1) + 
+  draw_plot(boxplots_stability_runtime_Mosmann, 0.55, 0, 0.4, 1) +
+  draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
+
+ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_multi_panel_Mosmann2014activ.pdf", 
+                width = 13, height = 5)
 
 
 
