@@ -1,5 +1,5 @@
 #########################################################################################
-# R script to load results for manually gated populations (truth) for robustness analysis
+# R script to load results for manually gated populations (truth) for stability analysis
 #
 # Lukas M. Weber, February 2016
 #########################################################################################

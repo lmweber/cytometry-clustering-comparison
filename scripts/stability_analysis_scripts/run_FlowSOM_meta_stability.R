@@ -1,12 +1,12 @@
 #########################################################################################
-# R script to run FlowSOM for robustness analysis
+# R script to run FlowSOM_meta for stability analysis
 # 
-# This script runs one iteration of FlowSOM for the robustness analysis. The main script 
-# "robustness_analysis.R" then runs the scripts for each clustering method several times
-# in a loop.
+# This script runs one iteration of FlowSOM_meta for the stability analysis. The main 
+# script "stability_analysis.R" then runs the scripts for each clustering method several
+# times in a loop.
 # 
 # Note: Don't set any random seeds here, since we want a different random start for each 
-# iteration in the robustness analysis.
+# iteration in the stability analysis.
 # 
 # Lukas M. Weber, February 2016
 #########################################################################################
@@ -19,8 +19,8 @@ library(FlowSOM)
 source("../helper_match_clusters_and_evaluate.R")
 source("../helper_match_one_rare_cluster_and_evaluate.R")
 
-# true (manually gated) cluster labels for robustness analysis
-source("load_results_truth_robustness.R")
+# true (manually gated) cluster labels for stability analysis
+source("load_results_truth_stability.R")
 
 
 
@@ -156,34 +156,34 @@ clus_FlowSOM_Mosmann <- fSOM_Mosmann$map$mapping[, 1]
 # run optional metaclustering step (FlowSOM_meta)
 
 # set number of clusters
-# k_Levine_32 <- 20
-# k_Levine_13 <- 30
-# k_Nilsson <- 50
-# k_Mosmann <- 50
+k_Levine_32 <- 20
+k_Levine_13 <- 30
+k_Nilsson <- 50
+k_Mosmann <- 50
 
 
 # set.seed(123)
-# runtime_FlowSOM_meta_Levine_32 <- system.time({
-#   meta_clustering_Levine_32 <- FlowSOM::metaClustering_consensus(fSOM_Levine_32$map$codes, k = k_Levine_32)
-# })
+runtime_FlowSOM_meta_Levine_32 <- system.time({
+  meta_clustering_Levine_32 <- FlowSOM::metaClustering_consensus(fSOM_Levine_32$map$codes, k = k_Levine_32)
+})
 
 
 # set.seed(123)
-# runtime_FlowSOM_meta_Levine_13 <- system.time({
-#   meta_clustering_Levine_13 <- FlowSOM::metaClustering_consensus(fSOM_Levine_13$map$codes, k = k_Levine_13)
-# })
+runtime_FlowSOM_meta_Levine_13 <- system.time({
+  meta_clustering_Levine_13 <- FlowSOM::metaClustering_consensus(fSOM_Levine_13$map$codes, k = k_Levine_13)
+})
 
 
 # set.seed(123)
-# runtime_FlowSOM_meta_Nilsson <- system.time({
-#   meta_clustering_Nilsson <- FlowSOM::metaClustering_consensus(fSOM_Nilsson$map$codes, k = k_Nilsson)
-# })
+runtime_FlowSOM_meta_Nilsson <- system.time({
+  meta_clustering_Nilsson <- FlowSOM::metaClustering_consensus(fSOM_Nilsson$map$codes, k = k_Nilsson)
+})
 
 
 # set.seed(123)
-# runtime_FlowSOM_meta_Mosmann <- system.time({
-#   meta_clustering_Mosmann <- FlowSOM::metaClustering_consensus(fSOM_Mosmann$map$codes, k = k_Mosmann)
-# })
+runtime_FlowSOM_meta_Mosmann <- system.time({
+  meta_clustering_Mosmann <- FlowSOM::metaClustering_consensus(fSOM_Mosmann$map$codes, k = k_Mosmann)
+})
 
 
 # alternatively: set number of clusters automatically (does not perform well)
@@ -219,10 +219,10 @@ clus_FlowSOM_Mosmann <- fSOM_Mosmann$map$mapping[, 1]
 
 # combine runtime
 
-# runtime_FlowSOM_meta_Levine_32 <- runtime_FlowSOM_Levine_32 + runtime_FlowSOM_meta_Levine_32
-# runtime_FlowSOM_meta_Levine_13 <- runtime_FlowSOM_Levine_13 + runtime_FlowSOM_meta_Levine_13
-# runtime_FlowSOM_meta_Nilsson <- runtime_FlowSOM_Nilsson + runtime_FlowSOM_meta_Nilsson
-# runtime_FlowSOM_meta_Mosmann <- runtime_FlowSOM_Mosmann + runtime_FlowSOM_meta_Mosmann
+runtime_FlowSOM_meta_Levine_32 <- runtime_FlowSOM_Levine_32 + runtime_FlowSOM_meta_Levine_32
+runtime_FlowSOM_meta_Levine_13 <- runtime_FlowSOM_Levine_13 + runtime_FlowSOM_meta_Levine_13
+runtime_FlowSOM_meta_Nilsson <- runtime_FlowSOM_Nilsson + runtime_FlowSOM_meta_Nilsson
+runtime_FlowSOM_meta_Mosmann <- runtime_FlowSOM_Mosmann + runtime_FlowSOM_meta_Mosmann
 
 
 # extract cluster labels
@@ -232,10 +232,10 @@ clus_FlowSOM_Mosmann <- fSOM_Mosmann$map$mapping[, 1]
 # meta_clustering_Nilsson
 # meta_clustering_Mosmann
 
-# clus_FlowSOM_meta_Levine_32 <- meta_clustering_Levine_32[fSOM_Levine_32$map$mapping[, 1]]
-# clus_FlowSOM_meta_Levine_13 <- meta_clustering_Levine_13[fSOM_Levine_13$map$mapping[, 1]]
-# clus_FlowSOM_meta_Nilsson <- meta_clustering_Nilsson[fSOM_Nilsson$map$mapping[, 1]]
-# clus_FlowSOM_meta_Mosmann <- meta_clustering_Mosmann[fSOM_Mosmann$map$mapping[, 1]]
+clus_FlowSOM_meta_Levine_32 <- meta_clustering_Levine_32[fSOM_Levine_32$map$mapping[, 1]]
+clus_FlowSOM_meta_Levine_13 <- meta_clustering_Levine_13[fSOM_Levine_13$map$mapping[, 1]]
+clus_FlowSOM_meta_Nilsson <- meta_clustering_Nilsson[fSOM_Nilsson$map$mapping[, 1]]
+clus_FlowSOM_meta_Mosmann <- meta_clustering_Mosmann[fSOM_Mosmann$map$mapping[, 1]]
 
 # length(clus_FlowSOM_meta_Levine_32)
 # length(clus_FlowSOM_meta_Levine_13)
@@ -265,56 +265,56 @@ clus_FlowSOM_Mosmann <- fSOM_Mosmann$map$mapping[, 1]
 # match cluster labels by highest F1 score and calculate results
 # precision, recall, F1 score, matched cluster labels, number of cells per matched cluster
 
-res_FlowSOM_Levine_32 <- helper_match_clusters_and_evaluate(clus_FlowSOM_Levine_32, clus_truth_Levine_32)
-res_FlowSOM_Levine_13 <- helper_match_clusters_and_evaluate(clus_FlowSOM_Levine_13, clus_truth_Levine_13)
-res_FlowSOM_Nilsson <- helper_match_one_rare_cluster_and_evaluate(clus_FlowSOM_Nilsson, clus_truth_Nilsson)
-res_FlowSOM_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_FlowSOM_Mosmann, clus_truth_Mosmann)
+res_FlowSOM_meta_Levine_32 <- helper_match_clusters_and_evaluate(clus_FlowSOM_meta_Levine_32, clus_truth_Levine_32)
+res_FlowSOM_meta_Levine_13 <- helper_match_clusters_and_evaluate(clus_FlowSOM_meta_Levine_13, clus_truth_Levine_13)
+res_FlowSOM_meta_Nilsson <- helper_match_one_rare_cluster_and_evaluate(clus_FlowSOM_meta_Nilsson, clus_truth_Nilsson)
+res_FlowSOM_meta_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_FlowSOM_meta_Mosmann, clus_truth_Mosmann)
 
-# res_FlowSOM_Levine_32
-# res_FlowSOM_Levine_13
-# res_FlowSOM_Nilsson
-# res_FlowSOM_Mosmann
-
-
+# res_FlowSOM_meta_Levine_32
+# res_FlowSOM_meta_Levine_13
+# res_FlowSOM_meta_Nilsson
+# res_FlowSOM_meta_Mosmann
 
 
-###############################################################
-### OUTPUT RESULTS FOR ONE ITERATION OF ROBUSTNESS ANALYSIS ###
-###############################################################
+
+
+##############################################################
+### OUTPUT RESULTS FOR ONE ITERATION OF STABILITY ANALYSIS ###
+##############################################################
 
 # data sets with multiple populations (Levine_32, Levine_13)
 # output mean F1 score, mean precision, mean recall, runtime
 
-res_robust_FlowSOM_Levine_32 <- list(
-  mean_F1 = mean(res_FlowSOM_Levine_32$F1), 
-  mean_pr = mean(res_FlowSOM_Levine_32$pr), 
-  mean_re = mean(res_FlowSOM_Levine_32$re), 
-  runtime = unname(runtime_FlowSOM_Levine_32["elapsed"])
+res_stability_FlowSOM_meta_Levine_32 <- list(
+  mean_F1 = mean(res_FlowSOM_meta_Levine_32$F1), 
+  mean_pr = mean(res_FlowSOM_meta_Levine_32$pr), 
+  mean_re = mean(res_FlowSOM_meta_Levine_32$re), 
+  runtime = unname(runtime_FlowSOM_meta_Levine_32["elapsed"])
 )
 
-res_robust_FlowSOM_Levine_13 <- list(
-  mean_F1 = mean(res_FlowSOM_Levine_13$F1), 
-  mean_pr = mean(res_FlowSOM_Levine_13$pr), 
-  mean_re = mean(res_FlowSOM_Levine_13$re), 
-  runtime = unname(runtime_FlowSOM_Levine_13["elapsed"])
+res_stability_FlowSOM_meta_Levine_13 <- list(
+  mean_F1 = mean(res_FlowSOM_meta_Levine_13$F1), 
+  mean_pr = mean(res_FlowSOM_meta_Levine_13$pr), 
+  mean_re = mean(res_FlowSOM_meta_Levine_13$re), 
+  runtime = unname(runtime_FlowSOM_meta_Levine_13["elapsed"])
 )
 
 
 # data sets with a single rare population of interest (Nilsson, Mosmann)
 # output F1 score, precision, recall (for population of interest), and runtime
 
-res_robust_FlowSOM_Nilsson <- list(
-  F1 = as.numeric(res_FlowSOM_Nilsson$F1), 
-  pr = as.numeric(res_FlowSOM_Nilsson$pr), 
-  re = as.numeric(res_FlowSOM_Nilsson$re), 
-  runtime = unname(runtime_FlowSOM_Nilsson["elapsed"])
+res_stability_FlowSOM_meta_Nilsson <- list(
+  F1 = as.numeric(res_FlowSOM_meta_Nilsson$F1), 
+  pr = as.numeric(res_FlowSOM_meta_Nilsson$pr), 
+  re = as.numeric(res_FlowSOM_meta_Nilsson$re), 
+  runtime = unname(runtime_FlowSOM_meta_Nilsson["elapsed"])
 )
 
-res_robust_FlowSOM_Mosmann <- list(
-  F1 = as.numeric(res_FlowSOM_Mosmann$F1), 
-  pr = as.numeric(res_FlowSOM_Mosmann$pr), 
-  re = as.numeric(res_FlowSOM_Mosmann$re), 
-  runtime = unname(runtime_FlowSOM_Mosmann["elapsed"])
+res_stability_FlowSOM_meta_Mosmann <- list(
+  F1 = as.numeric(res_FlowSOM_meta_Mosmann$F1), 
+  pr = as.numeric(res_FlowSOM_meta_Mosmann$pr), 
+  re = as.numeric(res_FlowSOM_meta_Mosmann$re), 
+  runtime = unname(runtime_FlowSOM_meta_Mosmann["elapsed"])
 )
 
 

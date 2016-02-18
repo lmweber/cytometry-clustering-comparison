@@ -1,9 +1,9 @@
 #########################################################################################
-# Python3 script to run PhenoGraph for robustness analysis
+# Python3 script to run PhenoGraph for stability analysis
 # 
 # This script runs one iteration of PhenoGraph by calling the Python3 scripts 
 # "run_PhenoGraph_python_Levine_32.py" etc (one for each data set) and loading results
-# back into R. The main script "robustness_analysis.R" then runs the scripts for each
+# back into R. The main script "stability_analysis.R" then runs the scripts for each
 # clustering method several times in a loop.
 # 
 # Lukas M. Weber, February 2016
@@ -13,8 +13,8 @@
 source("../helper_match_clusters_and_evaluate.R")
 source("../helper_match_one_rare_cluster_and_evaluate.R")
 
-# true (manually gated) cluster labels for robustness analysis
-source("load_results_truth_robustness.R")
+# true (manually gated) cluster labels for stability analysis
+source("load_results_truth_stability.R")
 
 
 
@@ -49,7 +49,7 @@ runtime_Mosmann <- system.time(
 
 # load cluster labels
 
-OUT_DIR <- "../../results/robustness_analysis/PhenoGraph"
+OUT_DIR <- "../../results/stability_analysis/PhenoGraph"
 
 file_out_Levine_32 <- file.path(OUT_DIR, "python_out_Levine_32.txt")
 file_out_Levine_13 <- file.path(OUT_DIR, "python_out_Levine_13.txt")
@@ -97,21 +97,21 @@ res_PhenoGraph_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_PhenoG
 
 
 
-###############################################################
-### OUTPUT RESULTS FOR ONE ITERATION OF ROBUSTNESS ANALYSIS ###
-###############################################################
+##############################################################
+### OUTPUT RESULTS FOR ONE ITERATION OF STABILITY ANALYSIS ###
+##############################################################
 
 # data sets with multiple populations (Levine_32, Levine_13)
 # output mean F1 score, mean precision, mean recall, runtime
 
-res_robust_PhenoGraph_Levine_32 <- list(
+res_stability_PhenoGraph_Levine_32 <- list(
   mean_F1 = mean(res_PhenoGraph_Levine_32$F1), 
   mean_pr = mean(res_PhenoGraph_Levine_32$pr), 
   mean_re = mean(res_PhenoGraph_Levine_32$re), 
   runtime = unname(runtime_Levine_32["elapsed"])
 )
 
-res_robust_PhenoGraph_Levine_13 <- list(
+res_stability_PhenoGraph_Levine_13 <- list(
   mean_F1 = mean(res_PhenoGraph_Levine_13$F1), 
   mean_pr = mean(res_PhenoGraph_Levine_13$pr), 
   mean_re = mean(res_PhenoGraph_Levine_13$re), 
@@ -122,14 +122,14 @@ res_robust_PhenoGraph_Levine_13 <- list(
 # data sets with a single rare population of interest (Nilsson, Mosmann)
 # output F1 score, precision, recall (for population of interest), and runtime
 
-res_robust_PhenoGraph_Nilsson <- list(
+res_stability_PhenoGraph_Nilsson <- list(
   F1 = as.numeric(res_PhenoGraph_Nilsson$F1), 
   pr = as.numeric(res_PhenoGraph_Nilsson$pr), 
   re = as.numeric(res_PhenoGraph_Nilsson$re), 
   runtime = unname(runtime_Nilsson["elapsed"])
 )
 
-res_robust_PhenoGraph_Mosmann <- list(
+res_stability_PhenoGraph_Mosmann <- list(
   F1 = as.numeric(res_PhenoGraph_Mosmann$F1), 
   pr = as.numeric(res_PhenoGraph_Mosmann$pr), 
   re = as.numeric(res_PhenoGraph_Mosmann$re), 

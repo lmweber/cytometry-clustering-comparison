@@ -1,5 +1,5 @@
 #########################################################################################
-# Python3 script to run PhenoGraph for robustness analysis
+# Python3 script to run PhenoGraph for stability analysis
 # 
 # This script runs one iteration of PhenoGraph (Python implementation) and saves results
 # as text files.
@@ -17,22 +17,22 @@ import numpy
 
 DATA_DIR = "../../../benchmark_data_sets"
 
-file_Nilsson = DATA_DIR + "/Nilsson_2013_HSC/data/Nilsson_2013_HSC.txt"
+file_Levine_13 = DATA_DIR + "/Levine_2015_marrow_13/data/Levine_2015_marrow_13.txt"
 
-data_Nilsson = numpy.loadtxt(fname = file_Nilsson, delimiter = '\t', skiprows = 1)
+data_Levine_13 = numpy.loadtxt(fname = file_Levine_13, delimiter = '\t', skiprows = 1)
 
 
 # indices of protein marker columns
 # note: Python indices start at 0
 
-marker_cols_Nilsson = list(range(4, 7)) + list(range(8, 18))
+marker_cols_Levine_13 = list(range(0, 13))
 
 
 # subset data
 
-data_Nilsson = data_Nilsson[:, marker_cols_Nilsson]
+data_Levine_13 = data_Levine_13[:, marker_cols_Levine_13]
 
-# data_Nilsson.shape
+# data_Levine_13.shape
 
 
 
@@ -45,7 +45,7 @@ data_Nilsson = data_Nilsson[:, marker_cols_Nilsson]
 
 import phenograph
 
-communities_Nilsson, graph_Nilsson, Q_Nilsson = phenograph.cluster(data_Nilsson, n_jobs = 1)
+communities_Levine_13, graph_Levine_13, Q_Levine_13 = phenograph.cluster(data_Levine_13, n_jobs = 1)
 
 
 
@@ -55,11 +55,11 @@ communities_Nilsson, graph_Nilsson, Q_Nilsson = phenograph.cluster(data_Nilsson,
 
 # export results as tab-delimited text file
 
-OUT_DIR = "../../results/robustness_analysis/PhenoGraph"
+OUT_DIR = "../../results/stability_analysis/PhenoGraph"
 
-file_out_Nilsson = OUT_DIR + "/python_out_Nilsson.txt"
+file_out_Levine_13 = OUT_DIR + "/python_out_Levine_13.txt"
 
-numpy.savetxt(fname = file_out_Nilsson, X = communities_Nilsson, fmt = '%i', delimiter = '\t')
+numpy.savetxt(fname = file_out_Levine_13, X = communities_Levine_13, fmt = '%i', delimiter = '\t')
 
 
 

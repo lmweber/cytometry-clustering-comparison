@@ -1,12 +1,12 @@
 #########################################################################################
-# R script to run immunoClust for robustness analysis
+# R script to run immunoClust for stability analysis
 # 
-# This script runs one iteration of immunoClust for the robustness analysis. The main 
-# script "robustness_analysis.R" then runs the scripts for each clustering method several
+# This script runs one iteration of immunoClust for the stability analysis. The main 
+# script "stability_analysis.R" then runs the scripts for each clustering method several
 # times in a loop.
 # 
 # Note: Don't set any random seeds here, since we want a different random start for each 
-# iteration in the robustness analysis.
+# iteration in the stability analysis.
 # 
 # Lukas M. Weber, February 2016
 #########################################################################################
@@ -21,8 +21,8 @@ library(immunoClust)
 source("../helper_match_clusters_and_evaluate.R")
 source("../helper_match_one_rare_cluster_and_evaluate.R")
 
-# true (manually gated) cluster labels for robustness analysis
-source("load_results_truth_robustness.R")
+# true (manually gated) cluster labels for stability analysis
+source("load_results_truth_stability.R")
 
 
 
@@ -268,21 +268,21 @@ res_immunoClust_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_immun
 
 
 
-###############################################################
-### OUTPUT RESULTS FOR ONE ITERATION OF ROBUSTNESS ANALYSIS ###
-###############################################################
+##############################################################
+### OUTPUT RESULTS FOR ONE ITERATION OF STABILITY ANALYSIS ###
+##############################################################
 
 # data sets with multiple populations (Levine_32, Levine_13)
 # output mean F1 score, mean precision, mean recall, runtime
 
-res_robust_immunoClust_Levine_32 <- list(
+res_stability_immunoClust_Levine_32 <- list(
   mean_F1 = mean(res_immunoClust_Levine_32$F1), 
   mean_pr = mean(res_immunoClust_Levine_32$pr), 
   mean_re = mean(res_immunoClust_Levine_32$re), 
   runtime = unname(runtime_immunoClust_Levine_32["elapsed"])
 )
 
-res_robust_immunoClust_Levine_13 <- list(
+res_stability_immunoClust_Levine_13 <- list(
   mean_F1 = mean(res_immunoClust_Levine_13$F1), 
   mean_pr = mean(res_immunoClust_Levine_13$pr), 
   mean_re = mean(res_immunoClust_Levine_13$re), 
@@ -293,14 +293,14 @@ res_robust_immunoClust_Levine_13 <- list(
 # data sets with a single rare population of interest (Nilsson, Mosmann)
 # output F1 score, precision, recall (for population of interest), and runtime
 
-res_robust_immunoClust_Nilsson <- list(
+res_stability_immunoClust_Nilsson <- list(
   F1 = as.numeric(res_immunoClust_Nilsson$F1), 
   pr = as.numeric(res_immunoClust_Nilsson$pr), 
   re = as.numeric(res_immunoClust_Nilsson$re), 
   runtime = unname(runtime_immunoClust_Nilsson["elapsed"])
 )
 
-res_robust_immunoClust_Mosmann <- list(
+res_stability_immunoClust_Mosmann <- list(
   F1 = as.numeric(res_immunoClust_Mosmann$F1), 
   pr = as.numeric(res_immunoClust_Mosmann$pr), 
   re = as.numeric(res_immunoClust_Mosmann$re), 

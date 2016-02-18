@@ -1,5 +1,5 @@
 #########################################################################################
-# Python3 script to run PhenoGraph for robustness analysis
+# Python3 script to run PhenoGraph for stability analysis
 # 
 # This script runs one iteration of PhenoGraph (Python implementation) and saves results
 # as text files.
@@ -17,22 +17,22 @@ import numpy
 
 DATA_DIR = "../../../benchmark_data_sets"
 
-file_Mosmann = DATA_DIR + "/Mosmann_2014_activ/data/Mosmann_2014_activ.txt"
+file_Nilsson = DATA_DIR + "/Nilsson_2013_HSC/data/Nilsson_2013_HSC.txt"
 
-data_Mosmann = numpy.loadtxt(fname = file_Mosmann, delimiter = '\t', skiprows = 1)
+data_Nilsson = numpy.loadtxt(fname = file_Nilsson, delimiter = '\t', skiprows = 1)
 
 
 # indices of protein marker columns
 # note: Python indices start at 0
 
-marker_cols_Mosmann = list(range(6, 21))
+marker_cols_Nilsson = list(range(4, 7)) + list(range(8, 18))
 
 
 # subset data
 
-data_Mosmann = data_Mosmann[:, marker_cols_Mosmann]
+data_Nilsson = data_Nilsson[:, marker_cols_Nilsson]
 
-# data_Mosmann.shape
+# data_Nilsson.shape
 
 
 
@@ -45,7 +45,7 @@ data_Mosmann = data_Mosmann[:, marker_cols_Mosmann]
 
 import phenograph
 
-communities_Mosmann, graph_Mosmann, Q_Mosmann = phenograph.cluster(data_Mosmann, n_jobs = 1)
+communities_Nilsson, graph_Nilsson, Q_Nilsson = phenograph.cluster(data_Nilsson, n_jobs = 1)
 
 
 
@@ -55,11 +55,11 @@ communities_Mosmann, graph_Mosmann, Q_Mosmann = phenograph.cluster(data_Mosmann,
 
 # export results as tab-delimited text file
 
-OUT_DIR = "../../results/robustness_analysis/PhenoGraph"
+OUT_DIR = "../../results/stability_analysis/PhenoGraph"
 
-file_out_Mosmann = OUT_DIR + "/python_out_Mosmann.txt"
+file_out_Nilsson = OUT_DIR + "/python_out_Nilsson.txt"
 
-numpy.savetxt(fname = file_out_Mosmann, X = communities_Mosmann, fmt = '%i', delimiter = '\t')
+numpy.savetxt(fname = file_out_Nilsson, X = communities_Nilsson, fmt = '%i', delimiter = '\t')
 
 
 
