@@ -817,26 +817,24 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_13/plots_multi_panel_Levine2015marr
 
 # Nilsson_2013_HSC
 ggdraw() + 
-  draw_plot(barplot_F1_pr_re_Nilsson, 0.3, 0.5, 0.4, 0.5) + 
-  draw_plot(runtime_barplot_Nilsson, 0.05, 0, 0.4, 0.5) + 
-  draw_plot(runtime_scatterplot_Nilsson, 0.55, 0.05, 0.4, 0.45) + 
-  draw_plot_label(LETTERS[1:3], 
-                  c(0.25, 0, 0.5), c(1, 0.5, 0.5), size = 16)
+  draw_plot(barplot_F1_pr_re_Nilsson, 0.025, 0.66, 0.8, 0.33) + 
+  draw_plot(runtime_barplot_Nilsson, 0.025, 0.33, 0.8, 0.33) + 
+  draw_plot(runtime_scatterplot_Nilsson, 0.025, 0.03, 0.8, 0.30) + 
+  draw_plot_label(LETTERS[1:3], c(0, 0, 0), c(0.99, 0.66, 0.33), size = 16)
 
 ggplot2::ggsave("../plots/Nilsson_2013_HSC/plots_multi_panel_Nilsson2013HSC.pdf", 
-                width = 13, height = 9.7)
+                width = 6.5, height = 14.5)
 
 
 # Mosmann_2014_activ
 ggdraw() + 
-  draw_plot(barplot_F1_pr_re_Mosmann, 0.3, 0.5, 0.4, 0.5) + 
-  draw_plot(runtime_barplot_Mosmann, 0.05, 0, 0.4, 0.5) + 
-  draw_plot(runtime_scatterplot_Mosmann, 0.55, 0.05, 0.4, 0.45) + 
-  draw_plot_label(LETTERS[1:3], 
-                  c(0.25, 0, 0.5), c(1, 0.5, 0.5), size = 16)
+  draw_plot(barplot_F1_pr_re_Mosmann, 0.025, 0.66, 0.8, 0.33) + 
+  draw_plot(runtime_barplot_Mosmann, 0.025, 0.33, 0.8, 0.33) + 
+  draw_plot(runtime_scatterplot_Mosmann, 0.025, 0.03, 0.8, 0.30) + 
+  draw_plot_label(LETTERS[1:3], c(0, 0, 0), c(0.99, 0.66, 0.33), size = 16)
 
 ggplot2::ggsave("../plots/Mosmann_2014_activ/plots_multi_panel_Mosmann2014activ.pdf", 
-                width = 13, height = 9.7)
+                width = 6.5, height = 14.5)
 
 
 

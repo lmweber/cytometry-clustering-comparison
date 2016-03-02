@@ -9,9 +9,10 @@ early_work/**
 gating_schemes/**
 paper/**
 plots/**
+plots_submission/**
 results/**
 supplementary_info/**
-template/**
+templates/**
 tex_file_from_Gosia/**
 tex_file_from_Charlotte/**
 
