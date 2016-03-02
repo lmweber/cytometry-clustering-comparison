@@ -423,7 +423,7 @@ ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_boxplo
 ### MULTI-PANEL PLOTS ###
 #########################
 
-# combine into one multi-panel plot for each data set; and one combined plot for Nilsson and Mosmann
+# combine into one multi-panel plot for each data set
 
 
 # Levine_32
@@ -472,8 +472,8 @@ ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_multi_
 ### COMBINED PLOT FOR NILSSON AND MOSMANN ###
 #############################################
 
-# combined multi-panel plot for Nilsson and Mosmann (without runtimes), with methods 
-# ordered by F1 score for Mosmann
+# combined multi-panel plot for Nilsson and Mosmann (without runtimes)
+# with methods ordered by F1 score for Mosmann
 
 
 # re-order methods
