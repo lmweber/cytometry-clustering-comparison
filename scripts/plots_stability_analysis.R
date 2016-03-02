@@ -423,7 +423,7 @@ ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_boxplo
 ### MULTI-PANEL PLOTS ###
 #########################
 
-# combine into one multi-panel plot for each data set
+# combine into one multi-panel plot for each data set; and one combined plot for Nilsson and Mosmann
 
 
 # Levine_32
@@ -463,6 +463,87 @@ ggdraw() +
   draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
 
 ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_multi_panel_Mosmann2014activ.pdf", 
+                width = 13, height = 5)
+
+
+
+
+#############################################
+### COMBINED PLOT FOR NILSSON AND MOSMANN ###
+#############################################
+
+# combined multi-panel plot for Nilsson and Mosmann (without runtimes), with methods 
+# ordered by F1 score for Mosmann
+
+
+# re-order methods
+df_stability_F1_Nilsson_reorder <- as.data.frame(sapply(res_stability_Nilsson, function(res) res$F1))
+df_stability_pr_Nilsson_reorder <- as.data.frame(sapply(res_stability_Nilsson, function(res) res$pr))
+df_stability_re_Nilsson_reorder <- as.data.frame(sapply(res_stability_Nilsson, function(res) res$re))
+df_stability_runtime_Nilsson_reorder <- as.data.frame(sapply(res_stability_Nilsson, function(res) res$runtime))
+
+df_stability_F1_Nilsson_reorder <- df_stability_F1_Nilsson_reorder[, ord_stability_Mosmann]
+df_stability_pr_Nilsson_reorder <- df_stability_pr_Nilsson_reorder[, ord_stability_Mosmann]
+df_stability_re_Nilsson_reorder <- df_stability_re_Nilsson_reorder[, ord_stability_Mosmann]
+df_stability_runtime_Nilsson_reorder <- df_stability_runtime_Nilsson_reorder[, ord_stability_Mosmann]
+
+
+# re-ordered tidy data
+df_stability_Nilsson_tidy_reorder <- data.frame(F1_score = as.vector(as.matrix(df_stability_F1_Nilsson_reorder)), 
+                                                precision = as.vector(as.matrix(df_stability_pr_Nilsson_reorder)), 
+                                                recall = as.vector(as.matrix(df_stability_re_Nilsson_reorder)))
+df_stability_Nilsson_tidy_reorder["method"] <- rep(factor(colnames(df_stability_F1_Nilsson_reorder), 
+                                                          levels = colnames(df_stability_F1_Nilsson_reorder)), 
+                                                   each = nrow(df_stability_F1_Nilsson_reorder))
+df_stability_Nilsson_tidy_reorder <- melt(df_stability_Nilsson_tidy_reorder, 
+                                          id.vars = "method", 
+                                          measure.vars = c("F1_score", "precision", "recall"))
+
+
+# re-ordered boxplots for Nilsson (no legend)
+boxplots_stability_Nilsson_reorder <- 
+  ggplot(df_stability_Nilsson_tidy_reorder, aes(x = method, y = value, color = variable, fill = variable)) + 
+  geom_boxplot(width = 0.85, position = position_dodge(0.75), outlier.size = 0.75) + 
+  scale_fill_hue(c = 60, l = 90) + 
+  ylim(0, 1) + 
+  ggtitle("Stability of clustering results: Nilsson_2013_HSC") + 
+  theme_bw() + 
+  theme(plot.title = element_text(size = 12), 
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank(), 
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+        legend.position = "none")
+
+boxplots_stability_Nilsson_reorder
+
+
+# boxplots with legend outside for Mosmann
+boxplots_stability_Mosmann_legend <- 
+  ggplot(df_stability_Mosmann_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
+  geom_boxplot(width = 0.85, position = position_dodge(0.75), outlier.size = 0.75) + 
+  scale_fill_hue(c = 60, l = 90) + 
+  ylim(0, 1) + 
+  ggtitle("Stability of clustering results: Mosmann_2014_activ") + 
+  theme_bw() + 
+  theme(plot.title = element_text(size = 12), 
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank(), 
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+        legend.key.size = unit(5, "mm"), 
+        legend.key = element_blank(), 
+        legend.title = element_blank(), 
+        legend.background = element_blank())
+
+boxplots_stability_Mosmann_legend
+
+
+# combined plot for Nilsson and Mosmann (without runtime)
+ggdraw() + 
+  draw_plot(boxplots_stability_Nilsson_reorder, 0.05, 0, 0.4, 1) + 
+  draw_plot(boxplots_stability_Mosmann_legend, 0.52, 0, 0.49, 1) + 
+  draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
+
+ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_multi_panel_Nilsson_Mosmann.pdf", 
                 width = 13, height = 5)
 
 
