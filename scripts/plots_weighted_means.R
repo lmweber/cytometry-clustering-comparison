@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to generate plots of results weighted by population size
 #
-# Lukas M. Weber, February 2016
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -149,11 +149,11 @@ barplot_mean_F1_pr_re_Levine_32_weighted <-
   ggplot(plot_data_Levine_32_weighted, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
   ylim(0, 1.02) + 
+  ylab("") + 
   ggtitle("Mean F1, precision, recall (weighted): Levine_2015_marrow_32") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 11), 
         axis.title.x = element_blank(), 
-        axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
         legend.position = c(0.75, 0.96), 
         legend.direction = "horizontal", 
@@ -171,11 +171,11 @@ barplot_mean_F1_pr_re_Levine_13_weighted <-
   ggplot(plot_data_Levine_13_weighted, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
   ylim(0, 1.02) + 
+  ylab("") + 
   ggtitle("Mean F1, precision, recall (weighted): Levine_2015_marrow_13") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 11), 
         axis.title.x = element_blank(), 
-        axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
         legend.position = c(0.75, 0.96), 
         legend.direction = "horizontal", 

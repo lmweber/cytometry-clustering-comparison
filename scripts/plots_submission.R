@@ -5,6 +5,7 @@
 #########################################################################################
 
 # for journal submission: convert plots to EPS format, max width 7.5in, all fonts as outlines
+# requires: Ghostscript and pdftops (Xpdf)
 
 
 
