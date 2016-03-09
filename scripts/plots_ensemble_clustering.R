@@ -1,11 +1,9 @@
 #########################################################################################
 # R script to generate plots for ensemble clustering results
 #
-# Lukas M. Weber, February 2016
+# Lukas M. Weber, March 2016
 #########################################################################################
 
-
-### before running this script, run the code in "ensemble_clustering.R" to load results
 
 library(ggplot2)
 library(reshape2)
@@ -13,6 +11,10 @@ library(cowplot)  # note masks ggplot2::ggsave
 
 # helper function
 source("helper_collapse_data_frame.R")
+
+# load ensemble clustering results
+load("../results/RData_files/ensemble_clustering_results.RData")
+
 
 
 
@@ -321,11 +323,11 @@ barplot_mean_F1_pr_re_Levine_32_ensemble <-
   ggplot(plot_data_Levine_32, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
   ylim(0, 1) + 
+  ylab("") + 
   ggtitle("Mean F1 score, precision, and recall: Levine_2015_marrow_32") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
-        axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
         legend.position = c(0.87, 0.92), 
         legend.key.size = unit(4, "mm"), 
@@ -342,11 +344,11 @@ barplot_mean_F1_pr_re_Levine_13_ensemble <-
   ggplot(plot_data_Levine_13, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
   ylim(0, 1) + 
+  ylab("") + 
   ggtitle("Mean F1 score, precision, and recall: Levine_2015_marrow_13") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
-        axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
         legend.position = c(0.87, 0.9), 
         legend.key.size = unit(4, "mm"), 
@@ -410,11 +412,11 @@ barplot_F1_pr_re_Nilsson_ensemble <-
   ggplot(plot_data_Nilsson, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
   ylim(0, 1) + 
+  ylab("") + 
   ggtitle("Rare cell population: Nilsson_2013_HSC") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
-        axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
         legend.position = c(0.12, 0.92), 
         legend.key.size = unit(4, "mm"), 
@@ -431,11 +433,11 @@ barplot_F1_pr_re_Mosmann_ensemble <-
   ggplot(plot_data_Mosmann, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
   ylim(0, 1) + 
+  ylab("") + 
   ggtitle("Rare cell population: Mosmann_2014_activ") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
-        axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
         legend.position = c(0.87, 0.92), 
         legend.key.size = unit(4, "mm"), 
