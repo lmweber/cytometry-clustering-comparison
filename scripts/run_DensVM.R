@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run DensVM (cytofkit R/Bioconductor package)
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -97,7 +97,8 @@ n_sub_Mosmann <- 20000
 set.seed(123)
 runtime_Levine_32 <- system.time({
   cytofkit::cytof_tsne_densvm(fcsFile = file_Levine_32, resDir = out_dir_Levine_32, 
-                              para = para_Levine_32, fixedNum = n_sub_Levine_32, verbose = TRUE)
+                              lgclMethod = "auto", para = para_Levine_32, 
+                              fixedNum = n_sub_Levine_32, verbose = TRUE)
 })
 setwd(INIT_DIR)  # reset working directory
 
@@ -105,7 +106,8 @@ setwd(INIT_DIR)  # reset working directory
 set.seed(123)
 runtime_Levine_13 <- system.time({
   cytofkit::cytof_tsne_densvm(fcsFile = file_Levine_13, resDir = out_dir_Levine_13, 
-                              para = para_Levine_13, fixedNum = n_sub_Levine_13, verbose = TRUE)
+                              lgclMethod = "auto", para = para_Levine_13, 
+                              fixedNum = n_sub_Levine_13, verbose = TRUE)
 })
 setwd(INIT_DIR)  # reset working directory
 
@@ -113,7 +115,8 @@ setwd(INIT_DIR)  # reset working directory
 set.seed(123)
 runtime_Nilsson <- system.time({
   cytofkit::cytof_tsne_densvm(fcsFile = file_Nilsson, resDir = out_dir_Nilsson, 
-                              para = para_Nilsson, fixedNum = n_sub_Nilsson, verbose = TRUE)
+                              lgclMethod = "auto", para = para_Nilsson, 
+                              fixedNum = n_sub_Nilsson, verbose = TRUE)
 })
 setwd(INIT_DIR)  # reset working directory
 
@@ -121,7 +124,8 @@ setwd(INIT_DIR)  # reset working directory
 set.seed(123)
 runtime_Mosmann <- system.time({
   cytofkit::cytof_tsne_densvm(fcsFile = file_Mosmann, resDir = out_dir_Mosmann, 
-                              para = para_Mosmann, fixedNum = n_sub_Mosmann, verbose = TRUE)
+                              lgclMethod = "auto", para = para_Mosmann, 
+                              fixedNum = n_sub_Mosmann, verbose = TRUE)
 })
 setwd(INIT_DIR)  # reset working directory
 
@@ -146,13 +150,13 @@ write.table(runtime_DensVM, file = "../results/runtime/runtime_DensVM.txt", quot
 
 # save session information
 
-sink(file = "../results/session_info/DensVM_session_info.txt")
+sink(file = "../results/session_info/session_info_DensVM.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/DensVM_results.RData")
+save.image(file = "../results/RData_files/results_DensVM.RData")
 
 

@@ -1,13 +1,13 @@
 #########################################################################################
 # R script to prepare benchmark data set Levine_2015_marrow_13
 # 
-# The data set is a 13-dimensional mass cytometry data set, consisting of expression
+# This data set is a 13-dimensional mass cytometry data set, consisting of expression
 # levels of 13 surface marker proteins. Cluster labels are available for 24 manually
 # gated cell populations. Cells are healthy human bone marrow mononuclear cells (BMMCs),
 # from 1 individual.
 #
-# This R script pre-processes the data and exports it in standard text-based format, to
-# make it easier to use it to test clustering algorithms.
+# This R script pre-processes the data set and exports it in TXT and FCS formats, to make
+# it easier to use with clustering algorithms.
 #
 # Source: "benchmark data set 1" in the following paper:
 # Levine et al. (2015), "Data-Driven Phenotypic Dissection of AML Reveals Progenitor-like
@@ -17,7 +17,7 @@
 # Link to data: https://www.cytobank.org/cytobank/experiments/46259 (download the FCS
 # files with Actions -> Export -> Download Files -> All FCS Files)
 # 
-# Lukas M. Weber, November 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -52,10 +52,12 @@ files_unassigned
 
 # cell population names
 
-pop_names <- files_assigned %>% 
+files_assigned %>% 
   gsub("^.*Marrow1_", "", .) %>% 
   gsub("\\.fcs$", "", .) %>% 
-  gsub(" ", "_", .)
+  gsub(" ", "_", .) -> 
+  pop_names
+
 pop_names
 
 df_pop_names <- data.frame(label = 1:length(pop_names), population = pop_names)
@@ -64,10 +66,12 @@ df_pop_names
 
 # column names (protein markers)
 
-col_names <- read.FCS(files_assigned[1], transformation = FALSE) %>% 
+read.FCS(files_assigned[1], transformation = FALSE) %>% 
   exprs %>% 
   colnames %>% 
-  unname
+  unname -> 
+  col_names
+
 col_names
 
 
@@ -92,6 +96,8 @@ table(data[, "label"])  # 24 manually gated clusters
 # load FCS file for unassigned cells
 
 data_unassigned <- flowCore::exprs(flowCore::read.FCS(files_unassigned, transformation = FALSE))
+
+data_unassigned <- cbind(data_unassigned, label = NA)
 
 head(data_unassigned)
 dim(data_unassigned)  # 85,297 unassigned cells
@@ -125,24 +131,26 @@ summary(data_unassigned)
 ### EXPORT DATA ###
 ###################
 
-# cell population names
+# combine data frames for assigned and unassigned cells
+
+data_combined <- rbind(data, data_unassigned)
+data_combined_notransform <- rbind(data_notransform, data_notransform_unassigned)
+
+dim(data_combined)
+dim(data_combined_notransform)
+
+# export cell population names
 
 write.table(df_pop_names, file = "data/population_names_Levine_2015_marrow_13.txt", quote = FALSE, sep = "\t", row.names = FALSE)
 
 # save data files in TXT format
 
-write.table(data, file = "data/Levine_2015_marrow_13.txt", quote = FALSE, sep = "\t", row.names = FALSE)
-write.table(data_notransform, file = "data/Levine_2015_marrow_13_notransform.txt", quote = FALSE, sep = "\t", row.names = FALSE)
-
-write.table(data_unassigned, file = "data/Levine_2015_marrow_13_unassigned.txt", quote = FALSE, sep = "\t", row.names = FALSE)
-write.table(data_notransform_unassigned, file = "data/Levine_2015_marrow_13_notransform_unassigned.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data_combined, file = "data/Levine_2015_marrow_13.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data_combined_notransform, file = "data/Levine_2015_marrow_13_notransform.txt", quote = FALSE, sep = "\t", row.names = FALSE)
 
 # save data files in FCS format
 
-flowCore::write.FCS(flowCore::flowFrame(data), filename = "data/Levine_2015_marrow_13.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_notransform), filename = "data/Levine_2015_marrow_13_notransform.fcs")
-
-flowCore::write.FCS(flowCore::flowFrame(data_unassigned), filename = "data/Levine_2015_marrow_13_unassigned.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_notransform_unassigned), filename = "data/Levine_2015_marrow_13_notransform_unassigned.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data_combined), filename = "data/Levine_2015_marrow_13.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data_combined_notransform), filename = "data/Levine_2015_marrow_13_notransform.fcs")
 
 

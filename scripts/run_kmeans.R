@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run k-means
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -70,21 +70,21 @@ dim(data_Mosmann)
 
 # number of clusters
 
-k_Levine_32 <- 20
-k_Levine_13 <- 30
-k_Nilsson <- 50
-k_Mosmann <- 50
+k_Levine_32 <- 40
+k_Levine_13 <- 40
+k_Nilsson <- 40
+k_Mosmann <- 40
 
 
 # run k-means
-# note: larger number of iterations required for convergence for some random seeds
+# note: returns errors for some random seeds; also additional iterations required
 
 set.seed(1234)
 runtime_Levine_32 <- system.time({
   out_kmeans_Levine_32 <- kmeans(data_Levine_32, k_Levine_32)
 })
 
-set.seed(1234)
+set.seed(1000)
 runtime_Levine_13 <- system.time({
   out_kmeans_Levine_13 <- kmeans(data_Levine_13, k_Levine_13)
 })
@@ -94,7 +94,7 @@ runtime_Nilsson <- system.time({
   out_kmeans_Nilsson <- kmeans(data_Nilsson, k_Nilsson, iter.max = 50)
 })
 
-set.seed(1234)
+set.seed(2000)
 runtime_Mosmann <- system.time({
   out_kmeans_Mosmann <- kmeans(data_Mosmann, k_Mosmann, iter.max = 50)
 })
@@ -167,13 +167,13 @@ write.table(runtime_kmeans, file = "../results/runtime/runtime_kmeans.txt", quot
 
 # save session information
 
-sink(file = "../results/session_info/kmeans_session_info.txt")
+sink(file = "../results/session_info/session_info_kmeans.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/kmeans_results.RData")
+save.image(file = "../results/RData_files/results_kmeans.RData")
 
 

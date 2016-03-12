@@ -14,7 +14,7 @@
 # Link to paper: http://www.ncbi.nlm.nih.gov/pubmed/23839904
 # Link to data: http://flowrepository.org/id/FR-FCM-ZZ6L
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -72,10 +72,12 @@ dim(data_single_nondeb_live)  # 44,140 cells
 col_names <- parameters(flowCore::read.FCS(file_single_nondeb_live))$desc
 length(col_names)
 
-cols_markers <- col_names %>% 
+col_names %>% 
   subset(., grepl("^CD", .)) %>% 
   gsub("^(CD[0-9A-Za-z]+).*", "\\1", .) %>% 
-  unname
+  unname -> 
+  cols_markers
+
 cols_markers
 length(cols_markers)
 

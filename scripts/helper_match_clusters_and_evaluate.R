@@ -2,7 +2,7 @@
 # Function to match cluster labels with "true" (manually gated) population labels, and
 # calculate precision, recall, and F1 score
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -11,6 +11,12 @@
 # - clus_truth: true cluster labels
 # (for both arguments: length = number of cells; names = cluster labels (integers))
 helper_match_clusters_and_evaluate <- function(clus_algorithm, clus_truth) {
+  
+  # remove unassigned cells (NA's in clus_truth)
+  unassigned <- is.na(clus_truth)
+  clus_algorithm <- clus_algorithm[!unassigned]
+  clus_truth <- clus_truth[!unassigned]
+  if (length(clus_algorithm) != length(clus_truth)) warning("vector lengths are not equal")
   
   tbl_algorithm <- table(clus_algorithm)
   tbl_truth <- table(clus_truth)

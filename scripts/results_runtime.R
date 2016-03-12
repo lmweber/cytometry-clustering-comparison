@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load runtime results
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -29,23 +29,23 @@ runtime_Mosmann <- list()
 # spreadsheet "parameters_and_runtime.xlsx")
 # ===================================================================================
 
-runtime_Levine_32[["ACCENSE"]] <- (5 * 60) + 12
-runtime_Levine_13[["ACCENSE"]] <- (5 * 60) + 7
+runtime_Levine_32[["ACCENSE"]] <- (4 * 60) + 47
+runtime_Levine_13[["ACCENSE"]] <- (4 * 60) + 26
 runtime_Nilsson[["ACCENSE"]] <- (5 * 60) + 39
 runtime_Mosmann[["ACCENSE"]] <- (4 * 60) + 17
 
-runtime_Levine_32[["FLOCK"]] <- 30
-runtime_Levine_13[["FLOCK"]] <- 7
+runtime_Levine_32[["FLOCK"]] <- (2 * 60) + 39
+runtime_Levine_13[["FLOCK"]] <- 21
 runtime_Nilsson[["FLOCK"]] <- 6
 runtime_Mosmann[["FLOCK"]] <- 65
 
-runtime_Levine_32[["PhenoGraph"]] <- (6 * 60) + 41
-runtime_Levine_13[["PhenoGraph"]] <- (4 * 60) + 18
+runtime_Levine_32[["PhenoGraph"]] <- (39 * 60) + 16
+runtime_Levine_13[["PhenoGraph"]] <- (12 * 60) + 48
 runtime_Nilsson[["PhenoGraph"]] <- (2 * 60) + 1
 runtime_Mosmann[["PhenoGraph"]] <- (49 * 60) + 32
 
-runtime_Levine_32[["SWIFT"]] <- 3600 + (7 * 60) + 47
-runtime_Levine_13[["SWIFT"]] <- (25 * 60) + 16
+runtime_Levine_32[["SWIFT"]] <- (2 * 3600) + (42 * 60) + 32
+runtime_Levine_13[["SWIFT"]] <- (44 * 60) + 28
 runtime_Nilsson[["SWIFT"]] <- (13 * 60) + 5
 runtime_Mosmann[["SWIFT"]] <- (41 * 60) + 22
 
@@ -58,17 +58,8 @@ runtime_Mosmann[["SWIFT"]] <- (41 * 60) + 22
 RUNTIME_DIR <- "../results/runtime"
 
 
-other_names_Levine_32 <- c("DensVM", "flowMeans", "FlowSOM", "FlowSOM_meta", "immunoClust", 
-                           "immunoClust_all", "kmeans", "Rclusterpp", "SamSPECTRAL")
-
-other_names_Levine_13 <- c("DensVM", "flowMeans", "FlowSOM", "FlowSOM_meta", "immunoClust", 
-                           "immunoClust_all", "kmeans", "Rclusterpp", "SamSPECTRAL")
-
-other_names_Nilsson <- c("DensVM", "flowMeans", "FlowSOM", "FlowSOM_meta", "immunoClust", 
-                         "immunoClust_all", "kmeans", "Rclusterpp", "SamSPECTRAL")
-# no Rclusterpp
-other_names_Mosmann <- c("DensVM", "flowMeans", "FlowSOM", "FlowSOM_meta", "immunoClust", 
-                         "immunoClust_all", "kmeans", "SamSPECTRAL")
+other_names_Levine_32 <- other_names_Levine_13 <- other_names_Nilsson <- other_names_Mosmann <- 
+  c("DensVM", "flowMeans", "FlowSOM", "FlowSOM_meta", "immunoClust", "immunoClust_all", "kmeans", "Rclusterpp", "SamSPECTRAL")
 
 
 # load runtime results files

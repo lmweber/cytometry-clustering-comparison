@@ -18,7 +18,7 @@
 # (filename: "JMW034-J16OFVQX_G2 0o1 3_D07.fcs"; see Supplementary Information file 3 for
 # full list of filenames)
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -69,10 +69,11 @@ dim(data_single_live)  # 396,460 cells
 
 # column names
 
-cols_markers <- parameters(flowCore::read.FCS(file_single_live))$desc[7:21] %>% 
+parameters(flowCore::read.FCS(file_single_live))$desc[7:21] %>% 
   unname %>% 
   gsub(" (.*)$", "", .) %>% 
-  gsub("/", "_", .)
+  gsub("/", "_", .) -> 
+  cols_markers
 
 cols_markers[c(5, 13)] <- c("GZB-SA", "CCL4")  # from Supplementary Info file 1
 cols_markers

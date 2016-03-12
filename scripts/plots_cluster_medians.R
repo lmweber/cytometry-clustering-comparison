@@ -17,6 +17,7 @@ source("load_results_ACCENSE.R")
 source("load_results_DensVM.R")
 source("load_results_FLOCK.R")
 source("load_results_PhenoGraph.R")
+source("load_results_Rclusterpp.R")
 source("load_results_SWIFT.R")
 source("load_results_truth.R")
 source("load_results_all_other_methods.R")
@@ -122,8 +123,9 @@ pheatmap(medians_truth_Levine_13,
 ### PLOT CLUSTER MEDIANS: EACH METHOD COMPARED TO TRUTH ###
 ###########################################################
 
-medians_Levine_32 <- list()
-medians_Levine_13 <- list()
+medians_Levine_32 <- vector("list", 13)
+medians_Levine_13 <- vector("list", 13)
+
 
 
 ### calculate cluster medians for ACCENSE
@@ -147,6 +149,7 @@ rownames(medians_ACCENSE_Levine_13) <- paste0("ACCENSE_", rownames(medians_ACCEN
 
 medians_Levine_32[[1]] <- medians_ACCENSE_Levine_32
 medians_Levine_13[[1]] <- medians_ACCENSE_Levine_13
+
 
 
 ### calculate cluster medians for DensVM
@@ -178,9 +181,40 @@ medians_Levine_32[[2]] <- medians_DensVM_Levine_32
 medians_Levine_13[[2]] <- medians_DensVM_Levine_13
 
 
+
+### calculate cluster medians for Rclusterpp
+
+# note Rclusterpp used subsampling, so need to use data matrix with subsampled points only
+
+file_Rclusterpp_Levine_32_sub <- "../results/Rclusterpp/Levine_2015_marrow_32_sub.fcs"
+file_Rclusterpp_Levine_13_sub <- "../results/Rclusterpp/Levine_2015_marrow_13_sub.fcs"
+
+data_medians_Rclusterpp_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_Rclusterpp_Levine_32_sub, transformation = FALSE))
+data_medians_Rclusterpp_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_Rclusterpp_Levine_13_sub, transformation = FALSE))
+
+marker_cols_Rclusterpp_Levine_32 <- 5:36
+marker_cols_Rclusterpp_Levine_13 <- 1:13
+
+data_medians_Rclusterpp_Levine_32 <- data_medians_Rclusterpp_Levine_32[, marker_cols_Rclusterpp_Levine_32]
+data_medians_Rclusterpp_Levine_13 <- data_medians_Rclusterpp_Levine_13[, marker_cols_Rclusterpp_Levine_13]
+
+# calculate cluster medians
+# note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
+
+medians_Rclusterpp_Levine_32 <- helper_calculate_cluster_medians(data_medians_Rclusterpp_Levine_32, clus_Rclusterpp_Levine_32)
+medians_Rclusterpp_Levine_13 <- helper_calculate_cluster_medians(data_medians_Rclusterpp_Levine_13, clus_Rclusterpp_Levine_13)
+
+rownames(medians_Rclusterpp_Levine_32) <- paste0("Rclusterpp_", rownames(medians_Rclusterpp_Levine_32))
+rownames(medians_Rclusterpp_Levine_13) <- paste0("Rclusterpp_", rownames(medians_Rclusterpp_Levine_13))
+
+medians_Levine_32[[11]] <- medians_Rclusterpp_Levine_32
+medians_Levine_13[[11]] <- medians_Rclusterpp_Levine_13
+
+
+
 ### calculate cluster medians for all other methods
 
-for (i in 3:n_methods_Levine_32) {
+for (i in c(3:10, 12:13)) {
   # calculate cluster medians
   # note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
   medians_i <- helper_calculate_cluster_medians(data_medians_Levine_32, clus_Levine_32[[i]])
@@ -188,7 +222,7 @@ for (i in 3:n_methods_Levine_32) {
   medians_Levine_32[[i]] <- medians_i
 }
 
-for (i in 3:n_methods_Levine_13) {
+for (i in c(3:10, 12:13)) {
   # calculate cluster medians
   # note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
   medians_i <- helper_calculate_cluster_medians(data_medians_Levine_13, clus_Levine_13[[i]])
@@ -200,6 +234,7 @@ for (i in 3:n_methods_Levine_13) {
 
 names(medians_Levine_32) <- names(clus_Levine_32)
 names(medians_Levine_13) <- names(clus_Levine_13)
+
 
 
 ### generate plots

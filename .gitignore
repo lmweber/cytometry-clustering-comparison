@@ -11,6 +11,8 @@ paper/**
 plots/**
 plots_submission/**
 results/**
+results_all_auto_clusters/**
+results_all_40_clusters/**
 supplementary_info/**
 templates/**
 tex_file_from_Gosia/**

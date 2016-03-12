@@ -18,6 +18,7 @@ source("load_results_ACCENSE.R")
 source("load_results_DensVM.R")
 source("load_results_FLOCK.R")
 source("load_results_PhenoGraph.R")
+source("load_results_Rclusterpp.R")
 source("load_results_SWIFT.R")
 source("load_results_truth.R")
 source("load_results_all_other_methods.R")
@@ -86,7 +87,7 @@ res_Mosmann <- list(ACCENSE = res_ACCENSE_Mosmann,
                     immunoClust_all = res_immunoClust_all_Mosmann, 
                     kmeans = res_kmeans_Mosmann, 
                     PhenoGraph = res_PhenoGraph_Mosmann, 
-                    #Rclusterpp = res_Rclusterpp_Mosmann,  # Rclusterpp did not complete for this data set
+                    Rclusterpp = res_Rclusterpp_Mosmann, 
                     SamSPECTRAL = res_SamSPECTRAL_Mosmann, 
                     SWIFT = res_SWIFT_Mosmann)
 
@@ -335,7 +336,8 @@ barplot_mean_F1_pr_re_Levine_32 <-
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.87, 0.92), 
+        legend.position = c(0.25, 0.95), 
+        legend.direction = "horizontal", 
         legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -356,7 +358,8 @@ barplot_mean_F1_pr_re_Levine_13 <-
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.87, 0.9), 
+        legend.position = c(0.25, 0.95), 
+        legend.direction = "horizontal", 
         legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -477,7 +480,8 @@ barplot_F1_pr_re_Nilsson <-
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.12, 0.92), 
+        legend.position = c(0.25, 0.95), 
+        legend.direction = "horizontal", 
         legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -498,7 +502,8 @@ barplot_F1_pr_re_Mosmann <-
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.87, 0.92), 
+        legend.position = c(0.88, 0.91), 
+        legend.direction = "vertical", 
         legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -554,9 +559,8 @@ runtime_Nilsson_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple cores"
 runtime_Nilsson_tidy$cores <- factor(runtime_Nilsson_tidy$cores, 
                                      levels = c("single core", "multiple cores"))
 
-# no Rclusterpp
 runtime_Mosmann_tidy$cores <- "single core"
-runtime_Mosmann_tidy[c("SWIFT"), "cores"] <- "multiple cores"
+runtime_Mosmann_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple cores"
 runtime_Mosmann_tidy$cores <- factor(runtime_Mosmann_tidy$cores, 
                                      levels = c("single core", "multiple cores"))
 
@@ -575,15 +579,15 @@ runtime_barplot_Levine_32 <-
   ggplot(runtime_Levine_32_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", aes(fill = cores)) + 
   scale_fill_manual(values = c("purple4", "gray30")) + 
-  geom_text(aes(label = round(value, 0), y = value + 1400, angle = 90), size = 3.5) + 
+  geom_text(aes(label = round(value, 0), y = value + 800, angle = 90), hjust = "left", size = 3.5) + 
   ggtitle("Runtime: Levine_2015_marrow_32") + 
-  ylim(0, 20500) + 
+  ylim(0, 39000) + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.18, 0.9), 
+        legend.position = c(0.16, 0.91), 
         legend.key.size = unit(5, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -598,15 +602,15 @@ runtime_barplot_Levine_13 <-
   ggplot(runtime_Levine_13_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", aes(fill = cores)) + 
   scale_fill_manual(values = c("purple4", "gray30")) + 
-  geom_text(aes(label = round(value, 0), y = value + 650, angle = 90), size = 3.5) + 
+  geom_text(aes(label = round(value, 0), y = value + 200, angle = 90), hjust = "left", size = 3.5) + 
   ggtitle("Runtime: Levine_2015_marrow_13") + 
-  ylim(0, 10500) + 
+  ylim(0, 11500) + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.18, 0.9), 
+        legend.position = c(0.16, 0.91), 
         legend.key.size = unit(5, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -621,15 +625,15 @@ runtime_barplot_Nilsson <-
   ggplot(runtime_Nilsson_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", aes(fill = cores)) + 
   scale_fill_manual(values = c("purple4", "gray30")) + 
-  geom_text(aes(label = round(value, 0), y = value + 850, angle = 90), size = 3.5) + 
+  geom_text(aes(label = round(value, 0), y = value + 250, angle = 90), hjust = "left", size = 3.5) + 
   ggtitle("Runtime: Nilsson_2013_HSC") + 
-  ylim(0, 11500) + 
+  ylim(0, 10500) + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.18, 0.9), 
+        legend.position = c(0.16, 0.91), 
         legend.key.size = unit(5, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -644,15 +648,15 @@ runtime_barplot_Mosmann <-
   ggplot(runtime_Mosmann_tidy, aes(x = method, y = value)) + 
   geom_bar(stat = "identity", aes(fill = cores)) + 
   scale_fill_manual(values = c("purple4", "gray30")) + 
-  geom_text(aes(label = round(value, 0), y = value + 1600, angle = 90), size = 3.5) + 
+  geom_text(aes(label = round(value, 0), y = value + 350, angle = 90), hjust = "left", size = 3.5) + 
   ggtitle("Runtime: Mosmann_2014_activ") + 
-  ylim(0, 20000) + 
+  ylim(0, 19000) + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.18, 0.9), 
+        legend.position = c(0.16, 0.91), 
         legend.key.size = unit(5, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -693,9 +697,9 @@ runtime_vs_F1_Levine_13_tidy
 runtime_scatterplot_Levine_32 <- 
   ggplot(runtime_vs_F1_Levine_32_tidy, aes(x = mean_F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5) + 
-  xlim(0.1, 0.82) + 
-  ylim(-1000, 18500) + 
+  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
+  xlim(0.15, 0.8) + 
+  ylim(-1000, 35000) + 
   ggtitle("Runtime vs. mean F1: Levine_2015_marrow_32") + 
   xlab("mean F1 score") + 
   ylab("runtime (seconds)") + 
@@ -710,9 +714,9 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/runtime_scatterplot_Levine2015ma
 runtime_scatterplot_Levine_13 <- 
   ggplot(runtime_vs_F1_Levine_13_tidy, aes(x = mean_F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5) + 
-  xlim(0.1, 0.82) + 
-  ylim(-1000, 9500) + 
+  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
+  xlim(0.15, 0.8) + 
+  ylim(-1000, 10500) + 
   ggtitle("Runtime vs. mean F1: Levine_2015_marrow_13") + 
   xlab("mean F1 score") + 
   ylab("runtime (seconds)") + 
@@ -745,7 +749,7 @@ runtime_vs_F1_Mosmann_tidy
 runtime_scatterplot_Nilsson <- 
   ggplot(runtime_vs_F1_Nilsson_tidy, aes(x = F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5) + 
+  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
   xlim(-0.05, 0.65) + 
   ylim(-1000, 10500) + 
   ggtitle("Runtime vs. F1: Nilsson_2013_HSC") + 
@@ -762,7 +766,7 @@ ggplot2::ggsave("../plots/Nilsson_2013_HSC/runtime_scatterplot_Nilsson2013HSC.pd
 runtime_scatterplot_Mosmann <- 
   ggplot(runtime_vs_F1_Mosmann_tidy, aes(x = F1, y = runtime)) +  # note no Rclusterpp
   geom_point(shape = 4, size = 2, stroke = 1, color = "purple4") + 
-  geom_text_repel(aes(label = method), size = 2.5) + 
+  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines"), force = 5) + 
   xlim(-0.05, 0.65) + 
   ylim(-1000, 18000) + 
   ggtitle("Runtime vs. F1: Mosmann_2014_activ") + 

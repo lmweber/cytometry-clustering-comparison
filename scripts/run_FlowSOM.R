@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run FlowSOM and FlowSOM_meta
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -142,10 +142,10 @@ length(table(clus_FlowSOM_Mosmann))
 # run optional metaclustering step (FlowSOM_meta)
 
 # set number of clusters
-k_Levine_32 <- 20
-k_Levine_13 <- 30
-k_Nilsson <- 50
-k_Mosmann <- 50
+k_Levine_32 <- 40
+k_Levine_13 <- 40
+k_Nilsson <- 40
+k_Mosmann <- 40
 
 
 set.seed(123)
@@ -312,13 +312,13 @@ write.table(runtime_FlowSOM_meta, file = "../results/runtime/runtime_FlowSOM_met
 
 # save session information
 
-sink(file = "../results/session_info/FlowSOM_and_FlowSOM_meta_session_info.txt")
+sink(file = "../results/session_info/session_info_FlowSOM_and_FlowSOM_meta.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/FlowSOM_and_FlowSOM_meta_results.RData")
+save.image(file = "../results/RData_files/results_FlowSOM_and_FlowSOM_meta.RData")
 
 

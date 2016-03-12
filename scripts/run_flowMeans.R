@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run flowMeans
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -73,25 +73,25 @@ dim(data_Mosmann)
 
 set.seed(123)
 runtime_Levine_32 <- system.time({
-  out_flowMeans_Levine_32 <- flowMeans(data_Levine_32, Standardize = FALSE)
+  out_flowMeans_Levine_32 <- flowMeans(data_Levine_32, Standardize = FALSE, NumC = 40)
 })
 
 
 set.seed(123)
 runtime_Levine_13 <- system.time({
-  out_flowMeans_Levine_13 <- flowMeans(data_Levine_13, Standardize = FALSE)
+  out_flowMeans_Levine_13 <- flowMeans(data_Levine_13, Standardize = FALSE, NumC = 40)
 })
 
 
 set.seed(123)
 runtime_Nilsson <- system.time({
-  out_flowMeans_Nilsson <- flowMeans(data_Nilsson, Standardize = FALSE, NumC = 50)
+  out_flowMeans_Nilsson <- flowMeans(data_Nilsson, Standardize = FALSE, NumC = 40)
 })
 
 
 set.seed(123)
 runtime_Mosmann <- system.time({
-  out_flowMeans_Mosmann <- flowMeans(data_Mosmann, Standardize = FALSE, NumC = 50)
+  out_flowMeans_Mosmann <- flowMeans(data_Mosmann, Standardize = FALSE, NumC = 40)
 })
 
 
@@ -162,13 +162,13 @@ write.table(runtime_flowMeans, file = "../results/runtime/runtime_flowMeans.txt"
 
 # save session information
 
-sink(file = "../results/session_info/flowMeans_session_info.txt")
+sink(file = "../results/session_info/session_info_flowMeans.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/flowMeans_results.RData")
+save.image(file = "../results/RData_files/results_flowMeans.RData")
 
 

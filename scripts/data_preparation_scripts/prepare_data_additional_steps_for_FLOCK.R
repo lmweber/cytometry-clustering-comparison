@@ -4,14 +4,14 @@
 # FLOCK requires TXT data files containing protein expression columns only. This script 
 # selects the required columns and exports as TXT files.
 #
-# Lukas M. Weber, December 2015 
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
 library(flowCore)
 
 
-# run from FLOCK program directory
+### run from FLOCK program directory
 
 data_Levine_32 <- exprs(read.FCS("Levine_2015_marrow_32.fcs", transformation = FALSE))
 data_Levine_13 <- exprs(read.FCS("Levine_2015_marrow_13.fcs", transformation = FALSE))
@@ -38,12 +38,8 @@ dim(data_Levine_13)
 dim(data_Nilsson)
 dim(data_Mosmann)
 
-write.table(data_Levine_32, file = "Levine_2015_marrow_32_markers_only.txt", 
-            quote = FALSE, sep = "\t", row.names = FALSE)
-write.table(data_Levine_13, file = "Levine_2015_marrow_13_markers_only.txt", 
-            quote = FALSE, sep = "\t", row.names = FALSE)
-write.table(data_Nilsson, file = "Nilsson_2013_HSC_markers_only.txt", 
-            quote = FALSE, sep = "\t", row.names = FALSE)
-write.table(data_Mosmann, file = "Mosmann_2014_activ_markers_only.txt", 
-            quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data_Levine_32, file = "Levine_2015_marrow_32_markers_only.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data_Levine_13, file = "Levine_2015_marrow_13_markers_only.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data_Nilsson, file = "Nilsson_2013_HSC_markers_only.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data_Mosmann, file = "Mosmann_2014_activ_markers_only.txt", quote = FALSE, sep = "\t", row.names = FALSE)
 

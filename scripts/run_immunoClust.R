@@ -1,7 +1,7 @@
 #########################################################################################
-# R script to run immunoClust
+# R script to run immunoClust and immunoClust_all
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -301,13 +301,13 @@ write.table(runtime_immunoClust_all, file = "../results/runtime/runtime_immunoCl
 
 # save session information
 
-sink(file = "../results/session_info/immunoClust_and_immunoClust_all_session_info.txt")
+sink(file = "../results/session_info/session_info_immunoClust_and_immunoClust_all.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/immunoClust_and_immunoClust_all_results.RData")
+save.image(file = "../results/RData_files/results_immunoClust_and_immunoClust_all.RData")
 
 

@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run SamSPECTRAL
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -163,13 +163,13 @@ write.table(runtime_SamSPECTRAL, file = "../results/runtime/runtime_SamSPECTRAL.
 
 # save session information
 
-sink(file = "../results/session_info/SamSPECTRAL_session_info.txt")
+sink(file = "../results/session_info/session_info_SamSPECTRAL.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/SamSPECTRAL_results.RData")
+save.image(file = "../results/RData_files/results_SamSPECTRAL.RData")
 
 
