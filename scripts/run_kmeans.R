@@ -41,7 +41,7 @@ dim(data_Mosmann)
 marker_cols_Levine_32 <- 5:36
 marker_cols_Levine_13 <- 1:13
 marker_cols_Nilsson <- c(5:7, 9:18)
-marker_cols_Mosmann <- 7:21
+marker_cols_Mosmann <- c(7:9, 11:21)
 
 length(marker_cols_Levine_32)
 length(marker_cols_Levine_13)
@@ -93,7 +93,7 @@ runtime_Nilsson <- system.time({
   out_kmeans_Nilsson <- kmeans(data_Nilsson, k_Nilsson, iter.max = 50)
 })
 
-set.seed(2000)
+set.seed(1234)
 runtime_Mosmann <- system.time({
   out_kmeans_Mosmann <- kmeans(data_Mosmann, k_Mosmann, iter.max = 50)
 })

@@ -447,6 +447,9 @@ recall_df_Mosmann_ord <- unlist(recall_df_Mosmann[ord_Mosmann])
 F1_df_Nilsson_ord <- unlist(F1_df_Nilsson[ord_Nilsson])
 F1_df_Mosmann_ord <- unlist(F1_df_Mosmann[ord_Mosmann])
 
+F1_df_Nilsson_ord
+F1_df_Mosmann_ord
+
 
 # tidy data format (for ggplot)
 
