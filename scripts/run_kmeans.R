@@ -64,12 +64,11 @@ dim(data_Mosmann)
 
 
 
-###################
-### Run k-means ###
-###################
+#########################################################
+### Run k-means: manually selected number of clusters ###
+#########################################################
 
 # number of clusters
-
 k_Levine_32 <- 40
 k_Levine_13 <- 40
 k_Nilsson <- 40
@@ -126,12 +125,6 @@ length(table(clus_kmeans_Nilsson))
 length(table(clus_kmeans_Mosmann))
 
 
-
-
-####################
-### SAVE RESULTS ###
-####################
-
 # save cluster labels
 
 res_kmeans_Levine_32 <- data.frame(label = clus_kmeans_Levine_32)
@@ -140,16 +133,16 @@ res_kmeans_Nilsson <- data.frame(label = clus_kmeans_Nilsson)
 res_kmeans_Mosmann <- data.frame(label = clus_kmeans_Mosmann)
 
 write.table(res_kmeans_Levine_32, 
-            file = "../results/kmeans/kmeans_labels_Levine_2015_marrow_32.txt", 
+            file = "../results_manual/kmeans/kmeans_labels_Levine_2015_marrow_32.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_kmeans_Levine_13, 
-            file = "../results/kmeans/kmeans_labels_Levine_2015_marrow_13.txt", 
+            file = "../results_manual/kmeans/kmeans_labels_Levine_2015_marrow_13.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_kmeans_Nilsson, 
-            file = "../results/kmeans/kmeans_labels_Nilsson_2013_HSC.txt", 
+            file = "../results_manual/kmeans/kmeans_labels_Nilsson_2013_HSC.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_kmeans_Mosmann, 
-            file = "../results/kmeans/kmeans_labels_Mosmann_2014_activ.txt", 
+            file = "../results_manual/kmeans/kmeans_labels_Mosmann_2014_activ.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
 
@@ -162,18 +155,18 @@ runtime_kmeans <- t(data.frame(
   Mosmann_2014_activ = runtime_Mosmann["elapsed"], 
   row.names = "runtime"))
 
-write.table(runtime_kmeans, file = "../results/runtime/runtime_kmeans.txt", quote = FALSE, sep = "\t")
+write.table(runtime_kmeans, file = "../results_manual/runtime/runtime_kmeans.txt", quote = FALSE, sep = "\t")
 
 
 # save session information
 
-sink(file = "../results/session_info/session_info_kmeans.txt")
+sink(file = "../results_manual/session_info/session_info_kmeans.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/results_kmeans.RData")
+save.image(file = "../results_manual/RData_files/results_kmeans.RData")
 
 

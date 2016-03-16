@@ -45,10 +45,10 @@ dim(data_Mosmann)
 
 # note DensVM also requires a copy of the input FCS file in the output directory
 
-out_dir_Levine_32 <- "../results/DensVM/Levine_2015_marrow_32"
-out_dir_Levine_13 <- "../results/DensVM/Levine_2015_marrow_13"
-out_dir_Nilsson <- "../results/DensVM/Nilsson_2013_HSC"
-out_dir_Mosmann <- "../results/DensVM/Mosmann_2014_activ"
+out_dir_Levine_32 <- "../results_auto/DensVM/Levine_2015_marrow_32"
+out_dir_Levine_13 <- "../results_auto/DensVM/Levine_2015_marrow_13"
+out_dir_Nilsson <- "../results_auto/DensVM/Nilsson_2013_HSC"
+out_dir_Mosmann <- "../results_auto/DensVM/Mosmann_2014_activ"
 
 
 # indices of protein marker columns
@@ -85,9 +85,11 @@ n_sub_Mosmann <- 20000
 
 
 
-##################
-### Run DensVM ###
-##################
+################################################
+### Run DensVM: automatic number of clusters ###
+################################################
+
+# run DensVM with automatic selection of number of clusters (manual selection is not available)
 
 # use main function "cytof_tsne_densvm"
 # graphical version can also be launched with "cytof_tsne_densvm_GUI()"
@@ -130,12 +132,6 @@ runtime_Mosmann <- system.time({
 setwd(INIT_DIR)  # reset working directory
 
 
-
-
-####################
-### SAVE RESULTS ###
-####################
-
 # save runtime
 
 runtime_DensVM <- t(data.frame(
@@ -145,18 +141,20 @@ runtime_DensVM <- t(data.frame(
   Mosmann_2014_activ = runtime_Mosmann["elapsed"], 
   row.names = "runtime"))
 
-write.table(runtime_DensVM, file = "../results/runtime/runtime_DensVM.txt", quote = FALSE, sep = "\t")
+write.table(runtime_DensVM, 
+            file = "../results_auto/runtime/runtime_DensVM.txt", 
+            quote = FALSE, sep = "\t")
 
 
 # save session information
 
-sink(file = "../results/session_info/session_info_DensVM.txt")
+sink(file = "../results_auto/session_info/session_info_DensVM.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/results_DensVM.RData")
+save.image(file = "../results_auto/RData_files/results_DensVM.RData")
 
 

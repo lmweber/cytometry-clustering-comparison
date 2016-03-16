@@ -59,7 +59,7 @@ length(marker_cols_Mosmann)
 ### Run FlowSOM ###
 ###################
 
-# run FlowSOM
+# run FlowSOM (using default number of clusters, i.e. 10x10 grid or 100 clusters)
 
 set.seed(123)
 runtime_FlowSOM_Levine_32 <- system.time({
@@ -133,121 +133,6 @@ length(table(clus_FlowSOM_Nilsson))
 length(table(clus_FlowSOM_Mosmann))
 
 
-
-
-########################
-### Run FlowSOM_meta ###
-########################
-
-# run optional metaclustering step (FlowSOM_meta)
-
-# set number of clusters
-k_Levine_32 <- 40
-k_Levine_13 <- 40
-k_Nilsson <- 40
-k_Mosmann <- 40
-
-
-set.seed(123)
-runtime_FlowSOM_meta_Levine_32 <- system.time({
-  meta_clustering_Levine_32 <- FlowSOM::metaClustering_consensus(fSOM_Levine_32$map$codes, k = k_Levine_32)
-})
-
-
-set.seed(123)
-runtime_FlowSOM_meta_Levine_13 <- system.time({
-  meta_clustering_Levine_13 <- FlowSOM::metaClustering_consensus(fSOM_Levine_13$map$codes, k = k_Levine_13)
-})
-
-
-set.seed(123)
-runtime_FlowSOM_meta_Nilsson <- system.time({
-  meta_clustering_Nilsson <- FlowSOM::metaClustering_consensus(fSOM_Nilsson$map$codes, k = k_Nilsson)
-})
-
-
-set.seed(123)
-runtime_FlowSOM_meta_Mosmann <- system.time({
-  meta_clustering_Mosmann <- FlowSOM::metaClustering_consensus(fSOM_Mosmann$map$codes, k = k_Mosmann)
-})
-
-
-# alternatively: set number of clusters automatically (does not perform well)
-
-# set.seed(123)
-# runtime_FlowSOM_meta_Levine_32 <- system.time({
-# meta_clustering_Levine_32 <- FlowSOM::MetaClustering(fSOM_Levine_32$map$codes, 
-#                                                      method = "metaClustering_consensus", 
-#                                                      max = 50)
-# })
-# 
-# set.seed(123)
-# runtime_FlowSOM_meta_Levine_13 <- system.time({
-# meta_clustering_Levine_13 <- FlowSOM::MetaClustering(fSOM_Levine_13$map$codes, 
-#                                                      method = "metaClustering_consensus", 
-#                                                      max = 50)
-# })
-# 
-# set.seed(123)
-# runtime_FlowSOM_meta_Nilsson <- system.time({
-#   meta_clustering_Nilsson <- FlowSOM::MetaClustering(fSOM_Nilsson$map$codes, 
-#                                                     method = "metaClustering_consensus", 
-#                                                     max = 50)
-# })
-# 
-# set.seed(123)
-# runtime_FlowSOM_meta_Mosmann <- system.time({
-#   meta_clustering_Mosmann <- FlowSOM::MetaClustering(fSOM_Mosmann$map$codes, 
-#                                                     method = "metaClustering_consensus", 
-#                                                     max = 50)
-# })
-
-
-# combine runtime
-
-runtime_FlowSOM_meta_Levine_32 <- runtime_FlowSOM_Levine_32 + runtime_FlowSOM_meta_Levine_32
-runtime_FlowSOM_meta_Levine_13 <- runtime_FlowSOM_Levine_13 + runtime_FlowSOM_meta_Levine_13
-runtime_FlowSOM_meta_Nilsson <- runtime_FlowSOM_Nilsson + runtime_FlowSOM_meta_Nilsson
-runtime_FlowSOM_meta_Mosmann <- runtime_FlowSOM_Mosmann + runtime_FlowSOM_meta_Mosmann
-
-
-# extract cluster labels
-
-meta_clustering_Levine_32
-meta_clustering_Levine_13
-meta_clustering_Nilsson
-meta_clustering_Mosmann
-
-clus_FlowSOM_meta_Levine_32 <- meta_clustering_Levine_32[fSOM_Levine_32$map$mapping[, 1]]
-clus_FlowSOM_meta_Levine_13 <- meta_clustering_Levine_13[fSOM_Levine_13$map$mapping[, 1]]
-clus_FlowSOM_meta_Nilsson <- meta_clustering_Nilsson[fSOM_Nilsson$map$mapping[, 1]]
-clus_FlowSOM_meta_Mosmann <- meta_clustering_Mosmann[fSOM_Mosmann$map$mapping[, 1]]
-
-length(clus_FlowSOM_meta_Levine_32)
-length(clus_FlowSOM_meta_Levine_13)
-length(clus_FlowSOM_meta_Nilsson)
-length(clus_FlowSOM_meta_Mosmann)
-
-
-# cluster sizes and number of clusters
-
-table(clus_FlowSOM_meta_Levine_32)
-table(clus_FlowSOM_meta_Levine_13)
-table(clus_FlowSOM_meta_Nilsson)
-table(clus_FlowSOM_meta_Mosmann)
-
-length(table(clus_FlowSOM_meta_Levine_32))
-length(table(clus_FlowSOM_meta_Levine_13))
-length(table(clus_FlowSOM_meta_Nilsson))
-length(table(clus_FlowSOM_meta_Mosmann))
-
-
-
-
-####################
-### SAVE RESULTS ###
-####################
-
 # save cluster labels
 
 res_FlowSOM_Levine_32 <- data.frame(label = clus_FlowSOM_Levine_32)
@@ -255,37 +140,17 @@ res_FlowSOM_Levine_13 <- data.frame(label = clus_FlowSOM_Levine_13)
 res_FlowSOM_Nilsson <- data.frame(label = clus_FlowSOM_Nilsson)
 res_FlowSOM_Mosmann <- data.frame(label = clus_FlowSOM_Mosmann)
 
-res_FlowSOM_meta_Levine_32 <- data.frame(label = clus_FlowSOM_meta_Levine_32)
-res_FlowSOM_meta_Levine_13 <- data.frame(label = clus_FlowSOM_meta_Levine_13)
-res_FlowSOM_meta_Nilsson <- data.frame(label = clus_FlowSOM_meta_Nilsson)
-res_FlowSOM_meta_Mosmann <- data.frame(label = clus_FlowSOM_meta_Mosmann)
-
-
 write.table(res_FlowSOM_Levine_32, 
-            file = "../results/FlowSOM/FlowSOM_labels_Levine_2015_marrow_32.txt", 
+            file = "../results_auto/FlowSOM/FlowSOM_labels_Levine_2015_marrow_32.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_FlowSOM_Levine_13, 
-            file = "../results/FlowSOM/FlowSOM_labels_Levine_2015_marrow_13.txt", 
+            file = "../results_auto/FlowSOM/FlowSOM_labels_Levine_2015_marrow_13.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_FlowSOM_Nilsson, 
-            file = "../results/FlowSOM/FlowSOM_labels_Nilsson_2013_HSC.txt", 
+            file = "../results_auto/FlowSOM/FlowSOM_labels_Nilsson_2013_HSC.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_FlowSOM_Mosmann, 
-            file = "../results/FlowSOM/FlowSOM_labels_Mosmann_2014_activ.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-
-
-write.table(res_FlowSOM_meta_Levine_32, 
-            file = "../results/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_32.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_meta_Levine_13, 
-            file = "../results/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_13.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_meta_Nilsson, 
-            file = "../results/FlowSOM_meta/FlowSOM_meta_labels_Nilsson_2013_HSC.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_meta_Mosmann, 
-            file = "../results/FlowSOM_meta/FlowSOM_meta_labels_Mosmann_2014_activ.txt", 
+            file = "../results_auto/FlowSOM/FlowSOM_labels_Mosmann_2014_activ.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
 
@@ -298,27 +163,256 @@ runtime_FlowSOM <- t(data.frame(
   Mosmann_2014_activ = runtime_FlowSOM_Mosmann["elapsed"], 
   row.names = "runtime"))
 
-runtime_FlowSOM_meta <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_FlowSOM_meta_Levine_32["elapsed"], 
-  Levine_2015_marrow_13 = runtime_FlowSOM_meta_Levine_13["elapsed"], 
-  Nilsson_2013_HSC = runtime_FlowSOM_meta_Nilsson["elapsed"], 
-  Mosmann_2014_activ = runtime_FlowSOM_meta_Mosmann["elapsed"], 
-  row.names = "runtime"))
-
-write.table(runtime_FlowSOM, file = "../results/runtime/runtime_FlowSOM.txt", quote = FALSE, sep = "\t")
-
-write.table(runtime_FlowSOM_meta, file = "../results/runtime/runtime_FlowSOM_meta.txt", quote = FALSE, sep = "\t")
+write.table(runtime_FlowSOM, file = "../results_auto/runtime/runtime_FlowSOM.txt", quote = FALSE, sep = "\t")
 
 
 # save session information
 
-sink(file = "../results/session_info/session_info_FlowSOM_and_FlowSOM_meta.txt")
+sink(file = "../results_auto/session_info/session_info_FlowSOM.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/results_FlowSOM_and_FlowSOM_meta.RData")
+save.image(file = "../results_auto/RData_files/results_FlowSOM.RData")
+
+
+
+
+######################################################
+### Run FlowSOM_meta: automatic number of clusters ###
+######################################################
+
+# run metaclustering step (i.e. FlowSOM_meta) with automatic selection of number of clusters
+
+set.seed(123)
+runtime_FlowSOM_meta_Levine_32_auto <- system.time({
+  meta_clustering_Levine_32_auto <- FlowSOM::MetaClustering(fSOM_Levine_32$map$codes, method = "metaClustering_consensus")
+})
+
+set.seed(123)
+runtime_FlowSOM_meta_Levine_13_auto <- system.time({
+  meta_clustering_Levine_13_auto <- FlowSOM::MetaClustering(fSOM_Levine_13$map$codes, method = "metaClustering_consensus")
+})
+
+set.seed(123)
+runtime_FlowSOM_meta_Nilsson_auto <- system.time({
+  meta_clustering_Nilsson_auto <- FlowSOM::MetaClustering(fSOM_Nilsson$map$codes, method = "metaClustering_consensus")
+})
+
+set.seed(123)
+runtime_FlowSOM_meta_Mosmann_auto <- system.time({
+  meta_clustering_Mosmann_auto <- FlowSOM::MetaClustering(fSOM_Mosmann$map$codes, method = "metaClustering_consensus")
+})
+
+
+# combine runtime
+
+runtime_FlowSOM_meta_Levine_32_auto <- runtime_FlowSOM_Levine_32 + runtime_FlowSOM_meta_Levine_32_auto
+runtime_FlowSOM_meta_Levine_13_auto <- runtime_FlowSOM_Levine_13 + runtime_FlowSOM_meta_Levine_13_auto
+runtime_FlowSOM_meta_Nilsson_auto <- runtime_FlowSOM_Nilsson + runtime_FlowSOM_meta_Nilsson_auto
+runtime_FlowSOM_meta_Mosmann_auto <- runtime_FlowSOM_Mosmann + runtime_FlowSOM_meta_Mosmann_auto
+
+
+# extract cluster labels
+
+meta_clustering_Levine_32_auto
+meta_clustering_Levine_13_auto
+meta_clustering_Nilsson_auto
+meta_clustering_Mosmann_auto
+
+clus_FlowSOM_meta_Levine_32_auto <- meta_clustering_Levine_32_auto[fSOM_Levine_32$map$mapping[, 1]]
+clus_FlowSOM_meta_Levine_13_auto <- meta_clustering_Levine_13_auto[fSOM_Levine_13$map$mapping[, 1]]
+clus_FlowSOM_meta_Nilsson_auto <- meta_clustering_Nilsson_auto[fSOM_Nilsson$map$mapping[, 1]]
+clus_FlowSOM_meta_Mosmann_auto <- meta_clustering_Mosmann_auto[fSOM_Mosmann$map$mapping[, 1]]
+
+length(clus_FlowSOM_meta_Levine_32_auto)
+length(clus_FlowSOM_meta_Levine_13_auto)
+length(clus_FlowSOM_meta_Nilsson_auto)
+length(clus_FlowSOM_meta_Mosmann_auto)
+
+
+# cluster sizes and number of clusters
+
+table(clus_FlowSOM_meta_Levine_32_auto)
+table(clus_FlowSOM_meta_Levine_13_auto)
+table(clus_FlowSOM_meta_Nilsson_auto)
+table(clus_FlowSOM_meta_Mosmann_auto)
+
+length(table(clus_FlowSOM_meta_Levine_32_auto))
+length(table(clus_FlowSOM_meta_Levine_13_auto))
+length(table(clus_FlowSOM_meta_Nilsson_auto))
+length(table(clus_FlowSOM_meta_Mosmann_auto))
+
+
+# save cluster labels
+
+res_FlowSOM_meta_Levine_32_auto <- data.frame(label = clus_FlowSOM_meta_Levine_32_auto)
+res_FlowSOM_meta_Levine_13_auto <- data.frame(label = clus_FlowSOM_meta_Levine_13_auto)
+res_FlowSOM_meta_Nilsson_auto <- data.frame(label = clus_FlowSOM_meta_Nilsson_auto)
+res_FlowSOM_meta_Mosmann_auto <- data.frame(label = clus_FlowSOM_meta_Mosmann_auto)
+
+write.table(res_FlowSOM_meta_Levine_32_auto, 
+            file = "../results_auto/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_32.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_meta_Levine_13_auto, 
+            file = "../results_auto/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_13.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_meta_Nilsson_auto, 
+            file = "../results_auto/FlowSOM_meta/FlowSOM_meta_labels_Nilsson_2013_HSC.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_meta_Mosmann_auto, 
+            file = "../results_auto/FlowSOM_meta/FlowSOM_meta_labels_Mosmann_2014_activ.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+
+
+# save runtime
+
+runtime_FlowSOM_meta_auto <- t(data.frame(
+  Levine_2015_marrow_32 = runtime_FlowSOM_meta_Levine_32_auto["elapsed"], 
+  Levine_2015_marrow_13 = runtime_FlowSOM_meta_Levine_13_auto["elapsed"], 
+  Nilsson_2013_HSC = runtime_FlowSOM_meta_Nilsson_auto["elapsed"], 
+  Mosmann_2014_activ = runtime_FlowSOM_meta_Mosmann_auto["elapsed"], 
+  row.names = "runtime"))
+
+write.table(runtime_FlowSOM_meta_auto, 
+            file = "../results_auto/runtime/runtime_FlowSOM_meta.txt", 
+            quote = FALSE, sep = "\t")
+
+
+# save session information
+
+sink(file = "../results_auto/session_info/session_info_FlowSOM_meta.txt")
+sessionInfo()
+sink()
+
+
+# save R objects
+
+save.image(file = "../results_auto/RData_files/results_FlowSOM_meta.RData")
+
+
+
+
+##############################################################
+### Run FlowSOM_meta: manually selected number of clusters ###
+##############################################################
+
+# run metaclustering step (i.e. FlowSOM_meta) with manual selection of number of clusters
+
+
+# number of clusters
+k_Levine_32 <- 40
+k_Levine_13 <- 40
+k_Nilsson <- 40
+k_Mosmann <- 40
+
+
+set.seed(123)
+runtime_FlowSOM_meta_Levine_32_manual <- system.time({
+  meta_clustering_Levine_32_manual <- FlowSOM::metaClustering_consensus(fSOM_Levine_32$map$codes, k = k_Levine_32)
+})
+
+set.seed(123)
+runtime_FlowSOM_meta_Levine_13_manual <- system.time({
+  meta_clustering_Levine_13_manual <- FlowSOM::metaClustering_consensus(fSOM_Levine_13$map$codes, k = k_Levine_13)
+})
+
+set.seed(123)
+runtime_FlowSOM_meta_Nilsson_manual <- system.time({
+  meta_clustering_Nilsson_manual <- FlowSOM::metaClustering_consensus(fSOM_Nilsson$map$codes, k = k_Nilsson)
+})
+
+set.seed(123)
+runtime_FlowSOM_meta_Mosmann_manual <- system.time({
+  meta_clustering_Mosmann_manual <- FlowSOM::metaClustering_consensus(fSOM_Mosmann$map$codes, k = k_Mosmann)
+})
+
+
+# combine runtime
+
+runtime_FlowSOM_meta_Levine_32_manual <- runtime_FlowSOM_Levine_32 + runtime_FlowSOM_meta_Levine_32_manual
+runtime_FlowSOM_meta_Levine_13_manual <- runtime_FlowSOM_Levine_13 + runtime_FlowSOM_meta_Levine_13_manual
+runtime_FlowSOM_meta_Nilsson_manual <- runtime_FlowSOM_Nilsson + runtime_FlowSOM_meta_Nilsson_manual
+runtime_FlowSOM_meta_Mosmann_manual <- runtime_FlowSOM_Mosmann + runtime_FlowSOM_meta_Mosmann_manual
+
+
+# extract cluster labels
+
+meta_clustering_Levine_32_manual
+meta_clustering_Levine_13_manual
+meta_clustering_Nilsson_manual
+meta_clustering_Mosmann_manual
+
+clus_FlowSOM_meta_Levine_32_manual <- meta_clustering_Levine_32_manual[fSOM_Levine_32$map$mapping[, 1]]
+clus_FlowSOM_meta_Levine_13_manual <- meta_clustering_Levine_13_manual[fSOM_Levine_13$map$mapping[, 1]]
+clus_FlowSOM_meta_Nilsson_manual <- meta_clustering_Nilsson_manual[fSOM_Nilsson$map$mapping[, 1]]
+clus_FlowSOM_meta_Mosmann_manual <- meta_clustering_Mosmann_manual[fSOM_Mosmann$map$mapping[, 1]]
+
+length(clus_FlowSOM_meta_Levine_32_manual)
+length(clus_FlowSOM_meta_Levine_13_manual)
+length(clus_FlowSOM_meta_Nilsson_manual)
+length(clus_FlowSOM_meta_Mosmann_manual)
+
+
+# cluster sizes and number of clusters
+
+table(clus_FlowSOM_meta_Levine_32_manual)
+table(clus_FlowSOM_meta_Levine_13_manual)
+table(clus_FlowSOM_meta_Nilsson_manual)
+table(clus_FlowSOM_meta_Mosmann_manual)
+
+length(table(clus_FlowSOM_meta_Levine_32_manual))
+length(table(clus_FlowSOM_meta_Levine_13_manual))
+length(table(clus_FlowSOM_meta_Nilsson_manual))
+length(table(clus_FlowSOM_meta_Mosmann_manual))
+
+
+# save cluster labels
+
+res_FlowSOM_meta_Levine_32_manual <- data.frame(label = clus_FlowSOM_meta_Levine_32_manual)
+res_FlowSOM_meta_Levine_13_manual <- data.frame(label = clus_FlowSOM_meta_Levine_13_manual)
+res_FlowSOM_meta_Nilsson_manual <- data.frame(label = clus_FlowSOM_meta_Nilsson_manual)
+res_FlowSOM_meta_Mosmann_manual <- data.frame(label = clus_FlowSOM_meta_Mosmann_manual)
+
+write.table(res_FlowSOM_meta_Levine_32_manual, 
+            file = "../results_manual/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_32.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_meta_Levine_13_manual, 
+            file = "../results_manual/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_13.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_meta_Nilsson_manual, 
+            file = "../results_manual/FlowSOM_meta/FlowSOM_meta_labels_Nilsson_2013_HSC.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_meta_Mosmann_manual, 
+            file = "../results_manual/FlowSOM_meta/FlowSOM_meta_labels_Mosmann_2014_activ.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+
+
+# save runtime
+
+runtime_FlowSOM_meta_manual <- t(data.frame(
+  Levine_2015_marrow_32 = runtime_FlowSOM_meta_Levine_32_manual["elapsed"], 
+  Levine_2015_marrow_13 = runtime_FlowSOM_meta_Levine_13_manual["elapsed"], 
+  Nilsson_2013_HSC = runtime_FlowSOM_meta_Nilsson_manual["elapsed"], 
+  Mosmann_2014_activ = runtime_FlowSOM_meta_Mosmann_manual["elapsed"], 
+  row.names = "runtime"))
+
+write.table(runtime_FlowSOM_meta_manual, 
+            file = "../results_manual/runtime/runtime_FlowSOM_meta.txt", 
+            quote = FALSE, sep = "\t")
+
+
+# save session information
+
+sink(file = "../results_manual/session_info/session_info_FlowSOM_meta.txt")
+sessionInfo()
+sink()
+
+
+# save R objects
+
+save.image(file = "../results_manual/RData_files/results_FlowSOM_meta.RData")
 
 

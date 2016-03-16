@@ -65,110 +65,219 @@ dim(data_Mosmann)
 
 
 
-#####################
-### Run flowMeans ###
-#####################
+###################################################
+### Run flowMeans: automatic number of clusters ###
+###################################################
 
-# run flowMeans
+# run flowMeans with automatic selection of number of clusters
 
 set.seed(123)
-runtime_Levine_32 <- system.time({
-  out_flowMeans_Levine_32 <- flowMeans(data_Levine_32, Standardize = FALSE, NumC = 40)
+runtime_Levine_32_auto <- system.time({
+  out_flowMeans_Levine_32_auto <- flowMeans(data_Levine_32, Standardize = FALSE)
 })
 
 
 set.seed(123)
-runtime_Levine_13 <- system.time({
-  out_flowMeans_Levine_13 <- flowMeans(data_Levine_13, Standardize = FALSE, NumC = 40)
+runtime_Levine_13_auto <- system.time({
+  out_flowMeans_Levine_13_auto <- flowMeans(data_Levine_13, Standardize = FALSE)
 })
 
 
 set.seed(123)
-runtime_Nilsson <- system.time({
-  out_flowMeans_Nilsson <- flowMeans(data_Nilsson, Standardize = FALSE, NumC = 40)
+runtime_Nilsson_auto <- system.time({
+  out_flowMeans_Nilsson_auto <- flowMeans(data_Nilsson, Standardize = FALSE)
 })
 
 
 set.seed(123)
-runtime_Mosmann <- system.time({
-  out_flowMeans_Mosmann <- flowMeans(data_Mosmann, Standardize = FALSE, NumC = 40)
+runtime_Mosmann_auto <- system.time({
+  out_flowMeans_Mosmann_auto <- flowMeans(data_Mosmann, Standardize = FALSE)
 })
 
 
 # extract cluster labels
 
-clus_flowMeans_Levine_32 <- out_flowMeans_Levine_32@Label
-clus_flowMeans_Levine_13 <- out_flowMeans_Levine_13@Label
-clus_flowMeans_Nilsson <- out_flowMeans_Nilsson@Label
-clus_flowMeans_Mosmann <- out_flowMeans_Mosmann@Label
+clus_flowMeans_Levine_32_auto <- out_flowMeans_Levine_32_auto@Label
+clus_flowMeans_Levine_13_auto <- out_flowMeans_Levine_13_auto@Label
+clus_flowMeans_Nilsson_auto <- out_flowMeans_Nilsson_auto@Label
+clus_flowMeans_Mosmann_auto <- out_flowMeans_Mosmann_auto@Label
 
-length(clus_flowMeans_Levine_32)
-length(clus_flowMeans_Levine_13)
-length(clus_flowMeans_Nilsson)
-length(clus_flowMeans_Mosmann)
+length(clus_flowMeans_Levine_32_auto)
+length(clus_flowMeans_Levine_13_auto)
+length(clus_flowMeans_Nilsson_auto)
+length(clus_flowMeans_Mosmann_auto)
 
 
 # cluster sizes and number of clusters
 
-table(clus_flowMeans_Levine_32)
-table(clus_flowMeans_Levine_13)
-table(clus_flowMeans_Nilsson)
-table(clus_flowMeans_Mosmann)
+table(clus_flowMeans_Levine_32_auto)
+table(clus_flowMeans_Levine_13_auto)
+table(clus_flowMeans_Nilsson_auto)
+table(clus_flowMeans_Mosmann_auto)
 
-length(table(clus_flowMeans_Levine_32))
-length(table(clus_flowMeans_Levine_13))
-length(table(clus_flowMeans_Nilsson))
-length(table(clus_flowMeans_Mosmann))
+length(table(clus_flowMeans_Levine_32_auto))
+length(table(clus_flowMeans_Levine_13_auto))
+length(table(clus_flowMeans_Nilsson_auto))
+length(table(clus_flowMeans_Mosmann_auto))
 
-
-
-
-####################
-### SAVE RESULTS ###
-####################
 
 # save cluster labels
 
-res_flowMeans_Levine_32 <- data.frame(label = clus_flowMeans_Levine_32)
-res_flowMeans_Levine_13 <- data.frame(label = clus_flowMeans_Levine_13)
-res_flowMeans_Nilsson <- data.frame(label = clus_flowMeans_Nilsson)
-res_flowMeans_Mosmann <- data.frame(label = clus_flowMeans_Mosmann)
+res_flowMeans_Levine_32_auto <- data.frame(label = clus_flowMeans_Levine_32_auto)
+res_flowMeans_Levine_13_auto <- data.frame(label = clus_flowMeans_Levine_13_auto)
+res_flowMeans_Nilsson_auto <- data.frame(label = clus_flowMeans_Nilsson_auto)
+res_flowMeans_Mosmann_auto <- data.frame(label = clus_flowMeans_Mosmann_auto)
 
-write.table(res_flowMeans_Levine_32, 
-            file = "../results/flowMeans/flowMeans_labels_Levine_2015_marrow_32.txt", 
+write.table(res_flowMeans_Levine_32_auto, 
+            file = "../results_auto/flowMeans/flowMeans_labels_Levine_2015_marrow_32.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_flowMeans_Levine_13, 
-            file = "../results/flowMeans/flowMeans_labels_Levine_2015_marrow_13.txt", 
+write.table(res_flowMeans_Levine_13_auto, 
+            file = "../results_auto/flowMeans/flowMeans_labels_Levine_2015_marrow_13.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_flowMeans_Nilsson, 
-            file = "../results/flowMeans/flowMeans_labels_Nilsson_2013_HSC.txt", 
+write.table(res_flowMeans_Nilsson_auto, 
+            file = "../results_auto/flowMeans/flowMeans_labels_Nilsson_2013_HSC.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_flowMeans_Mosmann, 
-            file = "../results/flowMeans/flowMeans_labels_Mosmann_2014_activ.txt", 
+write.table(res_flowMeans_Mosmann_auto, 
+            file = "../results_auto/flowMeans/flowMeans_labels_Mosmann_2014_activ.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
 
 # save runtime
 
-runtime_flowMeans <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_Levine_32["elapsed"], 
-  Levine_2015_marrow_13 = runtime_Levine_13["elapsed"], 
-  Nilsson_2013_HSC = runtime_Nilsson["elapsed"], 
-  Mosmann_2014_activ = runtime_Mosmann["elapsed"], 
+runtime_flowMeans_auto <- t(data.frame(
+  Levine_2015_marrow_32 = runtime_Levine_32_auto["elapsed"], 
+  Levine_2015_marrow_13 = runtime_Levine_13_auto["elapsed"], 
+  Nilsson_2013_HSC = runtime_Nilsson_auto["elapsed"], 
+  Mosmann_2014_activ = runtime_Mosmann_auto["elapsed"], 
   row.names = "runtime"))
 
-write.table(runtime_flowMeans, file = "../results/runtime/runtime_flowMeans.txt", quote = FALSE, sep = "\t")
+write.table(runtime_flowMeans_auto, 
+            file = "../results_auto/runtime/runtime_flowMeans.txt", 
+            quote = FALSE, sep = "\t")
 
 
 # save session information
 
-sink(file = "../results/session_info/session_info_flowMeans.txt")
+sink(file = "../results_auto/session_info/session_info_flowMeans.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/results_flowMeans.RData")
+save.image(file = "../results_auto/RData_files/results_flowMeans.RData")
+
+
+
+
+###########################################################
+### Run flowMeans: manually selected number of clusters ###
+###########################################################
+
+# run flowMeans with manual selection of number of clusters
+
+
+# number of clusters
+k_Levine_32 <- 40
+k_Levine_13 <- 40
+k_Nilsson <- 40
+k_Mosmann <- 40
+
+
+set.seed(123)
+runtime_Levine_32_manual <- system.time({
+  out_flowMeans_Levine_32_manual <- flowMeans(data_Levine_32, Standardize = FALSE, NumC = k_Levine_32)
+})
+
+
+set.seed(123)
+runtime_Levine_13_manual <- system.time({
+  out_flowMeans_Levine_13_manual <- flowMeans(data_Levine_13, Standardize = FALSE, NumC = k_Levine_13)
+})
+
+
+set.seed(123)
+runtime_Nilsson_manual <- system.time({
+  out_flowMeans_Nilsson_manual <- flowMeans(data_Nilsson, Standardize = FALSE, NumC = k_Nilsson)
+})
+
+
+set.seed(123)
+runtime_Mosmann_manual <- system.time({
+  out_flowMeans_Mosmann_manual <- flowMeans(data_Mosmann, Standardize = FALSE, NumC = k_Mosmann)
+})
+
+
+# extract cluster labels
+
+clus_flowMeans_Levine_32_manual <- out_flowMeans_Levine_32_manual@Label
+clus_flowMeans_Levine_13_manual <- out_flowMeans_Levine_13_manual@Label
+clus_flowMeans_Nilsson_manual <- out_flowMeans_Nilsson_manual@Label
+clus_flowMeans_Mosmann_manual <- out_flowMeans_Mosmann_manual@Label
+
+length(clus_flowMeans_Levine_32_manual)
+length(clus_flowMeans_Levine_13_manual)
+length(clus_flowMeans_Nilsson_manual)
+length(clus_flowMeans_Mosmann_manual)
+
+
+# cluster sizes and number of clusters
+
+table(clus_flowMeans_Levine_32_manual)
+table(clus_flowMeans_Levine_13_manual)
+table(clus_flowMeans_Nilsson_manual)
+table(clus_flowMeans_Mosmann_manual)
+
+length(table(clus_flowMeans_Levine_32_manual))
+length(table(clus_flowMeans_Levine_13_manual))
+length(table(clus_flowMeans_Nilsson_manual))
+length(table(clus_flowMeans_Mosmann_manual))
+
+
+# save cluster labels
+
+res_flowMeans_Levine_32_manual <- data.frame(label = clus_flowMeans_Levine_32_manual)
+res_flowMeans_Levine_13_manual <- data.frame(label = clus_flowMeans_Levine_13_manual)
+res_flowMeans_Nilsson_manual <- data.frame(label = clus_flowMeans_Nilsson_manual)
+res_flowMeans_Mosmann_manual <- data.frame(label = clus_flowMeans_Mosmann_manual)
+
+write.table(res_flowMeans_Levine_32_manual, 
+            file = "../results_manual/flowMeans/flowMeans_labels_Levine_2015_marrow_32.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_flowMeans_Levine_13_manual, 
+            file = "../results_manual/flowMeans/flowMeans_labels_Levine_2015_marrow_13.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_flowMeans_Nilsson_manual, 
+            file = "../results_manual/flowMeans/flowMeans_labels_Nilsson_2013_HSC.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_flowMeans_Mosmann_manual, 
+            file = "../results_manual/flowMeans/flowMeans_labels_Mosmann_2014_activ.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+
+
+# save runtime
+
+runtime_flowMeans_manual <- t(data.frame(
+  Levine_2015_marrow_32 = runtime_Levine_32_manual["elapsed"], 
+  Levine_2015_marrow_13 = runtime_Levine_13_manual["elapsed"], 
+  Nilsson_2013_HSC = runtime_Nilsson_manual["elapsed"], 
+  Mosmann_2014_activ = runtime_Mosmann_manual["elapsed"], 
+  row.names = "runtime"))
+
+write.table(runtime_flowMeans_manual, 
+            file = "../results_manual/runtime/runtime_flowMeans.txt", 
+            quote = FALSE, sep = "\t")
+
+
+# save session information
+
+sink(file = "../results_manual/session_info/session_info_flowMeans.txt")
+sessionInfo()
+sink()
+
+
+# save R objects
+
+save.image(file = "../results_manual/RData_files/results_flowMeans.RData")
 
 

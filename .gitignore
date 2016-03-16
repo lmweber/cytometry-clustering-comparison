@@ -8,11 +8,12 @@ drafts_slides_notes/**
 early_work/**
 gating_schemes/**
 paper/**
+parameters_spreadsheet/**
 plots/**
 plots_submission/**
 results/**
-results_all_auto_clusters/**
-results_all_40_clusters/**
+results_auto/**
+results_manual/**
 supplementary_info/**
 templates/**
 tex_file_from_Gosia/**

@@ -60,10 +60,14 @@ dim(data_Mosmann)
 
 # save subsampled data (contains true population labels for subsampled rows)
 
-flowCore::write.FCS(flowCore::flowFrame(data_Levine_32), filename = "../results/Rclusterpp/Levine_2015_marrow_32_sub.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_Levine_13), filename = "../results/Rclusterpp/Levine_2015_marrow_13_sub.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_Nilsson), filename = "../results/Rclusterpp/Nilsson_2013_HSC_sub.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_Mosmann), filename = "../results/Rclusterpp/Mosmann_2014_activ_sub.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data_Levine_32), 
+                    filename = "../results_manual/Rclusterpp/Levine_2015_marrow_32_sub.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data_Levine_13), 
+                    filename = "../results_manual/Rclusterpp/Levine_2015_marrow_13_sub.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data_Nilsson), 
+                    filename = "../results_manual/Rclusterpp/Nilsson_2013_HSC_sub.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data_Mosmann), 
+                    filename = "../results_manual/Rclusterpp/Mosmann_2014_activ_sub.fcs")
 
 
 # indices of protein marker columns
@@ -94,9 +98,9 @@ dim(data_Mosmann)
 
 
 
-######################
-### Run Rclusterpp ###
-######################
+############################################################
+### Run Rclusterpp: manually selected number of clusters ###
+############################################################
 
 # run Rclusterpp
 # note: uses maximum number of cores if setThreads is left as default
@@ -163,12 +167,6 @@ length(table(clus_Rclusterpp_Nilsson))
 length(table(clus_Rclusterpp_Mosmann))
 
 
-
-
-####################
-### SAVE RESULTS ###
-####################
-
 # save cluster labels
 
 res_Rclusterpp_Levine_32 <- data.frame(label = clus_Rclusterpp_Levine_32)
@@ -177,16 +175,16 @@ res_Rclusterpp_Nilsson <- data.frame(label = clus_Rclusterpp_Nilsson)
 res_Rclusterpp_Mosmann <- data.frame(label = clus_Rclusterpp_Mosmann)
 
 write.table(res_Rclusterpp_Levine_32, 
-            file = "../results/Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_32.txt", 
+            file = "../results_manual/Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_32.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_Rclusterpp_Levine_13, 
-            file = "../results/Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_13.txt", 
+            file = "../results_manual/Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_13.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_Rclusterpp_Nilsson, 
-            file = "../results/Rclusterpp/Rclusterpp_labels_Nilsson_2013_HSC.txt", 
+            file = "../results_manual/Rclusterpp/Rclusterpp_labels_Nilsson_2013_HSC.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_Rclusterpp_Mosmann, 
-            file = "../results/Rclusterpp/Rclusterpp_labels_Mosmann_2014_activ.txt", 
+            file = "../results_manual/Rclusterpp/Rclusterpp_labels_Mosmann_2014_activ.txt", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
 
@@ -199,18 +197,20 @@ runtime_Rclusterpp <- t(data.frame(
   Mosmann_2014_activ = runtime_Mosmann["elapsed"], 
   row.names = "runtime"))
 
-write.table(runtime_Rclusterpp, file = "../results/runtime/runtime_Rclusterpp.txt", quote = FALSE, sep = "\t")
+write.table(runtime_Rclusterpp, 
+            file = "../results_manual/runtime/runtime_Rclusterpp.txt", 
+            quote = FALSE, sep = "\t")
 
 
 # save session information
 
-sink(file = "../results/session_info/session_info_Rclusterpp.txt")
+sink(file = "../results_manual/session_info/session_info_Rclusterpp.txt")
 sessionInfo()
 sink()
 
 
 # save R objects
 
-save.image(file = "../results/RData_files/results_Rclusterpp.RData")
+save.image(file = "../results_manual/RData_files/results_Rclusterpp.RData")
 
 
