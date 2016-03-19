@@ -55,11 +55,11 @@ length(marker_cols_Mosmann)
 
 
 
-###################
-### Run FlowSOM ###
-###################
+#################################################
+### Run FlowSOM: automatic number of clusters ###
+#################################################
 
-# run FlowSOM (using default number of clusters, i.e. 10x10 grid or 100 clusters)
+# run FlowSOM with default number of clusters for all data sets (10x10 grid or 100 clusters)
 
 set.seed(123)
 runtime_FlowSOM_Levine_32 <- system.time({
@@ -291,6 +291,143 @@ sink()
 # save R objects
 
 save.image(file = "../results_auto/RData_files/results_FlowSOM_meta.RData")
+
+
+
+
+#########################################################
+### Run FlowSOM: manually selected number of clusters ###
+#########################################################
+
+# run FlowSOM with manually selected number of clusters (e.g. 10x10 or 20x20 grid)
+
+
+# grid size (e.g. 10x10 or 20x20 grid, i.e. 100 or 400 clusters)
+grid_Levine_32 <- 10
+grid_Levine_13 <- 10
+grid_Nilsson <- 10
+grid_Mosmann <- 20
+
+
+set.seed(123)
+runtime_FlowSOM_Levine_32 <- system.time({
+  fSOM_Levine_32 <- FlowSOM::ReadInput(data_Levine_32, transform = FALSE, scale = FALSE)
+  fSOM_Levine_32 <- FlowSOM::BuildSOM(fSOM_Levine_32, colsToUse = marker_cols_Levine_32, 
+                                      xdim = grid_Levine_32, ydim = grid_Levine_32)
+  fSOM_Levine_32 <- FlowSOM::BuildMST(fSOM_Levine_32)
+})
+
+
+set.seed(123)
+runtime_FlowSOM_Levine_13 <- system.time({
+  fSOM_Levine_13 <- FlowSOM::ReadInput(data_Levine_13, transform = FALSE, scale = FALSE)
+  fSOM_Levine_13 <- FlowSOM::BuildSOM(fSOM_Levine_13, colsToUse = marker_cols_Levine_13, 
+                                      xdim = grid_Levine_13, ydim = grid_Levine_13)
+  fSOM_Levine_13 <- FlowSOM::BuildMST(fSOM_Levine_13)
+})
+
+
+set.seed(123)
+runtime_FlowSOM_Nilsson <- system.time({
+  fSOM_Nilsson <- FlowSOM::ReadInput(data_Nilsson, transform = FALSE, scale = FALSE)
+  fSOM_Nilsson <- FlowSOM::BuildSOM(fSOM_Nilsson, colsToUse = marker_cols_Nilsson, 
+                                    xdim = grid_Nilsson, ydim = grid_Nilsson)
+  fSOM_Nilsson <- FlowSOM::BuildMST(fSOM_Nilsson)
+})
+
+
+set.seed(123)
+runtime_FlowSOM_Mosmann <- system.time({
+  fSOM_Mosmann <- FlowSOM::ReadInput(data_Mosmann, transform = FALSE, scale = FALSE)
+  fSOM_Mosmann <- FlowSOM::BuildSOM(fSOM_Mosmann, colsToUse = marker_cols_Mosmann, 
+                                    xdim = grid_Mosmann, ydim = grid_Mosmann)
+  fSOM_Mosmann <- FlowSOM::BuildMST(fSOM_Mosmann)
+})
+
+
+# plots
+
+FlowSOM::PlotStars(fSOM_Levine_32)
+FlowSOM::PlotStars(fSOM_Levine_13)
+FlowSOM::PlotStars(fSOM_Nilsson)
+FlowSOM::PlotStars(fSOM_Mosmann)
+
+
+# extract cluster labels
+
+str(fSOM_Levine_32$map)
+
+head(fSOM_Levine_32$map$mapping)
+dim(fSOM_Levine_32$map$mapping)
+
+
+clus_FlowSOM_Levine_32 <- fSOM_Levine_32$map$mapping[, 1]
+clus_FlowSOM_Levine_13 <- fSOM_Levine_13$map$mapping[, 1]
+clus_FlowSOM_Nilsson <- fSOM_Nilsson$map$mapping[, 1]
+clus_FlowSOM_Mosmann <- fSOM_Mosmann$map$mapping[, 1]
+
+length(clus_FlowSOM_Levine_32)
+length(clus_FlowSOM_Levine_13)
+length(clus_FlowSOM_Nilsson)
+length(clus_FlowSOM_Mosmann)
+
+
+# cluster sizes and number of clusters
+
+table(clus_FlowSOM_Levine_32)
+table(clus_FlowSOM_Levine_13)
+table(clus_FlowSOM_Nilsson)
+table(clus_FlowSOM_Mosmann)
+
+length(table(clus_FlowSOM_Levine_32))
+length(table(clus_FlowSOM_Levine_13))
+length(table(clus_FlowSOM_Nilsson))
+length(table(clus_FlowSOM_Mosmann))
+
+
+# save cluster labels
+
+res_FlowSOM_Levine_32 <- data.frame(label = clus_FlowSOM_Levine_32)
+res_FlowSOM_Levine_13 <- data.frame(label = clus_FlowSOM_Levine_13)
+res_FlowSOM_Nilsson <- data.frame(label = clus_FlowSOM_Nilsson)
+res_FlowSOM_Mosmann <- data.frame(label = clus_FlowSOM_Mosmann)
+
+write.table(res_FlowSOM_Levine_32, 
+            file = "../results_manual/FlowSOM/FlowSOM_labels_Levine_2015_marrow_32.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_Levine_13, 
+            file = "../results_manual/FlowSOM/FlowSOM_labels_Levine_2015_marrow_13.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_Nilsson, 
+            file = "../results_manual/FlowSOM/FlowSOM_labels_Nilsson_2013_HSC.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(res_FlowSOM_Mosmann, 
+            file = "../results_manual/FlowSOM/FlowSOM_labels_Mosmann_2014_activ.txt", 
+            row.names = FALSE, quote = FALSE, sep = "\t")
+
+
+# save runtime
+
+runtime_FlowSOM <- t(data.frame(
+  Levine_2015_marrow_32 = runtime_FlowSOM_Levine_32["elapsed"], 
+  Levine_2015_marrow_13 = runtime_FlowSOM_Levine_13["elapsed"], 
+  Nilsson_2013_HSC = runtime_FlowSOM_Nilsson["elapsed"], 
+  Mosmann_2014_activ = runtime_FlowSOM_Mosmann["elapsed"], 
+  row.names = "runtime"))
+
+write.table(runtime_FlowSOM, file = "../results_manual/runtime/runtime_FlowSOM.txt", quote = FALSE, sep = "\t")
+
+
+# save session information
+
+sink(file = "../results_manual/session_info/session_info_FlowSOM.txt")
+sessionInfo()
+sink()
+
+
+# save R objects
+
+save.image(file = "../results_manual/RData_files/results_FlowSOM.RData")
 
 
 

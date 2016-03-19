@@ -292,11 +292,11 @@ runtime_immunoClust_all_auto <- t(data.frame(
   Mosmann_2014_activ = runtime_immunoClust_all_Mosmann_auto["elapsed"], 
   row.names = "runtime"))
 
-write.table(runtime_immunoClust, 
+write.table(runtime_immunoClust_auto, 
             file = "../results_auto/runtime/runtime_immunoClust.txt", 
             quote = FALSE, sep = "\t")
 
-write.table(runtime_immunoClust_all, 
+write.table(runtime_immunoClust_all_auto, 
             file = "../results_auto/runtime/runtime_immunoClust_all.txt", 
             quote = FALSE, sep = "\t")
 
@@ -325,13 +325,13 @@ save.image(file = "../results_auto/RData_files/results_immunoClust_and_immunoClu
 set.seed(123)
 runtime_immunoClust_Levine_32_manual <- system.time({
   out_immunoClust_Levine_32_manual <- 
-    immunoClust::cell.process(data_Levine_32, parameters = pars_Levine_32, bias = 0.1)
+    immunoClust::cell.process(data_Levine_32, parameters = pars_Levine_32)
 })
 
 set.seed(123)
 runtime_immunoClust_Levine_13_manual <- system.time({
   out_immunoClust_Levine_13_manual <- 
-    immunoClust::cell.process(data_Levine_13, parameters = pars_Levine_13, bias = 0.1)
+    immunoClust::cell.process(data_Levine_13, parameters = pars_Levine_13)
 })
 
 set.seed(123)
@@ -352,13 +352,13 @@ runtime_immunoClust_Mosmann_manual <- system.time({
 set.seed(123)
 runtime_immunoClust_all_Levine_32_manual <- system.time({
   out_immunoClust_all_Levine_32_manual <- 
-    immunoClust::cell.process(data_Levine_32, parameters = pars_Levine_32, bias = 0.1, classify.all = TRUE)
+    immunoClust::cell.process(data_Levine_32, parameters = pars_Levine_32, classify.all = TRUE)
 })
 
 set.seed(123)
 runtime_immunoClust_all_Levine_13_manual <- system.time({
   out_immunoClust_all_Levine_13_manual <- 
-    immunoClust::cell.process(data_Levine_13, parameters = pars_Levine_13, bias = 0.1, classify.all = TRUE)
+    immunoClust::cell.process(data_Levine_13, parameters = pars_Levine_13, classify.all = TRUE)
 })
 
 set.seed(123)
@@ -535,11 +535,11 @@ runtime_immunoClust_all_manual <- t(data.frame(
   Mosmann_2014_activ = runtime_immunoClust_all_Mosmann_manual["elapsed"], 
   row.names = "runtime"))
 
-write.table(runtime_immunoClust, 
+write.table(runtime_immunoClust_manual, 
             file = "../results_manual/runtime/runtime_immunoClust.txt", 
             quote = FALSE, sep = "\t")
 
-write.table(runtime_immunoClust_all, 
+write.table(runtime_immunoClust_all_manual, 
             file = "../results_manual/runtime/runtime_immunoClust_all.txt", 
             quote = FALSE, sep = "\t")
 
