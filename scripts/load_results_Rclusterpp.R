@@ -11,6 +11,9 @@ library(flowCore)
 source("helper_match_clusters_and_evaluate.R")
 source("helper_match_one_rare_cluster_and_evaluate.R")
 
+# results directories
+source("load_results_directories.R")
+
 
 
 ###############################
@@ -19,12 +22,13 @@ source("helper_match_one_rare_cluster_and_evaluate.R")
 
 # note Rclusterpp uses subsampled data, so truth labels also need to be re-calculated
 
+
 # load true population labels from subsampled data
 
-file_truth_Levine_32_sub <- "../results/Rclusterpp/Levine_2015_marrow_32_sub.fcs"
-file_truth_Levine_13_sub <- "../results/Rclusterpp/Levine_2015_marrow_13_sub.fcs"
-file_truth_Nilsson_sub <- "../results/Rclusterpp/Nilsson_2013_HSC_sub.fcs"
-file_truth_Mosmann_sub <- "../results/Rclusterpp/Mosmann_2014_activ_sub.fcs"
+file_truth_Levine_32_sub <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Levine_2015_marrow_32_sub.fcs")
+file_truth_Levine_13_sub <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Levine_2015_marrow_13_sub.fcs")
+file_truth_Nilsson_sub <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Nilsson_2013_HSC_sub.fcs")
+file_truth_Mosmann_sub <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Mosmann_2014_activ_sub.fcs")
 
 data_truth_Levine_32_sub <- flowCore::exprs(flowCore::read.FCS(file_truth_Levine_32_sub, transformation = FALSE))
 data_truth_Levine_13_sub <- flowCore::exprs(flowCore::read.FCS(file_truth_Levine_13_sub, transformation = FALSE))
@@ -54,10 +58,10 @@ length(clus_truth_Mosmann_sub)
 
 # load Rclusterpp cluster labels
 
-file_Rclusterpp_Levine_32 <- "../results/Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_32.txt"
-file_Rclusterpp_Levine_13 <- "../results/Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_13.txt"
-file_Rclusterpp_Nilsson <- "../results/Rclusterpp/Rclusterpp_labels_Nilsson_2013_HSC.txt"
-file_Rclusterpp_Mosmann <- "../results/Rclusterpp/Rclusterpp_labels_Mosmann_2014_activ.txt"
+file_Rclusterpp_Levine_32 <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_32.txt")
+file_Rclusterpp_Levine_13 <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_13.txt")
+file_Rclusterpp_Nilsson <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Rclusterpp_labels_Nilsson_2013_HSC.txt")
+file_Rclusterpp_Mosmann <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Rclusterpp_labels_Mosmann_2014_activ.txt")
 
 data_Rclusterpp_Levine_32 <- read.table(file_Rclusterpp_Levine_32, header = TRUE, sep = "\t", comment.char = "")
 data_Rclusterpp_Levine_13 <- read.table(file_Rclusterpp_Levine_13, header = TRUE, sep = "\t", comment.char = "")

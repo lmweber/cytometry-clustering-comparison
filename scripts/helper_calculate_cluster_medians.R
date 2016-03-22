@@ -3,7 +3,7 @@
 # for a given cluster. Note that data should already be transformed, e.g. using standard
 # asinh transform.
 #
-# Lukas M. Weber, October 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -16,6 +16,12 @@ library(robustbase)
 helper_calculate_cluster_medians <- function(data, labels) {
   
   data <- as.data.frame(data)
+  
+  # remove unassigned cells (NA's in labels)
+  unassigned <- is.na(labels)
+  labels <- labels[!unassigned]
+  data <- data[!unassigned, ]
+  if (length(labels) != nrow(data)) warning("lengths not equal")
   
   # note that data should already be transformed (e.g. asinh)
   

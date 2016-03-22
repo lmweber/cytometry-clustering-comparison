@@ -11,9 +11,8 @@ paper/**
 parameters_spreadsheet/**
 plots/**
 plots_submission/**
-results/**
-results_auto/**
-results_manual/**
+results_auto_n_clus/**
+results_manual_n_clus/**
 supplementary_info/**
 templates/**
 tex_file_from_Gosia/**

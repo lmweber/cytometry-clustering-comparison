@@ -2,7 +2,7 @@
 # R script to plot cluster median expression values and compare against manually gated
 # populations (truth)
 #
-# Lukas M. Weber, January 2016
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -103,7 +103,7 @@ pheatmap(medians_truth_Levine_32,
          fontsize = 9, 
          filename = "../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_truth_Levine2015marrow32.pdf", 
          width = 8, 
-         height = 4)
+         height = 3.5)
 
 set.seed(123)
 pheatmap(medians_truth_Levine_13, 
@@ -113,8 +113,8 @@ pheatmap(medians_truth_Levine_13,
          clustering_method = "average", 
          fontsize = 9, 
          filename = "../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_truth_Levine2015marrow13.pdf", 
-         width = 5, 
-         height = 6)
+         width = 4.75, 
+         height = 5)
 
 
 
@@ -156,8 +156,8 @@ medians_Levine_13[[1]] <- medians_ACCENSE_Levine_13
 
 # note DensVM used subsampling, so need to use data matrix with subsampled points only
 
-file_DensVM_Levine_32_sub <- "../results/DensVM/Levine_2015_marrow_32/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_32_notransform.fcs"
-file_DensVM_Levine_13_sub <- "../results/DensVM/Levine_2015_marrow_13/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_13_notransform.fcs"
+file_DensVM_Levine_32_sub <- file.path(RES_DIR_DENSVM, "DensVM/Levine_2015_marrow_32/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_32_notransform.fcs")
+file_DensVM_Levine_13_sub <- file.path(RES_DIR_DENSVM, "DensVM/Levine_2015_marrow_13/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_13_notransform.fcs")
 
 data_medians_DensVM_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_DensVM_Levine_32_sub, transformation = FALSE))
 data_medians_DensVM_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_DensVM_Levine_13_sub, transformation = FALSE))
@@ -186,8 +186,8 @@ medians_Levine_13[[2]] <- medians_DensVM_Levine_13
 
 # note Rclusterpp used subsampling, so need to use data matrix with subsampled points only
 
-file_Rclusterpp_Levine_32_sub <- "../results/Rclusterpp/Levine_2015_marrow_32_sub.fcs"
-file_Rclusterpp_Levine_13_sub <- "../results/Rclusterpp/Levine_2015_marrow_13_sub.fcs"
+file_Rclusterpp_Levine_32_sub <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Levine_2015_marrow_32_sub.fcs")
+file_Rclusterpp_Levine_13_sub <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Levine_2015_marrow_13_sub.fcs")
 
 data_medians_Rclusterpp_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_Rclusterpp_Levine_32_sub, transformation = FALSE))
 data_medians_Rclusterpp_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_Rclusterpp_Levine_13_sub, transformation = FALSE))
@@ -241,11 +241,11 @@ names(medians_Levine_13) <- names(clus_Levine_13)
 
 # plot each method together with manually gated clusters
 
-plot_heights_Levine_32 <- c(8.5, 6.5, 7.5, 7, 14, 7.5, 14, 14, 7.5, 8, 7.5, 6, 14)
-plot_heights_Levine_13 <- c(10.5, 8.5, 9.5, 9, 14, 12, 14, 14, 12, 9, 12, 8, 14)
+plot_heights_Levine_32 <- c(9, 5.5, 8.5, 9.5, 14, 9.5, 14, 14, 9.5, 8.5, 9.5, 7, 14)
+plot_heights_Levine_13 <- c(13, 7.5, 9.5, 13, 14, 13, 14, 14, 13, 10.5, 13, 8, 14)
 
-fontsize_row_Levine_32 <- c(9, 9, 9, 9, 7, 9, 8, 8, 9, 9, 9, 9, 2)
-fontsize_row_Levine_13 <- c(9, 9, 9, 9, 7, 9, 7, 7, 9, 9, 9, 9, 4)
+fontsize_row_Levine_32 <- c(8, 8, 8, 8, 7, 8, 5, 5, 8, 8, 8, 8, 1)
+fontsize_row_Levine_13 <- c(8, 8, 8, 8, 6, 8, 5, 5, 8, 8, 8, 8, 2)
 
 
 for (i in 1:n_methods_Levine_32) {
@@ -273,7 +273,7 @@ for (i in 1:n_methods_Levine_32) {
            filename = paste0("../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_", 
                              names(medians_Levine_32)[i], 
                              "_Levine2015marrow32.pdf"), 
-           width = 10, 
+           width = 9.5, 
            height = plot_heights_Levine_32[i])
 }
 
@@ -303,7 +303,7 @@ for (i in 1:n_methods_Levine_13) {
            filename = paste0("../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_", 
                              names(medians_Levine_13)[i], 
                              "_Levine2015marrow13.pdf"), 
-           width = 6.75, 
+           width = 6.5, 
            height = plot_heights_Levine_13[i])
 }
 

@@ -14,6 +14,9 @@ source("helper_match_one_rare_cluster_and_evaluate.R")
 # true (manually gated) cluster labels
 source("load_results_truth.R")
 
+# results directories
+source("load_results_directories.R")
+
 
 
 ##############################
@@ -22,10 +25,10 @@ source("load_results_truth.R")
 
 # load cluster labels
 
-file_flowMeans_Levine_32 <- "../results/flowMeans/flowMeans_labels_Levine_2015_marrow_32.txt"
-file_flowMeans_Levine_13 <- "../results/flowMeans/flowMeans_labels_Levine_2015_marrow_13.txt"
-file_flowMeans_Nilsson <- "../results/flowMeans/flowMeans_labels_Nilsson_2013_HSC.txt"
-file_flowMeans_Mosmann <- "../results/flowMeans/flowMeans_labels_Mosmann_2014_activ.txt"
+file_flowMeans_Levine_32 <- file.path(RES_DIR_FLOWMEANS, "flowMeans/flowMeans_labels_Levine_2015_marrow_32.txt")
+file_flowMeans_Levine_13 <- file.path(RES_DIR_FLOWMEANS, "flowMeans/flowMeans_labels_Levine_2015_marrow_13.txt")
+file_flowMeans_Nilsson <- file.path(RES_DIR_FLOWMEANS, "flowMeans/flowMeans_labels_Nilsson_2013_HSC.txt")
+file_flowMeans_Mosmann <- file.path(RES_DIR_FLOWMEANS, "flowMeans/flowMeans_labels_Mosmann_2014_activ.txt")
 
 data_flowMeans_Levine_32 <- read.table(file_flowMeans_Levine_32, header = TRUE, sep = "\t", comment.char = "")
 data_flowMeans_Levine_13 <- read.table(file_flowMeans_Levine_13, header = TRUE, sep = "\t", comment.char = "")
@@ -93,10 +96,10 @@ res_flowMeans_Mosmann
 
 # load cluster labels
 
-file_FlowSOM_Levine_32 <- "../results/FlowSOM/FlowSOM_labels_Levine_2015_marrow_32.txt"
-file_FlowSOM_Levine_13 <- "../results/FlowSOM/FlowSOM_labels_Levine_2015_marrow_13.txt"
-file_FlowSOM_Nilsson <- "../results/FlowSOM/FlowSOM_labels_Nilsson_2013_HSC.txt"
-file_FlowSOM_Mosmann <- "../results/FlowSOM/FlowSOM_labels_Mosmann_2014_activ.txt"
+file_FlowSOM_Levine_32 <- file.path(RES_DIR_FLOWSOM, "FlowSOM/FlowSOM_labels_Levine_2015_marrow_32.txt")
+file_FlowSOM_Levine_13 <- file.path(RES_DIR_FLOWSOM, "FlowSOM/FlowSOM_labels_Levine_2015_marrow_13.txt")
+file_FlowSOM_Nilsson <- file.path(RES_DIR_FLOWSOM, "FlowSOM/FlowSOM_labels_Nilsson_2013_HSC.txt")
+file_FlowSOM_Mosmann <- file.path(RES_DIR_FLOWSOM, "FlowSOM/FlowSOM_labels_Mosmann_2014_activ.txt")
 
 data_FlowSOM_Levine_32 <- read.table(file_FlowSOM_Levine_32, header = TRUE, sep = "\t", comment.char = "")
 data_FlowSOM_Levine_13 <- read.table(file_FlowSOM_Levine_13, header = TRUE, sep = "\t", comment.char = "")
@@ -164,10 +167,10 @@ res_FlowSOM_Mosmann
 
 # load cluster labels
 
-file_FlowSOM_meta_Levine_32 <- "../results/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_32.txt"
-file_FlowSOM_meta_Levine_13 <- "../results/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_13.txt"
-file_FlowSOM_meta_Nilsson <- "../results/FlowSOM_meta/FlowSOM_meta_labels_Nilsson_2013_HSC.txt"
-file_FlowSOM_meta_Mosmann <- "../results/FlowSOM_meta/FlowSOM_meta_labels_Mosmann_2014_activ.txt"
+file_FlowSOM_meta_Levine_32 <- file.path(RES_DIR_FLOWSOM_META, "FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_32.txt")
+file_FlowSOM_meta_Levine_13 <- file.path(RES_DIR_FLOWSOM_META, "FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_13.txt")
+file_FlowSOM_meta_Nilsson <- file.path(RES_DIR_FLOWSOM_META, "FlowSOM_meta/FlowSOM_meta_labels_Nilsson_2013_HSC.txt")
+file_FlowSOM_meta_Mosmann <- file.path(RES_DIR_FLOWSOM_META, "FlowSOM_meta/FlowSOM_meta_labels_Mosmann_2014_activ.txt")
 
 data_FlowSOM_meta_Levine_32 <- read.table(file_FlowSOM_meta_Levine_32, header = TRUE, sep = "\t", comment.char = "")
 data_FlowSOM_meta_Levine_13 <- read.table(file_FlowSOM_meta_Levine_13, header = TRUE, sep = "\t", comment.char = "")
@@ -235,10 +238,10 @@ res_FlowSOM_meta_Mosmann
 
 # load cluster labels
 
-file_immunoClust_Levine_32 <- "../results/immunoClust/immunoClust_labels_Levine_2015_marrow_32.txt"
-file_immunoClust_Levine_13 <- "../results/immunoClust/immunoClust_labels_Levine_2015_marrow_13.txt"
-file_immunoClust_Nilsson <- "../results/immunoClust/immunoClust_labels_Nilsson_2013_HSC.txt"
-file_immunoClust_Mosmann <- "../results/immunoClust/immunoClust_labels_Mosmann_2014_activ.txt"
+file_immunoClust_Levine_32 <- file.path(RES_DIR_IMMUNOCLUST, "immunoClust/immunoClust_labels_Levine_2015_marrow_32.txt")
+file_immunoClust_Levine_13 <- file.path(RES_DIR_IMMUNOCLUST, "immunoClust/immunoClust_labels_Levine_2015_marrow_13.txt")
+file_immunoClust_Nilsson <- file.path(RES_DIR_IMMUNOCLUST, "immunoClust/immunoClust_labels_Nilsson_2013_HSC.txt")
+file_immunoClust_Mosmann <- file.path(RES_DIR_IMMUNOCLUST, "immunoClust/immunoClust_labels_Mosmann_2014_activ.txt")
 
 data_immunoClust_Levine_32 <- read.table(file_immunoClust_Levine_32, header = TRUE, sep = "\t", comment.char = "")
 data_immunoClust_Levine_13 <- read.table(file_immunoClust_Levine_13, header = TRUE, sep = "\t", comment.char = "")
@@ -306,10 +309,10 @@ res_immunoClust_Mosmann
 
 # load cluster labels
 
-file_immunoClust_all_Levine_32 <- "../results/immunoClust_all/immunoClust_all_labels_Levine_2015_marrow_32.txt"
-file_immunoClust_all_Levine_13 <- "../results/immunoClust_all/immunoClust_all_labels_Levine_2015_marrow_13.txt"
-file_immunoClust_all_Nilsson <- "../results/immunoClust_all/immunoClust_all_labels_Nilsson_2013_HSC.txt"
-file_immunoClust_all_Mosmann <- "../results/immunoClust_all/immunoClust_all_labels_Mosmann_2014_activ.txt"
+file_immunoClust_all_Levine_32 <- file.path(RES_DIR_IMMUNOCLUST_ALL, "immunoClust_all/immunoClust_all_labels_Levine_2015_marrow_32.txt")
+file_immunoClust_all_Levine_13 <- file.path(RES_DIR_IMMUNOCLUST_ALL, "immunoClust_all/immunoClust_all_labels_Levine_2015_marrow_13.txt")
+file_immunoClust_all_Nilsson <- file.path(RES_DIR_IMMUNOCLUST_ALL, "immunoClust_all/immunoClust_all_labels_Nilsson_2013_HSC.txt")
+file_immunoClust_all_Mosmann <- file.path(RES_DIR_IMMUNOCLUST_ALL, "immunoClust_all/immunoClust_all_labels_Mosmann_2014_activ.txt")
 
 data_immunoClust_all_Levine_32 <- read.table(file_immunoClust_all_Levine_32, header = TRUE, sep = "\t", comment.char = "")
 data_immunoClust_all_Levine_13 <- read.table(file_immunoClust_all_Levine_13, header = TRUE, sep = "\t", comment.char = "")
@@ -377,10 +380,10 @@ res_immunoClust_all_Mosmann
 
 # load cluster labels
 
-file_kmeans_Levine_32 <- "../results/kmeans/kmeans_labels_Levine_2015_marrow_32.txt"
-file_kmeans_Levine_13 <- "../results/kmeans/kmeans_labels_Levine_2015_marrow_13.txt"
-file_kmeans_Nilsson <- "../results/kmeans/kmeans_labels_Nilsson_2013_HSC.txt"
-file_kmeans_Mosmann <- "../results/kmeans/kmeans_labels_Mosmann_2014_activ.txt"
+file_kmeans_Levine_32 <- file.path(RES_DIR_KMEANS, "kmeans/kmeans_labels_Levine_2015_marrow_32.txt")
+file_kmeans_Levine_13 <- file.path(RES_DIR_KMEANS, "kmeans/kmeans_labels_Levine_2015_marrow_13.txt")
+file_kmeans_Nilsson <- file.path(RES_DIR_KMEANS, "kmeans/kmeans_labels_Nilsson_2013_HSC.txt")
+file_kmeans_Mosmann <- file.path(RES_DIR_KMEANS, "kmeans/kmeans_labels_Mosmann_2014_activ.txt")
 
 data_kmeans_Levine_32 <- read.table(file_kmeans_Levine_32, header = TRUE, sep = "\t", comment.char = "")
 data_kmeans_Levine_13 <- read.table(file_kmeans_Levine_13, header = TRUE, sep = "\t", comment.char = "")
@@ -448,10 +451,10 @@ res_kmeans_Mosmann
 
 # load cluster labels
 
-file_SamSPECTRAL_Levine_32 <- "../results/SamSPECTRAL/SamSPECTRAL_labels_Levine_2015_marrow_32.txt"
-file_SamSPECTRAL_Levine_13 <- "../results/SamSPECTRAL/SamSPECTRAL_labels_Levine_2015_marrow_13.txt"
-file_SamSPECTRAL_Nilsson <- "../results/SamSPECTRAL/SamSPECTRAL_labels_Nilsson_2013_HSC.txt"
-file_SamSPECTRAL_Mosmann <- "../results/SamSPECTRAL/SamSPECTRAL_labels_Mosmann_2014_activ.txt"
+file_SamSPECTRAL_Levine_32 <- file.path(RES_DIR_SAMSPECTRAL, "SamSPECTRAL/SamSPECTRAL_labels_Levine_2015_marrow_32.txt")
+file_SamSPECTRAL_Levine_13 <- file.path(RES_DIR_SAMSPECTRAL, "SamSPECTRAL/SamSPECTRAL_labels_Levine_2015_marrow_13.txt")
+file_SamSPECTRAL_Nilsson <- file.path(RES_DIR_SAMSPECTRAL, "SamSPECTRAL/SamSPECTRAL_labels_Nilsson_2013_HSC.txt")
+file_SamSPECTRAL_Mosmann <- file.path(RES_DIR_SAMSPECTRAL, "SamSPECTRAL/SamSPECTRAL_labels_Mosmann_2014_activ.txt")
 
 data_SamSPECTRAL_Levine_32 <- read.table(file_SamSPECTRAL_Levine_32, header = TRUE, sep = "\t", comment.char = "")
 data_SamSPECTRAL_Levine_13 <- read.table(file_SamSPECTRAL_Levine_13, header = TRUE, sep = "\t", comment.char = "")

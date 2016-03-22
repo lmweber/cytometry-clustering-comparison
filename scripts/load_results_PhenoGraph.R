@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load and calculate results for PhenoGraph
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -14,6 +14,9 @@ source("helper_match_one_rare_cluster_and_evaluate.R")
 # true (manually gated) cluster labels
 source("load_results_truth.R")
 
+# results directories
+source("load_results_directories.R")
+
 
 
 ###############################
@@ -22,10 +25,10 @@ source("load_results_truth.R")
 
 # load PhenoGraph output files
 
-file_PhenoGraph_Levine_32 <- "../results/PhenoGraph/PhenoGraph_results_Levine_2015_marrow_32.fcs"
-file_PhenoGraph_Levine_13 <- "../results/PhenoGraph/PhenoGraph_results_Levine_2015_marrow_13.fcs"
-file_PhenoGraph_Nilsson <- "../results/PhenoGraph/PhenoGraph_results_Nilsson_2013_HSC.fcs"
-file_PhenoGraph_Mosmann <- "../results/PhenoGraph/PhenoGraph_results_Mosmann_2014_activ.fcs"
+file_PhenoGraph_Levine_32 <- file.path(RES_DIR_PHENOGRAPH, "PhenoGraph/PhenoGraph_results_Levine_2015_marrow_32.fcs")
+file_PhenoGraph_Levine_13 <- file.path(RES_DIR_PHENOGRAPH, "PhenoGraph/PhenoGraph_results_Levine_2015_marrow_13.fcs")
+file_PhenoGraph_Nilsson <- file.path(RES_DIR_PHENOGRAPH, "PhenoGraph/PhenoGraph_results_Nilsson_2013_HSC.fcs")
+file_PhenoGraph_Mosmann <- file.path(RES_DIR_PHENOGRAPH, "PhenoGraph/PhenoGraph_results_Mosmann_2014_activ.fcs")
 
 data_PhenoGraph_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_PhenoGraph_Levine_32, transformation = FALSE))
 data_PhenoGraph_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_PhenoGraph_Levine_13, transformation = FALSE))

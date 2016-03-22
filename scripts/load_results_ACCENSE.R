@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load and calculate results for ACCENSE
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -11,6 +11,9 @@ library(flowCore)
 source("helper_match_clusters_and_evaluate.R")
 source("helper_match_one_rare_cluster_and_evaluate.R")
 
+# results directories
+source("load_results_directories.R")
+
 
 
 ############################
@@ -19,12 +22,13 @@ source("helper_match_one_rare_cluster_and_evaluate.R")
 
 # note ACCENSE uses subsampled data, so truth labels also need to be re-calculated
 
+
 # load "accense_output.csv" files
 
-file_ACCENSE_Levine_32 <- "../results/ACCENSE/accense_output_Levine_2015_marrow_32.csv"
-file_ACCENSE_Levine_13 <- "../results/ACCENSE/accense_output_Levine_2015_marrow_13.csv"
-file_ACCENSE_Nilsson <- "../results/ACCENSE/accense_output_Nilsson_2013_HSC.csv"
-file_ACCENSE_Mosmann <- "../results/ACCENSE/accense_output_Mosmann_2014_activ.csv"
+file_ACCENSE_Levine_32 <- file.path(RES_DIR_ACCENSE, "ACCENSE/accense_output_Levine_2015_marrow_32.csv")
+file_ACCENSE_Levine_13 <- file.path(RES_DIR_ACCENSE, "ACCENSE/accense_output_Levine_2015_marrow_13.csv")
+file_ACCENSE_Nilsson <- file.path(RES_DIR_ACCENSE, "ACCENSE/accense_output_Nilsson_2013_HSC.csv")
+file_ACCENSE_Mosmann <- file.path(RES_DIR_ACCENSE, "ACCENSE/accense_output_Mosmann_2014_activ.csv")
 
 data_ACCENSE_Levine_32 <- read.csv(file_ACCENSE_Levine_32)
 data_ACCENSE_Levine_13 <- read.csv(file_ACCENSE_Levine_13)

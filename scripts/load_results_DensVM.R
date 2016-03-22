@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load and calculate results for DensVM
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -11,6 +11,9 @@ library(flowCore)
 source("helper_match_clusters_and_evaluate.R")
 source("helper_match_one_rare_cluster_and_evaluate.R")
 
+# results directories
+source("load_results_directories.R")
+
 
 
 ###########################
@@ -19,12 +22,13 @@ source("helper_match_one_rare_cluster_and_evaluate.R")
 
 # note DensVM uses subsampled data, so truth labels also need to be re-calculated
 
+
 # load DensVM output files
 
-file_DensVM_Levine_32 <- "../results/DensVM/Levine_2015_marrow_32/cytofkit_analysis_tsne_cluster.txt"
-file_DensVM_Levine_13 <- "../results/DensVM/Levine_2015_marrow_13/cytofkit_analysis_tsne_cluster.txt"
-file_DensVM_Nilsson <- "../results/DensVM/Nilsson_2013_HSC/cytofkit_analysis_tsne_cluster.txt"
-file_DensVM_Mosmann <- "../results/DensVM/Mosmann_2014_activ/cytofkit_analysis_tsne_cluster.txt"
+file_DensVM_Levine_32 <- file.path(RES_DIR_DENSVM, "DensVM/Levine_2015_marrow_32/cytofkit_analysis_tsne_cluster.txt")
+file_DensVM_Levine_13 <- file.path(RES_DIR_DENSVM, "DensVM/Levine_2015_marrow_13/cytofkit_analysis_tsne_cluster.txt")
+file_DensVM_Nilsson <- file.path(RES_DIR_DENSVM, "DensVM/Nilsson_2013_HSC/cytofkit_analysis_tsne_cluster.txt")
+file_DensVM_Mosmann <- file.path(RES_DIR_DENSVM, "DensVM/Mosmann_2014_activ/cytofkit_analysis_tsne_cluster.txt")
 
 data_DensVM_Levine_32 <- read.table(file_DensVM_Levine_32, header = TRUE, sep = "\t")
 data_DensVM_Levine_13 <- read.table(file_DensVM_Levine_13, header = TRUE, sep = "\t")
@@ -44,10 +48,10 @@ dim(data_DensVM_Mosmann)
 
 # extract truth labels from subsampled data set
 
-file_truth_Levine_32_subsampled <- "../results/DensVM/Levine_2015_marrow_32/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_32_notransform.fcs"
-file_truth_Levine_13_subsampled <- "../results/DensVM/Levine_2015_marrow_13/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_13_notransform.fcs"
-file_truth_Nilsson_subsampled <- "../results/DensVM/Nilsson_2013_HSC/cytofkit_analysis_analyzedFCS/Nilsson_2013_HSC_notransform.fcs"
-file_truth_Mosmann_subsampled <- "../results/DensVM/Mosmann_2014_activ/cytofkit_analysis_analyzedFCS/Mosmann_2014_activ_notransform.fcs"
+file_truth_Levine_32_subsampled <- file.path(RES_DIR_DENSVM, "DensVM/Levine_2015_marrow_32/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_32_notransform.fcs")
+file_truth_Levine_13_subsampled <- file.path(RES_DIR_DENSVM, "DensVM/Levine_2015_marrow_13/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_13_notransform.fcs")
+file_truth_Nilsson_subsampled <- file.path(RES_DIR_DENSVM, "DensVM/Nilsson_2013_HSC/cytofkit_analysis_analyzedFCS/Nilsson_2013_HSC_notransform.fcs")
+file_truth_Mosmann_subsampled <- file.path(RES_DIR_DENSVM, "DensVM/Mosmann_2014_activ/cytofkit_analysis_analyzedFCS/Mosmann_2014_activ_notransform.fcs")
 
 data_truth_Levine_32_subsampled <- flowCore::exprs(flowCore::read.FCS(file_truth_Levine_32_subsampled, transformation = FALSE))
 data_truth_Levine_13_subsampled <- flowCore::exprs(flowCore::read.FCS(file_truth_Levine_13_subsampled, transformation = FALSE))

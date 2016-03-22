@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load and calculate results for SWIFT
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -14,6 +14,9 @@ source("helper_match_one_rare_cluster_and_evaluate.R")
 # true (manually gated) cluster labels
 source("load_results_truth.R")
 
+# results directories
+source("load_results_directories.R")
+
 
 
 ##########################
@@ -22,10 +25,10 @@ source("load_results_truth.R")
 
 # load SWIFT output files
 
-file_SWIFT_Levine_32 <- "../results/SWIFT/Levine_2015_marrow_32/Levine_2015_marrow_32_notransform.fcs.Cluster_Output.txt"
-file_SWIFT_Levine_13 <- "../results/SWIFT/Levine_2015_marrow_13/Levine_2015_marrow_13_notransform.fcs.Cluster_Output.txt"
-file_SWIFT_Nilsson <- "../results/SWIFT/Nilsson_2013_HSC/Nilsson_2013_HSC_notransform.fcs.Cluster_Output.txt"
-file_SWIFT_Mosmann <- "../results/SWIFT/Mosmann_2014_activ/Mosmann_2014_activ_notransform.fcs.Cluster_Output.txt"
+file_SWIFT_Levine_32 <- file.path(RES_DIR_SWIFT, "SWIFT/Levine_2015_marrow_32/Levine_2015_marrow_32_notransform.fcs.Cluster_Output.txt")
+file_SWIFT_Levine_13 <- file.path(RES_DIR_SWIFT, "SWIFT/Levine_2015_marrow_13/Levine_2015_marrow_13_notransform.fcs.Cluster_Output.txt")
+file_SWIFT_Nilsson <- file.path(RES_DIR_SWIFT, "SWIFT/Nilsson_2013_HSC/Nilsson_2013_HSC_notransform.fcs.Cluster_Output.txt")
+file_SWIFT_Mosmann <- file.path(RES_DIR_SWIFT, "SWIFT/Mosmann_2014_activ/Mosmann_2014_activ_notransform.fcs.Cluster_Output.txt")
 
 data_SWIFT_Levine_32 <- read.table(file_SWIFT_Levine_32, header = TRUE, sep = "\t", comment.char = "")
 data_SWIFT_Levine_13 <- read.table(file_SWIFT_Levine_13, header = TRUE, sep = "\t", comment.char = "")

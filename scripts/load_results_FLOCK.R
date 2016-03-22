@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load and calculate results for FLOCK
 #
-# Lukas M. Weber, December 2015
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
@@ -14,6 +14,9 @@ source("helper_match_one_rare_cluster_and_evaluate.R")
 # true (manually gated) cluster labels
 source("load_results_truth.R")
 
+# results directories
+source("load_results_directories.R")
+
 
 
 ##########################
@@ -22,10 +25,10 @@ source("load_results_truth.R")
 
 # load FLOCK output files
 
-file_FLOCK_Levine_32 <- "../results/FLOCK/flock_results_Levine_2015_marrow_32.txt"
-file_FLOCK_Levine_13 <- "../results/FLOCK/flock_results_Levine_2015_marrow_13.txt"
-file_FLOCK_Nilsson <- "../results/FLOCK/flock_results_Nilsson_2013_HSC.txt"
-file_FLOCK_Mosmann <- "../results/FLOCK/flock_results_Mosmann_2014_activ.txt"
+file_FLOCK_Levine_32 <- file.path(RES_DIR_FLOCK, "FLOCK/flock_results_Levine_2015_marrow_32.txt")
+file_FLOCK_Levine_13 <- file.path(RES_DIR_FLOCK, "FLOCK/flock_results_Levine_2015_marrow_13.txt")
+file_FLOCK_Nilsson <- file.path(RES_DIR_FLOCK, "FLOCK/flock_results_Nilsson_2013_HSC.txt")
+file_FLOCK_Mosmann <- file.path(RES_DIR_FLOCK, "FLOCK/flock_results_Mosmann_2014_activ.txt")
 
 data_FLOCK_Levine_32 <- read.table(file_FLOCK_Levine_32, header = TRUE, sep = "\t")
 data_FLOCK_Levine_13 <- read.table(file_FLOCK_Levine_13, header = TRUE, sep = "\t")
