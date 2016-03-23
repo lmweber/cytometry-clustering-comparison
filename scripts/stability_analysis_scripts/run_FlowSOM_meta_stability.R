@@ -26,7 +26,7 @@ run_FlowSOM_meta_stability <- function(data_list) {
   grid_Levine_32 <- 10
   grid_Levine_13 <- 10
   grid_Nilsson <- 10
-  grid_Mosmann <- 10
+  grid_Mosmann <- 20
   
   # number of clusters
   k_Levine_32 <- 40
