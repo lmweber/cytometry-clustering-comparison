@@ -59,8 +59,6 @@ write.table(res_stability_Nilsson, file = file.path(RESULTS_DIR, "FLOCK", "stabi
 write.table(res_stability_Mosmann, file = file.path(RESULTS_DIR, "FLOCK", "stability_FLOCK_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-# no R session information since FLOCK is a command-line program
-
 
 
 
@@ -102,8 +100,6 @@ write.table(res_stability_Nilsson, file = file.path(RESULTS_DIR, "PhenoGraph", "
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_stability_Mosmann, file = file.path(RESULTS_DIR, "PhenoGraph", "stability_PhenoGraph_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
-
-# no R session information since using Python command-line implementation of PhenoGraph
 
 
 

@@ -113,12 +113,6 @@ write.table(res_stability_Nilsson, file = file.path(RESULTS_DIR, "flowMeans", "s
 write.table(res_stability_Mosmann, file = file.path(RESULTS_DIR, "flowMeans", "stability_flowMeans_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-# save session information
-
-sink(file = file.path(RESULTS_DIR, "flowMeans", "session_info_stability_flowMeans.txt"))
-sessionInfo()
-sink()
-
 
 
 
@@ -164,12 +158,6 @@ write.table(res_stability_Nilsson, file = file.path(RESULTS_DIR, "FlowSOM", "sta
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_stability_Mosmann, file = file.path(RESULTS_DIR, "FlowSOM", "stability_FlowSOM_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
-
-# save session information
-
-sink(file = file.path(RESULTS_DIR, "FlowSOM", "session_info_stability_FlowSOM.txt"))
-sessionInfo()
-sink()
 
 
 
@@ -217,12 +205,6 @@ write.table(res_stability_Nilsson, file = file.path(RESULTS_DIR, "FlowSOM_meta",
 write.table(res_stability_Mosmann, file = file.path(RESULTS_DIR, "FlowSOM_meta", "stability_FlowSOM_meta_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-# save session information
-
-sink(file = file.path(RESULTS_DIR, "FlowSOM_meta", "session_info_stability_FlowSOM_meta.txt"))
-sessionInfo()
-sink()
-
 
 
 
@@ -256,12 +238,6 @@ write.table(res_stability_Nilsson, file = file.path(RESULTS_DIR, "kmeans", "stab
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_stability_Mosmann, file = file.path(RESULTS_DIR, "kmeans", "stability_kmeans_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
-
-# save session information
-
-sink(file = file.path(RESULTS_DIR, "kmeans", "session_info_stability_kmeans.txt"))
-sessionInfo()
-sink()
 
 
 
@@ -325,12 +301,6 @@ write.table(res_stability_Nilsson, file = file.path(RESULTS_DIR, "immunoClust", 
 write.table(res_stability_Mosmann, file = file.path(RESULTS_DIR, "immunoClust", "stability_immunoClust_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-# save session information
-
-sink(file = file.path(RESULTS_DIR, "immunoClust", "session_info_stability_immunoClust.txt"))
-sessionInfo()
-sink()
-
 
 
 
@@ -393,12 +363,6 @@ write.table(res_stability_Nilsson, file = file.path(RESULTS_DIR, "immunoClust_al
 write.table(res_stability_Mosmann, file = file.path(RESULTS_DIR, "immunoClust_all", "stability_immunoClust_all_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
-# save session information
-
-sink(file = file.path(RESULTS_DIR, "immunoClust_all", "session_info_stability_immunoClust_all.txt"))
-sessionInfo()
-sink()
-
 
 
 
@@ -434,12 +398,6 @@ write.table(res_stability_Nilsson, file = file.path(RESULTS_DIR, "SamSPECTRAL", 
             row.names = FALSE, quote = FALSE, sep = "\t")
 write.table(res_stability_Mosmann, file = file.path(RESULTS_DIR, "SamSPECTRAL", "stability_SamSPECTRAL_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
-
-# save session information
-
-sink(file = file.path(RESULTS_DIR, "SamSPECTRAL", "session_info_stability_SamSPECTRAL.txt"))
-sessionInfo()
-sink()
 
 
 
