@@ -177,7 +177,7 @@ mean_F1_Levine_13_tidy
 
 barplot_mean_F1_Levine_32 <- 
   ggplot(mean_F1_Levine_32_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", fill = "blue3") + 
+  geom_bar(stat = "identity", fill = "royalblue3") + 
   geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
   ylim(0, 1) + 
   ylab("mean F1 score") + 
@@ -194,7 +194,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/results_barplot_mean_F1_Levine20
 
 barplot_mean_F1_Levine_13 <- 
   ggplot(mean_F1_Levine_13_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", fill = "blue3") + 
+  geom_bar(stat = "identity", fill = "royalblue3") + 
   geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
   ylim(0, 1) + 
   ylab("mean F1 score") + 

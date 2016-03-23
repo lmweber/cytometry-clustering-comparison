@@ -3,14 +3,13 @@
 # 
 # This script runs one iteration of FLOCK for the stability analysis. Note that FLOCK 
 # runs from the command line (not available as an R package). The main script 
-# "stability_analysis.R" then runs the scripts for each clustering method several times 
-# in a loop.
+# "stability_analysis.R" then runs the scripts for each clustering method several times.
 # 
-# Lukas M. Weber, February 2016
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
-### run this script from the FLOCK program directory
+### run this script from the stability analysis directory
 ### FLOCK automatically saves results in file "flock_results.txt" in the current directory
 
 

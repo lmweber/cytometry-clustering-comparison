@@ -6,8 +6,11 @@
 # back into R. The main script "stability_analysis.R" then runs the scripts for each
 # clustering method several times in a loop.
 # 
-# Lukas M. Weber, February 2016
+# Lukas M. Weber, March 2016
 #########################################################################################
+
+
+### run this script from the stability analysis directory
 
 
 source("../helper_match_clusters_and_evaluate.R")
