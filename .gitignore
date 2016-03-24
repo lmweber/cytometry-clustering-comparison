@@ -13,6 +13,7 @@ plots/**
 plots_submission/**
 results_auto_n_clus/**
 results_manual_n_clus/**
+results_range_k/**
 results_stability_analysis/**
 supplementary_info/**
 templates/**
