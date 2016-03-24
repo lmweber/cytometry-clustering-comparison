@@ -195,10 +195,10 @@ res_range_k <- lapply(k_range, run_FlowSOM_meta_k,
 
 # collapse results into one data frame for each data set
 
-res_range_k_Levine_32 <- t(sapply(res_range_k, function(s) s[[1]]))
-res_range_k_Levine_13 <- t(sapply(res_range_k, function(s) s[[2]]))
-res_range_k_Nilsson <- t(sapply(res_range_k, function(s) s[[3]]))
-res_range_k_Mosmann <- t(sapply(res_range_k, function(s) s[[4]]))
+res_range_k_Levine_32 <- cbind(k = k_range, t(sapply(res_range_k, function(s) s[[1]])))
+res_range_k_Levine_13 <- cbind(k = k_range, t(sapply(res_range_k, function(s) s[[2]])))
+res_range_k_Nilsson <- cbind(k = k_range, t(sapply(res_range_k, function(s) s[[3]])))
+res_range_k_Mosmann <- cbind(k = k_range, t(sapply(res_range_k, function(s) s[[4]])))
 
 # save results to files
 
