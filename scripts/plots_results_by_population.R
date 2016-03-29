@@ -1,5 +1,5 @@
 #########################################################################################
-# R script to generate heatmaps with additional results by cell population
+# R script to generate plots of additional results by population
 #
 # Lukas M. Weber, March 2016
 #########################################################################################
@@ -12,9 +12,10 @@ library(RColorBrewer)
 
 
 
-#################################################################################
-### HEATMAPS: F1 SCORE, PRECISION, AND RECALL BY POPULATION (ORDERED BY SIZE) ###
-#################################################################################
+
+###########################################################
+### HEATMAPS: F1 SCORE, PRECISION, RECALL BY POPULATION ###
+###########################################################
 
 # for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
 
@@ -43,13 +44,13 @@ titles_Levine_13 <- c("(A)   F1 score: Levine_2015_marrow_13",
                       "(C)   Recall: Levine_2015_marrow_13")
 
 
-filenames_Levine_32 <- c("../plots/Levine_2015_marrow_32/heatmaps/results_heatmap_F1_Levine2015marrow32.pdf", 
-                         "../plots/Levine_2015_marrow_32/heatmaps/results_heatmap_precision_Levine2015marrow32.pdf", 
-                         "../plots/Levine_2015_marrow_32/heatmaps/results_heatmap_recall_Levine2015marrow32.pdf")
+filenames_Levine_32 <- c("../plots/Levine_2015_marrow_32/by_population/results_by_population_F1_Levine2015marrow32.pdf", 
+                         "../plots/Levine_2015_marrow_32/by_population/results_by_population_pr_Levine2015marrow32.pdf", 
+                         "../plots/Levine_2015_marrow_32/by_population/results_by_population_re_Levine2015marrow32.pdf")
 
-filenames_Levine_13 <- c("../plots/Levine_2015_marrow_13/heatmaps/results_heatmap_F1_Levine2015marrow13.pdf", 
-                         "../plots/Levine_2015_marrow_13/heatmaps/results_heatmap_precision_Levine2015marrow13.pdf", 
-                         "../plots/Levine_2015_marrow_13/heatmaps/results_heatmap_recall_Levine2015marrow13.pdf")
+filenames_Levine_13 <- c("../plots/Levine_2015_marrow_13/by_population/results_by_population_F1_Levine2015marrow13.pdf", 
+                         "../plots/Levine_2015_marrow_13/by_population/results_by_population_pr_Levine2015marrow13.pdf", 
+                         "../plots/Levine_2015_marrow_13/by_population/results_by_population_re_Levine2015marrow13.pdf")
 
 
 # heatmaps of F1 score, precision, and recall for each true population

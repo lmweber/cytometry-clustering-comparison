@@ -29,11 +29,12 @@ source("load_results_all_other_methods.R")
 # load runtime results
 source("load_results_runtime.R")
 
-# color-blind friendly palette (http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/)
-cb_palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+# color-blind friendly palettes (http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/)
+cb_pal_black <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cb_pal_gray <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 # ggplot2 default palette (access with ggplot_build(p)$data)
-gg_palette <- c("#F8766D", "#00BA38", "#619CFF")
+gg_pal <- c("#F8766D", "#00BA38", "#619CFF")
 
 
 
@@ -338,7 +339,7 @@ plot_data_Levine_13 <- melt(plot_data_Levine_13,
 barplot_mean_F1_pr_re_Levine_32 <- 
   ggplot(plot_data_Levine_32, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_palette[1], cb_palette[4], cb_palette[3])) + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1) + 
   ylab("") + 
   ggtitle("Mean F1 score, precision, and recall: Levine_2015_marrow_32") + 
@@ -361,7 +362,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/results_barplot_mean_F1_pr_re_Le
 barplot_mean_F1_pr_re_Levine_13 <- 
   ggplot(plot_data_Levine_13, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_palette[1], cb_palette[4], cb_palette[3])) + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1) + 
   ylab("") + 
   ggtitle("Mean F1 score, precision, and recall: Levine_2015_marrow_13") + 
@@ -487,7 +488,7 @@ plot_data_Mosmann <- melt(plot_data_Mosmann,
 barplot_F1_pr_re_Nilsson <- 
   ggplot(plot_data_Nilsson, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_palette[1], cb_palette[4], cb_palette[3])) + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1.05) + 
   ylab("") + 
   ggtitle("Rare cell population: Nilsson_2013_HSC") + 
@@ -510,7 +511,7 @@ ggplot2::ggsave("../plots/Nilsson_2013_HSC/results_barplot_F1_pr_re_Nilsson2013H
 barplot_F1_pr_re_Mosmann <- 
   ggplot(plot_data_Mosmann, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_palette[1], cb_palette[4], cb_palette[3])) + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1.05) + 
   ylab("") + 
   ggtitle("Rare cell population: Mosmann_2014_activ") + 
@@ -765,7 +766,7 @@ runtime_vs_F1_Mosmann_tidy
 runtime_scatterplot_Nilsson <- 
   ggplot(runtime_vs_F1_Nilsson_tidy, aes(x = F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
+  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines"), force = 3) + 
   xlim(-0.1, 0.75) + 
   ylim(-1000, 10000) + 
   ggtitle("Runtime vs. F1: Nilsson_2013_HSC") + 
@@ -782,7 +783,7 @@ ggplot2::ggsave("../plots/Nilsson_2013_HSC/runtime_scatterplot_Nilsson2013HSC.pd
 runtime_scatterplot_Mosmann <- 
   ggplot(runtime_vs_F1_Mosmann_tidy, aes(x = F1, y = runtime)) + 
   geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
+  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.45, "lines")) + 
   xlim(-0.1, 0.75) + 
   ylim(-1000, 16750) + 
   ggtitle("Runtime vs. F1: Mosmann_2014_activ") + 

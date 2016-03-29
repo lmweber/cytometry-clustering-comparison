@@ -64,7 +64,7 @@ grid_Nilsson <- 10
 grid_Mosmann <- 20
 
 
-set.seed(123)
+set.seed(100)
 runtime_FlowSOM_Levine_32 <- system.time({
   fSOM_Levine_32 <- FlowSOM::ReadInput(data_Levine_32, transform = FALSE, scale = FALSE)
   fSOM_Levine_32 <- FlowSOM::BuildSOM(fSOM_Levine_32, colsToUse = marker_cols_Levine_32, 
@@ -72,7 +72,7 @@ runtime_FlowSOM_Levine_32 <- system.time({
   fSOM_Levine_32 <- FlowSOM::BuildMST(fSOM_Levine_32)
 })
 
-set.seed(123)
+set.seed(100)
 runtime_FlowSOM_Levine_13 <- system.time({
   fSOM_Levine_13 <- FlowSOM::ReadInput(data_Levine_13, transform = FALSE, scale = FALSE)
   fSOM_Levine_13 <- FlowSOM::BuildSOM(fSOM_Levine_13, colsToUse = marker_cols_Levine_13, 
@@ -80,7 +80,7 @@ runtime_FlowSOM_Levine_13 <- system.time({
   fSOM_Levine_13 <- FlowSOM::BuildMST(fSOM_Levine_13)
 })
 
-set.seed(123)
+set.seed(100)
 runtime_FlowSOM_Nilsson <- system.time({
   fSOM_Nilsson <- FlowSOM::ReadInput(data_Nilsson, transform = FALSE, scale = FALSE)
   fSOM_Nilsson <- FlowSOM::BuildSOM(fSOM_Nilsson, colsToUse = marker_cols_Nilsson, 
@@ -88,7 +88,7 @@ runtime_FlowSOM_Nilsson <- system.time({
   fSOM_Nilsson <- FlowSOM::BuildMST(fSOM_Nilsson)
 })
 
-set.seed(123)
+set.seed(100)
 runtime_FlowSOM_Mosmann <- system.time({
   fSOM_Mosmann <- FlowSOM::ReadInput(data_Mosmann, transform = FALSE, scale = FALSE)
   fSOM_Mosmann <- FlowSOM::BuildSOM(fSOM_Mosmann, colsToUse = marker_cols_Mosmann, 
@@ -189,7 +189,7 @@ k_range <- seq(5, 80, by = 5)
 
 # run FlowSOM_meta for range of values of k
 
-set.seed(1234)
+set.seed(100)
 res_range_k <- lapply(k_range, run_FlowSOM_meta_k, 
                       fSOM_Levine_32, fSOM_Levine_13, fSOM_Nilsson, fSOM_Mosmann)
 
@@ -199,6 +199,7 @@ res_range_k_Levine_32 <- cbind(k = k_range, t(sapply(res_range_k, function(s) s[
 res_range_k_Levine_13 <- cbind(k = k_range, t(sapply(res_range_k, function(s) s[[2]])))
 res_range_k_Nilsson <- cbind(k = k_range, t(sapply(res_range_k, function(s) s[[3]])))
 res_range_k_Mosmann <- cbind(k = k_range, t(sapply(res_range_k, function(s) s[[4]])))
+
 
 # save results to files
 
@@ -211,11 +212,17 @@ write.table(res_range_k_Nilsson, file = file.path(RES_DIR, "results_FlowSOM_meta
 write.table(res_range_k_Mosmann, file = file.path(RES_DIR, "results_FlowSOM_meta_range_k_Mosmann.txt"), 
             row.names = FALSE, quote = FALSE, sep = "\t")
 
+
 # save session information
 
 sink(file = file.path(RES_DIR, "session_FlowSOM_meta_range_k.txt"))
 sessionInfo()
 sink()
+
+
+# save R objects
+
+save.image(file = file.path(RES_DIR, "results_FlowSOM_meta_range_k.RData"))
 
 
 

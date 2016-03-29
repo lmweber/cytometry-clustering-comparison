@@ -9,7 +9,7 @@
 
 
 
-# Figure 1 (Levine_32 multi-panel)
+# Figure 1: Levine_32 multi-panel
 
 fn.pdf <- "../plots/Levine_2015_marrow_32/plots_multi_panel_Levine2015marrow32.pdf"
 fn.eps <- "../plots_submission/Fig1_Levine32.eps"
@@ -21,7 +21,7 @@ unlink(fn.tmp.eps)
 
 
 
-# Figure 2 (Levine_13 multi-panel)
+# Figure 2: Levine_13 multi-panel
 
 fn.pdf <- "../plots/Levine_2015_marrow_13/plots_multi_panel_Levine2015marrow13.pdf"
 fn.eps <- "../plots_submission/Fig2_Levine13.eps"
@@ -33,9 +33,9 @@ unlink(fn.tmp.eps)
 
 
 
-# Figure 3 (Cluster medians for FlowSOM_meta)
+# Figure 3: Cluster medians for FlowSOM_meta
 
-fn.pdf <- "../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_FlowSOM_meta_Levine2015marrow32.pdf"
+fn.pdf <- "../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_heatmap_FlowSOM_meta_Levine2015marrow32.pdf"
 fn.eps <- "../plots_submission/Fig3_cluster_medians.eps"
 fn.tmp.eps <- "../plots_submission/Fig3_cluster_medians.tmp.eps"
 
@@ -45,7 +45,7 @@ unlink(fn.tmp.eps)
 
 
 
-# Figure 4 (Nilsson multi-panel)
+# Figure 4: Nilsson multi-panel
 
 fn.pdf <- "../plots/Nilsson_2013_HSC/plots_multi_panel_Nilsson2013HSC.pdf"
 fn.eps <- "../plots_submission/Fig4_Nilsson.eps"
@@ -57,7 +57,7 @@ unlink(fn.tmp.eps)
 
 
 
-# Figure 5 (Mosmann multi-panel)
+# Figure 5: Mosmann multi-panel
 
 fn.pdf <- "../plots/Mosmann_2014_activ/plots_multi_panel_Mosmann2014activ.pdf"
 fn.eps <- "../plots_submission/Fig5_Mosmann.eps"
@@ -69,13 +69,25 @@ unlink(fn.tmp.eps)
 
 
 
-# Figure 6 (Stability analysis for Nilsson and Mosmann)
+# Figure 6: FlowSOM_meta for range of values k
 
-fn.pdf <- "../plots/Mosmann_2014_activ/stability_analysis/stability_multi_panel_Nilsson_Mosmann.pdf"
-fn.eps <- "../plots_submission/Fig6_stability.eps"
-fn.tmp.eps <- "../plots_submission/Fig6_stability.tmp.eps"
+fn.pdf <- "../plots/plots_range_k/results_FlowSOM_meta_F1_range_k.pdf"
+fn.eps <- "../plots_submission/Fig6_range_k.eps"
+fn.tmp.eps <- "../plots_submission/Fig6_range_k.tmp.eps"
 
-system(paste("pdftops -eps -paperw 2100", fn.pdf, fn.tmp.eps))
+system(paste("pdftops -eps -paperw 970", fn.pdf, fn.tmp.eps))
+system(paste("gs -o", fn.eps, "-sDEVICE=epswrite -dNoOutputFonts -dEPSCrop", fn.tmp.eps))
+unlink(fn.tmp.eps)
+
+
+
+# Figure 7: Stability analysis for Mosmann
+
+fn.pdf <- "../plots/Mosmann_2014_activ/stability_analysis/stability_boxplots_Mosmann2014activ.pdf"
+fn.eps <- "../plots_submission/Fig7_stability.eps"
+fn.tmp.eps <- "../plots_submission/Fig7_stability.tmp.eps"
+
+system(paste("pdftops -eps -paperw 970", fn.pdf, fn.tmp.eps))
 system(paste("gs -o", fn.eps, "-sDEVICE=epswrite -dNoOutputFonts -dEPSCrop", fn.tmp.eps))
 unlink(fn.tmp.eps)
 

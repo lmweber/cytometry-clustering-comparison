@@ -58,7 +58,7 @@ mean_F1_Levine_13_tidy_weighted
 
 barplot_mean_F1_Levine_32_weighted <- 
   ggplot(mean_F1_Levine_32_tidy_weighted, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", fill = "blue3") + 
+  geom_bar(stat = "identity", fill = "royalblue3") + 
   geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
   ylim(0, 1.02) + 
   ylab("mean F1 score (weighted)") + 
@@ -75,7 +75,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/weighted_means/results_mean_F1_w
 
 barplot_mean_F1_Levine_13_weighted <- 
   ggplot(mean_F1_Levine_13_tidy_weighted, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", fill = "blue3") + 
+  geom_bar(stat = "identity", fill = "royalblue3") + 
   geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
   ylim(0, 1.02) + 
   ylab("mean F1 score (weighted)") + 
@@ -148,7 +148,7 @@ plot_data_Levine_13_weighted <- melt(plot_data_Levine_13_weighted,
 barplot_mean_F1_pr_re_Levine_32_weighted <- 
   ggplot(plot_data_Levine_32_weighted, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_palette[1], cb_palette[4], cb_palette[3])) + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1.02) + 
   ylab("") + 
   ggtitle("Mean F1, precision, recall (weighted): Levine_2015_marrow_32") + 
@@ -171,7 +171,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/weighted_means/results_mean_F1_p
 barplot_mean_F1_pr_re_Levine_13_weighted <- 
   ggplot(plot_data_Levine_13_weighted, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_palette[1], cb_palette[4], cb_palette[3])) + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1.02) + 
   ylab("") + 
   ggtitle("Mean F1, precision, recall (weighted): Levine_2015_marrow_13") + 

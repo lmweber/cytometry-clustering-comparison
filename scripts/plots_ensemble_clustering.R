@@ -13,7 +13,10 @@ library(cowplot)  # note masks ggplot2::ggsave
 source("helper_collapse_data_frame.R")
 
 # load ensemble clustering results
-load("../results/RData_files/ensemble_clustering_results.RData")
+source("load_results_ensemble_clustering.R")
+
+
+### before running this script, also run the code in "plots_main_results.R" to load results
 
 
 
@@ -80,7 +83,7 @@ res_Mosmann <- list(ACCENSE = res_ACCENSE_Mosmann,
                     immunoClust_all = res_immunoClust_all_Mosmann, 
                     kmeans = res_kmeans_Mosmann, 
                     PhenoGraph = res_PhenoGraph_Mosmann, 
-                    #Rclusterpp = res_Rclusterpp_Mosmann,  # Rclusterpp did not complete for this data set
+                    Rclusterpp = res_Rclusterpp_Mosmann, 
                     SamSPECTRAL = res_SamSPECTRAL_Mosmann, 
                     SWIFT = res_SWIFT_Mosmann)
 
@@ -161,7 +164,7 @@ mean_F1_Levine_13_tidy
 
 barplot_mean_F1_Levine_32_ensemble <- 
   ggplot(mean_F1_Levine_32_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", fill = "blue") + 
+  geom_bar(stat = "identity", fill = "royalblue3") + 
   geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
   ylim(0, 1) + 
   ylab("mean F1 score") + 
@@ -178,7 +181,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/ensemble_clustering/results_barp
 
 barplot_mean_F1_Levine_13_ensemble <- 
   ggplot(mean_F1_Levine_13_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", fill = "blue") + 
+  geom_bar(stat = "identity", fill = "royalblue3") + 
   geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
   ylim(0, 1) + 
   ylab("mean F1 score") + 
@@ -322,6 +325,7 @@ plot_data_Levine_13 <- melt(plot_data_Levine_13,
 barplot_mean_F1_pr_re_Levine_32_ensemble <- 
   ggplot(plot_data_Levine_32, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1) + 
   ylab("") + 
   ggtitle("Mean F1 score, precision, and recall: Levine_2015_marrow_32") + 
@@ -329,7 +333,8 @@ barplot_mean_F1_pr_re_Levine_32_ensemble <-
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.87, 0.92), 
+        legend.position = c(0.73, 0.95), 
+        legend.direction = "horizontal", 
         legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -343,6 +348,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/ensemble_clustering/results_barp
 barplot_mean_F1_pr_re_Levine_13_ensemble <- 
   ggplot(plot_data_Levine_13, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1) + 
   ylab("") + 
   ggtitle("Mean F1 score, precision, and recall: Levine_2015_marrow_13") + 
@@ -350,7 +356,8 @@ barplot_mean_F1_pr_re_Levine_13_ensemble <-
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.87, 0.9), 
+        legend.position = c(0.73, 0.95), 
+        legend.direction = "horizontal", 
         legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -385,6 +392,9 @@ recall_df_Mosmann_ord <- unlist(recall_df_Mosmann[ord_Mosmann])
 F1_df_Nilsson_ord <- unlist(F1_df_Nilsson[ord_Nilsson])
 F1_df_Mosmann_ord <- unlist(F1_df_Mosmann[ord_Mosmann])
 
+F1_df_Nilsson_ord
+F1_df_Mosmann_ord
+
 
 # tidy data format (for ggplot)
 
@@ -411,14 +421,16 @@ plot_data_Mosmann <- melt(plot_data_Mosmann,
 barplot_F1_pr_re_Nilsson_ensemble <- 
   ggplot(plot_data_Nilsson, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
-  ylim(0, 1) + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
+  ylim(0, 1.05) + 
   ylab("") + 
   ggtitle("Rare cell population: Nilsson_2013_HSC") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.12, 0.92), 
+        legend.position = c(0.73, 0.955), 
+        legend.direction = "horizontal", 
         legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -432,14 +444,16 @@ ggplot2::ggsave("../plots/Nilsson_2013_HSC/ensemble_clustering/results_barplot_F
 barplot_F1_pr_re_Mosmann_ensemble <- 
   ggplot(plot_data_Mosmann, aes(x = method, y = value, group = variable, fill = variable)) + 
   geom_bar(stat = "identity", position = "dodge") + 
-  ylim(0, 1) + 
+  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
+  ylim(0, 1.05) + 
   ylab("") + 
   ggtitle("Rare cell population: Mosmann_2014_activ") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.87, 0.92), 
+        legend.position = c(0.73, 0.955), 
+        legend.direction = "horizontal", 
         legend.key.size = unit(4, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 

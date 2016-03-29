@@ -1,13 +1,28 @@
 #########################################################################################
 # R script to generate plots for stability analysis
 #
-# Lukas M. Weber, February 2016
+# Lukas M. Weber, March 2016
 #########################################################################################
 
 
 library(ggplot2)
 library(reshape2)
 library(cowplot)  # note masks ggplot2::ggsave
+library(colorspace)
+
+# color-blind friendly palettes (http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/)
+cb_pal_black <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cb_pal_gray <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+# ggplot2 default palette (access with ggplot_build(p)$data)
+gg_pal <- c("#F8766D", "#00BA38", "#619CFF")
+
+# custom palette: adjust chroma, luminance
+custom_pal <- c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])
+hcl <- coords(as(hex2RGB(custom_pal), "polarLUV"))
+hcl[, "L"] <- 85
+hcl[, "C"] <- 35
+custom_pal <- hex(polarLUV(hcl), fixup = TRUE)
 
 
 
@@ -16,7 +31,7 @@ library(cowplot)  # note masks ggplot2::ggsave
 ### LOAD DATA ###
 #################
 
-STABILITY_DIR <- "../results/stability_analysis"
+STABILITY_DIR <- "../results_stability_analysis"
 
 
 # read saved data
@@ -45,6 +60,10 @@ files_immunoClust_all <- list.files(file.path(STABILITY_DIR, "immunoClust_all"),
 files_immunoClust_all <- files_immunoClust_all[c(2, 1, 4, 3)]
 res_stability_immunoClust_all <- lapply(files_immunoClust_all, function(f) read.table(f, header = TRUE, sep = "\t"))
 
+files_kmeans <- list.files(file.path(STABILITY_DIR, "kmeans"), "^stability", full.names = TRUE)
+files_kmeans <- files_kmeans[c(2, 1, 4, 3)]
+res_stability_kmeans <- lapply(files_kmeans, function(f) read.table(f, header = TRUE, sep = "\t"))
+
 files_PhenoGraph <- list.files(file.path(STABILITY_DIR, "PhenoGraph"), "^stability", full.names = TRUE)
 files_PhenoGraph <- files_PhenoGraph[c(2, 1, 4, 3)]
 res_stability_PhenoGraph <- lapply(files_PhenoGraph, function(f) read.table(f, header = TRUE, sep = "\t"))
@@ -62,6 +81,7 @@ res_stability_Levine_32 <- list(FLOCK = res_stability_FLOCK[[1]],
                                 FlowSOM_meta = res_stability_FlowSOM_meta[[1]], 
                                 immunoClust = res_stability_immunoClust[[1]], 
                                 immunoClust_all = res_stability_immunoClust_all[[1]], 
+                                kmeans = res_stability_kmeans[[1]], 
                                 PhenoGraph = res_stability_PhenoGraph[[1]], 
                                 SamSPECTRAL = res_stability_SamSPECTRAL[[1]])
 
@@ -71,6 +91,7 @@ res_stability_Levine_13 <- list(FLOCK = res_stability_FLOCK[[2]],
                                 FlowSOM_meta = res_stability_FlowSOM_meta[[2]], 
                                 immunoClust = res_stability_immunoClust[[2]], 
                                 immunoClust_all = res_stability_immunoClust_all[[2]], 
+                                kmeans = res_stability_kmeans[[2]], 
                                 PhenoGraph = res_stability_PhenoGraph[[2]], 
                                 SamSPECTRAL = res_stability_SamSPECTRAL[[2]])
 
@@ -80,6 +101,7 @@ res_stability_Nilsson <- list(FLOCK = res_stability_FLOCK[[3]],
                               FlowSOM_meta = res_stability_FlowSOM_meta[[3]], 
                               immunoClust = res_stability_immunoClust[[3]], 
                               immunoClust_all = res_stability_immunoClust_all[[3]], 
+                              kmeans = res_stability_kmeans[[3]], 
                               PhenoGraph = res_stability_PhenoGraph[[3]], 
                               SamSPECTRAL = res_stability_SamSPECTRAL[[3]])
 
@@ -89,6 +111,7 @@ res_stability_Mosmann <- list(FLOCK = res_stability_FLOCK[[4]],
                               FlowSOM_meta = res_stability_FlowSOM_meta[[4]], 
                               immunoClust = res_stability_immunoClust[[4]], 
                               immunoClust_all = res_stability_immunoClust_all[[4]], 
+                              kmeans = res_stability_kmeans[[4]], 
                               PhenoGraph = res_stability_PhenoGraph[[4]], 
                               SamSPECTRAL = res_stability_SamSPECTRAL[[4]])
 
@@ -118,10 +141,10 @@ df_stability_runtime_Mosmann <- as.data.frame(sapply(res_stability_Mosmann, func
 
 # arrange columns in same order as previously (excluding methods with no stability analysis)
 
-ord_stability_Levine_32 <- c(4, 2, 1, 7, 3, 8, 6, 5)
-ord_stability_Levine_13 <- c(4, 7, 2, 1, 8, 3, 6, 5)
-ord_stability_Nilsson <- c(2, 4, 3, 7, 6, 1, 8, 5)
-ord_stability_Mosmann <- c(8, 7, 4, 3, 2, 1, 6, 5)
+ord_stability_Levine_32 <- c(4, 2, 1, 8, 9, 7, 3, 6, 5)
+ord_stability_Levine_13 <- c(4, 8, 2, 7, 1, 3, 9, 6, 5)
+ord_stability_Nilsson <- c(7, 4, 3, 2, 6, 8, 1, 9, 5)
+ord_stability_Mosmann <- c(9, 4, 3, 8, 2, 1, 7, 6, 5)
 
 df_stability_F1_Levine_32 <- df_stability_F1_Levine_32[, ord_stability_Levine_32]
 df_stability_F1_Levine_13 <- df_stability_F1_Levine_13[, ord_stability_Levine_13]
@@ -253,7 +276,8 @@ df_stability_runtime_Mosmann_tidy <- melt(df_stability_runtime_Mosmann_tidy,
 boxplots_stability_Levine_32 <- 
   ggplot(df_stability_Levine_32_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
   geom_boxplot(width = 0.85, position = position_dodge(0.75), outlier.size = 0.75) + 
-  scale_fill_hue(c = 60, l = 90) + 
+  scale_fill_manual(values = custom_pal) + 
+  scale_color_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1) + 
   ggtitle("Stability of clustering results: Levine_2015_marrow_32") + 
   theme_bw() + 
@@ -261,7 +285,7 @@ boxplots_stability_Levine_32 <-
         axis.title.x = element_blank(), 
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.13, 0.15), 
+        legend.position = "right", 
         legend.key.size = unit(5, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -269,14 +293,15 @@ boxplots_stability_Levine_32 <-
 
 boxplots_stability_Levine_32
 ggplot2::ggsave("../plots/Levine_2015_marrow_32/stability_analysis/stability_boxplots_Levine2015marrow32.pdf", 
-                width = 5, height = 5)
+                width = 6, height = 5)
 
 
 # Levine_13
 boxplots_stability_Levine_13 <- 
   ggplot(df_stability_Levine_13_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
   geom_boxplot(width = 0.85, position = position_dodge(0.75), outlier.size = 0.75) + 
-  scale_fill_hue(c = 60, l = 90) + 
+  scale_fill_manual(values = custom_pal) + 
+  scale_color_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1) + 
   ggtitle("Stability of clustering results: Levine_2015_marrow_13") + 
   theme_bw() + 
@@ -284,7 +309,7 @@ boxplots_stability_Levine_13 <-
         axis.title.x = element_blank(), 
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.13, 0.15), 
+        legend.position = "right", 
         legend.key.size = unit(5, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -292,7 +317,7 @@ boxplots_stability_Levine_13 <-
 
 boxplots_stability_Levine_13
 ggplot2::ggsave("../plots/Levine_2015_marrow_13/stability_analysis/stability_boxplots_Levine2015marrow13.pdf", 
-                width = 5, height = 5)
+                width = 6, height = 5)
 
 
 # box plots of F1 score, precision, recall
@@ -303,7 +328,8 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_13/stability_analysis/stability_box
 boxplots_stability_Nilsson <- 
   ggplot(df_stability_Nilsson_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
   geom_boxplot(width = 0.85, position = position_dodge(0.75), outlier.size = 0.75) + 
-  scale_fill_hue(c = 60, l = 90) + 
+  scale_fill_manual(values = custom_pal) + 
+  scale_color_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1) + 
   ggtitle("Stability of clustering results: Nilsson_2013_HSC") + 
   theme_bw() + 
@@ -311,7 +337,7 @@ boxplots_stability_Nilsson <-
         axis.title.x = element_blank(), 
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.12, 0.12), 
+        legend.position = "right", 
         legend.key.size = unit(5, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -319,14 +345,15 @@ boxplots_stability_Nilsson <-
 
 boxplots_stability_Nilsson
 ggplot2::ggsave("../plots/Nilsson_2013_HSC/stability_analysis/stability_boxplots_Nilsson2013HSC.pdf", 
-                width = 5, height = 5)
+                width = 6, height = 5)
 
 
 # Mosmann
 boxplots_stability_Mosmann <- 
   ggplot(df_stability_Mosmann_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
   geom_boxplot(width = 0.85, position = position_dodge(0.75), outlier.size = 0.75) + 
-  scale_fill_hue(c = 60, l = 90) + 
+  scale_fill_manual(values = custom_pal) + 
+  scale_color_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
   ylim(0, 1) + 
   ggtitle("Stability of clustering results: Mosmann_2014_activ") + 
   theme_bw() + 
@@ -334,7 +361,7 @@ boxplots_stability_Mosmann <-
         axis.title.x = element_blank(), 
         axis.title.y = element_blank(), 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.89, 0.9), 
+        legend.position = "right", 
         legend.key.size = unit(5, "mm"), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
@@ -342,7 +369,7 @@ boxplots_stability_Mosmann <-
 
 boxplots_stability_Mosmann
 ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_boxplots_Mosmann2014activ.pdf", 
-                width = 5, height = 5)
+                width = 6, height = 5)
 
 
 
@@ -355,66 +382,94 @@ ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_boxplo
 
 # Levine_32
 boxplots_stability_runtime_Levine_32 <- 
-  ggplot(df_stability_runtime_Levine_32_tidy, aes(x = method, y = value)) + 
-  geom_boxplot(width = 0.4, outlier.size = 0.8, color = "purple4", fill = "mediumpurple1") + 
+  ggplot(df_stability_runtime_Levine_32_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
+  geom_boxplot(width = 0.4, outlier.size = 0.8) + 
+  scale_fill_manual(values = alpha("mediumpurple", 0.4)) + 
+  scale_color_manual(values = "mediumpurple") + 
   ggtitle("Distribution of runtimes: Levine_2015_marrow_32") + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+        legend.position = "right", 
+        legend.key.size = unit(5, "mm"), 
+        legend.key = element_blank(), 
+        legend.title = element_blank(), 
+        legend.background = element_blank())
 
 boxplots_stability_runtime_Levine_32
 ggplot2::ggsave("../plots/Levine_2015_marrow_32/stability_analysis/stability_boxplots_runtime_Levine2015marrow32.pdf", 
-                width = 5, height = 5)
+                width = 6, height = 5)
 
 
 # Levine_13
 boxplots_stability_runtime_Levine_13 <- 
-  ggplot(df_stability_runtime_Levine_13_tidy, aes(x = method, y = value)) + 
-  geom_boxplot(width = 0.4, outlier.size = 0.8, color = "purple4", fill = "mediumpurple1") + 
+  ggplot(df_stability_runtime_Levine_13_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
+  geom_boxplot(width = 0.4, outlier.size = 0.8) + 
+  scale_fill_manual(values = alpha("mediumpurple", 0.4)) + 
+  scale_color_manual(values = "mediumpurple") + 
   ggtitle("Distribution of runtimes: Levine_2015_marrow_13") + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+        legend.position = "right", 
+        legend.key.size = unit(5, "mm"), 
+        legend.key = element_blank(), 
+        legend.title = element_blank(), 
+        legend.background = element_blank())
 
 boxplots_stability_runtime_Levine_13
 ggplot2::ggsave("../plots/Levine_2015_marrow_13/stability_analysis/stability_boxplots_runtime_Levine2015marrow13.pdf", 
-                width = 5, height = 5)
+                width = 6, height = 5)
 
 
 # Nilsson
 boxplots_stability_runtime_Nilsson <- 
-  ggplot(df_stability_runtime_Nilsson_tidy, aes(x = method, y = value)) + 
-  geom_boxplot(width = 0.4, outlier.size = 0.8, color = "purple4", fill = "mediumpurple1") + 
+  ggplot(df_stability_runtime_Nilsson_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
+  geom_boxplot(width = 0.4, outlier.size = 0.8) + 
+  scale_fill_manual(values = alpha("mediumpurple", 0.4)) + 
+  scale_color_manual(values = "mediumpurple") + 
   ggtitle("Distribution of runtimes: Nilsson_2013_HSC") + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+        legend.position = "right", 
+        legend.key.size = unit(5, "mm"), 
+        legend.key = element_blank(), 
+        legend.title = element_blank(), 
+        legend.background = element_blank())
 
 boxplots_stability_runtime_Nilsson
 ggplot2::ggsave("../plots/Nilsson_2013_HSC/stability_analysis/stability_boxplots_runtime_Nilsson2013HSC.pdf", 
-                width = 5, height = 5)
+                width = 6, height = 5)
 
 
 # Mosmann
 boxplots_stability_runtime_Mosmann <- 
-  ggplot(df_stability_runtime_Mosmann_tidy, aes(x = method, y = value)) + 
-  geom_boxplot(width = 0.4, outlier.size = 0.8, color = "purple4", fill = "mediumpurple1") + 
+  ggplot(df_stability_runtime_Mosmann_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
+  geom_boxplot(width = 0.4, outlier.size = 0.8) + 
+  scale_fill_manual(values = alpha("mediumpurple", 0.4)) + 
+  scale_color_manual(values = "mediumpurple") + 
   ggtitle("Distribution of runtimes: Mosmann_2014_activ") + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
         axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+        legend.position = "right", 
+        legend.key.size = unit(5, "mm"), 
+        legend.key = element_blank(), 
+        legend.title = element_blank(), 
+        legend.background = element_blank())
 
 boxplots_stability_runtime_Mosmann
 ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_boxplots_runtime_Mosmann2014activ.pdf", 
-                width = 5, height = 5)
+                width = 6, height = 5)
 
 
 
@@ -428,8 +483,8 @@ ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_boxplo
 
 # Levine_32
 ggdraw() + 
-  draw_plot(boxplots_stability_Levine_32, 0.05, 0, 0.4, 1) + 
-  draw_plot(boxplots_stability_runtime_Levine_32, 0.55, 0, 0.4, 1) +
+  draw_plot(boxplots_stability_Levine_32, 0.05, 0, 0.45, 1) + 
+  draw_plot(boxplots_stability_runtime_Levine_32, 0.55, 0, 0.45, 1) +
   draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
 
 ggplot2::ggsave("../plots/Levine_2015_marrow_32/stability_analysis/stability_multi_panel_Levine2015marrow32.pdf", 
@@ -438,8 +493,8 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_32/stability_analysis/stability_mul
 
 # Levine_13
 ggdraw() + 
-  draw_plot(boxplots_stability_Levine_13, 0.05, 0, 0.4, 1) + 
-  draw_plot(boxplots_stability_runtime_Levine_13, 0.55, 0, 0.4, 1) +
+  draw_plot(boxplots_stability_Levine_13, 0.05, 0, 0.45, 1) + 
+  draw_plot(boxplots_stability_runtime_Levine_13, 0.55, 0, 0.45, 1) +
   draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
 
 ggplot2::ggsave("../plots/Levine_2015_marrow_13/stability_analysis/stability_multi_panel_Levine2015marrow13.pdf", 
@@ -448,8 +503,8 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_13/stability_analysis/stability_mul
 
 # Nilsson
 ggdraw() + 
-  draw_plot(boxplots_stability_Nilsson, 0.05, 0, 0.4, 1) + 
-  draw_plot(boxplots_stability_runtime_Nilsson, 0.55, 0, 0.4, 1) +
+  draw_plot(boxplots_stability_Nilsson, 0.05, 0, 0.45, 1) + 
+  draw_plot(boxplots_stability_runtime_Nilsson, 0.55, 0, 0.45, 1) +
   draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
 
 ggplot2::ggsave("../plots/Nilsson_2013_HSC/stability_analysis/stability_multi_panel_Nilsson2013HSC.pdf", 
@@ -458,92 +513,11 @@ ggplot2::ggsave("../plots/Nilsson_2013_HSC/stability_analysis/stability_multi_pa
 
 # Mosmann
 ggdraw() + 
-  draw_plot(boxplots_stability_Mosmann, 0.05, 0, 0.4, 1) + 
-  draw_plot(boxplots_stability_runtime_Mosmann, 0.55, 0, 0.4, 1) +
+  draw_plot(boxplots_stability_Mosmann, 0.05, 0, 0.45, 1) + 
+  draw_plot(boxplots_stability_runtime_Mosmann, 0.55, 0, 0.45, 1) +
   draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
 
 ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_multi_panel_Mosmann2014activ.pdf", 
-                width = 13, height = 5)
-
-
-
-
-#############################################
-### COMBINED PLOT FOR NILSSON AND MOSMANN ###
-#############################################
-
-# combined multi-panel plot for Nilsson and Mosmann (without runtimes)
-# with methods ordered by F1 score for Mosmann
-
-
-# re-order methods
-df_stability_F1_Nilsson_reorder <- as.data.frame(sapply(res_stability_Nilsson, function(res) res$F1))
-df_stability_pr_Nilsson_reorder <- as.data.frame(sapply(res_stability_Nilsson, function(res) res$pr))
-df_stability_re_Nilsson_reorder <- as.data.frame(sapply(res_stability_Nilsson, function(res) res$re))
-df_stability_runtime_Nilsson_reorder <- as.data.frame(sapply(res_stability_Nilsson, function(res) res$runtime))
-
-df_stability_F1_Nilsson_reorder <- df_stability_F1_Nilsson_reorder[, ord_stability_Mosmann]
-df_stability_pr_Nilsson_reorder <- df_stability_pr_Nilsson_reorder[, ord_stability_Mosmann]
-df_stability_re_Nilsson_reorder <- df_stability_re_Nilsson_reorder[, ord_stability_Mosmann]
-df_stability_runtime_Nilsson_reorder <- df_stability_runtime_Nilsson_reorder[, ord_stability_Mosmann]
-
-
-# re-ordered tidy data
-df_stability_Nilsson_tidy_reorder <- data.frame(F1_score = as.vector(as.matrix(df_stability_F1_Nilsson_reorder)), 
-                                                precision = as.vector(as.matrix(df_stability_pr_Nilsson_reorder)), 
-                                                recall = as.vector(as.matrix(df_stability_re_Nilsson_reorder)))
-df_stability_Nilsson_tidy_reorder["method"] <- rep(factor(colnames(df_stability_F1_Nilsson_reorder), 
-                                                          levels = colnames(df_stability_F1_Nilsson_reorder)), 
-                                                   each = nrow(df_stability_F1_Nilsson_reorder))
-df_stability_Nilsson_tidy_reorder <- melt(df_stability_Nilsson_tidy_reorder, 
-                                          id.vars = "method", 
-                                          measure.vars = c("F1_score", "precision", "recall"))
-
-
-# re-ordered boxplots for Nilsson (no legend)
-boxplots_stability_Nilsson_reorder <- 
-  ggplot(df_stability_Nilsson_tidy_reorder, aes(x = method, y = value, color = variable, fill = variable)) + 
-  geom_boxplot(width = 0.85, position = position_dodge(0.75), outlier.size = 0.75) + 
-  scale_fill_hue(c = 60, l = 90) + 
-  ylim(0, 1) + 
-  ggtitle("Stability of clustering results: Nilsson_2013_HSC") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.title.y = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = "none")
-
-boxplots_stability_Nilsson_reorder
-
-
-# boxplots with legend outside for Mosmann
-boxplots_stability_Mosmann_legend <- 
-  ggplot(df_stability_Mosmann_tidy, aes(x = method, y = value, color = variable, fill = variable)) + 
-  geom_boxplot(width = 0.85, position = position_dodge(0.75), outlier.size = 0.75) + 
-  scale_fill_hue(c = 60, l = 90) + 
-  ylim(0, 1) + 
-  ggtitle("Stability of clustering results: Mosmann_2014_activ") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.title.y = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.key.size = unit(5, "mm"), 
-        legend.key = element_blank(), 
-        legend.title = element_blank(), 
-        legend.background = element_blank())
-
-boxplots_stability_Mosmann_legend
-
-
-# combined plot for Nilsson and Mosmann (without runtime)
-ggdraw() + 
-  draw_plot(boxplots_stability_Nilsson_reorder, 0.05, 0, 0.4, 1) + 
-  draw_plot(boxplots_stability_Mosmann_legend, 0.52, 0, 0.49, 1) + 
-  draw_plot_label(LETTERS[1:2], c(0, 0.5), c(1, 1), size = 16)
-
-ggplot2::ggsave("../plots/Mosmann_2014_activ/stability_analysis/stability_multi_panel_Nilsson_Mosmann.pdf", 
                 width = 13, height = 5)
 
 

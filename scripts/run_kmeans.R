@@ -88,7 +88,7 @@ runtime_Levine_13 <- system.time({
   out_kmeans_Levine_13 <- kmeans(data_Levine_13, k_Levine_13)
 })
 
-set.seed(1234)
+set.seed(1001)
 runtime_Nilsson <- system.time({
   out_kmeans_Nilsson <- kmeans(data_Nilsson, k_Nilsson, iter.max = 50)
 })

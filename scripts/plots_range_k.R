@@ -59,12 +59,13 @@ res_Mosmann
 # tidy data format for ggplot
 
 res_F1 <- data.frame(k = res_Levine_32$k, 
-                     Levine_32 = res_Levine_32$mean_F1, 
-                     Levine_13 = res_Levine_13$mean_F1, 
-                     Nilsson = res_Nilsson$F1, 
-                     Mosmann = res_Mosmann$F1)
+                     Levine_2015_marrow_32 = res_Levine_32$mean_F1, 
+                     Levine_2015_marrow_13 = res_Levine_13$mean_F1, 
+                     Nilsson_2013_HSC = res_Nilsson$F1, 
+                     Mosmann_2014_activ = res_Mosmann$F1)
 
 res_F1_tidy <- melt(res_F1, id.vars = "k", measure_vars = c("Levine_32", "Levine_13", "Nilsson", "Mosmann"))
+
 
 # line plot
 
@@ -74,14 +75,14 @@ lineplot_F1_range_k <-
   geom_line(aes(color = variable)) + 
   geom_vline(xintercept = 40, color = "red", linetype = 1) + 
   scale_color_manual(values = cb_pal_black[1:4]) + 
-  ylim(0, 0.8) + 
+  ylim(0, 0.82) + 
   scale_x_continuous(breaks = seq(5, 80, by = 5)) + 
   ylab("mean F1 score or F1 score") + 
   xlab("number of clusters k") + 
   ggtitle("FlowSOM_meta") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
-        legend.position = c(0.87, 0.16), 
+        legend.position = c(0.80, 0.15), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
         legend.background = element_rect("white"))

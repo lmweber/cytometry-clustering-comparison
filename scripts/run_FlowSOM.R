@@ -77,7 +77,7 @@ runtime_FlowSOM_Levine_13 <- system.time({
 })
 
 
-set.seed(123)
+set.seed(100)
 runtime_FlowSOM_Nilsson <- system.time({
   fSOM_Nilsson <- FlowSOM::ReadInput(data_Nilsson, transform = FALSE, scale = FALSE)
   fSOM_Nilsson <- FlowSOM::BuildSOM(fSOM_Nilsson, colsToUse = marker_cols_Nilsson)
@@ -196,7 +196,7 @@ runtime_FlowSOM_meta_Levine_13_auto <- system.time({
   meta_clustering_Levine_13_auto <- FlowSOM::MetaClustering(fSOM_Levine_13$map$codes, method = "metaClustering_consensus")
 })
 
-set.seed(123)
+set.seed(100)
 runtime_FlowSOM_meta_Nilsson_auto <- system.time({
   meta_clustering_Nilsson_auto <- FlowSOM::MetaClustering(fSOM_Nilsson$map$codes, method = "metaClustering_consensus")
 })
@@ -327,7 +327,7 @@ runtime_FlowSOM_Levine_13 <- system.time({
 })
 
 
-set.seed(123)
+set.seed(100)
 runtime_FlowSOM_Nilsson <- system.time({
   fSOM_Nilsson <- FlowSOM::ReadInput(data_Nilsson, transform = FALSE, scale = FALSE)
   fSOM_Nilsson <- FlowSOM::BuildSOM(fSOM_Nilsson, colsToUse = marker_cols_Nilsson, 
@@ -456,7 +456,7 @@ runtime_FlowSOM_meta_Levine_13_manual <- system.time({
   meta_clustering_Levine_13_manual <- FlowSOM::metaClustering_consensus(fSOM_Levine_13$map$codes, k = k_Levine_13)
 })
 
-set.seed(123)
+set.seed(100)
 runtime_FlowSOM_meta_Nilsson_manual <- system.time({
   meta_clustering_Nilsson_manual <- FlowSOM::metaClustering_consensus(fSOM_Nilsson$map$codes, k = k_Nilsson)
 })

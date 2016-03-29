@@ -1,6 +1,6 @@
 #########################################################################################
-# R script to plot cluster median expression values and compare against manually gated
-# populations (truth)
+# R script to generate plots comparing median expression values of detected clusters and 
+# manually gated populations (heatmaps, MDS plots, t-SNE plots)
 #
 # Lukas M. Weber, March 2016
 #########################################################################################
@@ -8,6 +8,8 @@
 
 library(pheatmap)
 library(RColorBrewer)
+library(Rtsne)
+library(ggplot2)
 
 # helper function
 source("helper_calculate_cluster_medians.R")
@@ -78,9 +80,9 @@ n_methods_Levine_13 <- length(clus_Levine_13)
 
 
 
-####################################################
-### PLOT CLUSTER MEDIANS: MANUALLY GATED (TRUTH) ###
-####################################################
+#######################################
+### HEATMAPS: TRUE POPULATIONS ONLY ###
+#######################################
 
 # calculate cluster medians
 # note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
@@ -101,7 +103,7 @@ pheatmap(medians_truth_Levine_32,
          cluster_cols = TRUE, 
          clustering_method = "average", 
          fontsize = 9, 
-         filename = "../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_truth_Levine2015marrow32.pdf", 
+         filename = "../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_heatmap_truth_Levine2015marrow32.pdf", 
          width = 8, 
          height = 3.5)
 
@@ -112,16 +114,16 @@ pheatmap(medians_truth_Levine_13,
          cluster_cols = TRUE, 
          clustering_method = "average", 
          fontsize = 9, 
-         filename = "../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_truth_Levine2015marrow13.pdf", 
+         filename = "../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_heatmap_truth_Levine2015marrow13.pdf", 
          width = 4.75, 
          height = 5)
 
 
 
 
-###########################################################
-### PLOT CLUSTER MEDIANS: EACH METHOD COMPARED TO TRUTH ###
-###########################################################
+###############################################
+### HEATMAPS: EACH METHOD COMPARED TO TRUTH ###
+###############################################
 
 medians_Levine_32 <- vector("list", 13)
 medians_Levine_13 <- vector("list", 13)
@@ -270,7 +272,7 @@ for (i in 1:n_methods_Levine_32) {
            annotation_colors = annot_colors, 
            fontsize = 9, 
            fontsize_row = fontsize_row_Levine_32[i], 
-           filename = paste0("../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_", 
+           filename = paste0("../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_heatmap_", 
                              names(medians_Levine_32)[i], 
                              "_Levine2015marrow32.pdf"), 
            width = 9.5, 
@@ -300,11 +302,202 @@ for (i in 1:n_methods_Levine_13) {
            annotation_colors = annot_colors, 
            fontsize = 9, 
            fontsize_row = fontsize_row_Levine_13[i], 
-           filename = paste0("../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_", 
+           filename = paste0("../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_heatmap_", 
                              names(medians_Levine_13)[i], 
                              "_Levine2015marrow13.pdf"), 
            width = 6.5, 
            height = plot_heights_Levine_13[i])
 }
+
+
+
+
+#############################################
+### MULTI-DIMENSIONAL SCALING (MDS) PLOTS ###
+#############################################
+
+
+for (i in 1:n_methods_Levine_32) {
+  
+  data_mds <- rbind(medians_truth_Levine_32, medians_Levine_32[[i]])
+  
+  # calculate distance matrix (euclidean distance)
+  d <- dist(data_mds)
+  
+  # calculate MDS
+  fit_mds <- cmdscale(d, k = 2)
+  
+  # plot
+  plot_data <- as.data.frame(fit_mds)
+  colnames(plot_data) <- c("x", "y")
+  plot_data$num <- as.character(c(1:nrow(medians_truth_Levine_32), 1:nrow(medians_Levine_32[[i]])))
+  plot_data$method <- rep(c("manually_gated", names(medians_Levine_32)[i]), 
+                          times = c(nrow(medians_truth_Levine_32), nrow(medians_Levine_32[[i]])), 
+                          levels = c("manually_gated", names(medians_Levine_32)[i]))
+  filename_i = paste0("../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_MDS_", 
+                      names(medians_Levine_32)[i], 
+                      "_Levine2015marrow32.pdf")
+  
+  plot_i <- 
+    ggplot(plot_data, aes(x = x, y = y, label = num, color = method)) + 
+    geom_point(alpha = 0) + 
+    geom_text(size = 3, show.legend = FALSE) + 
+    scale_color_manual(values = c("blue", "red")) + 
+    ggtitle(paste0("MDS plot: ", names(medians_Levine_32)[i], ", Levine_2015_marrow_32")) + 
+    xlab("MDS coordinate 1") + 
+    ylab("MDS coordinate 2") + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          legend.position = "bottom", 
+          legend.direction = "horizontal", 
+          legend.key = element_blank(), 
+          legend.title = element_blank()) + 
+    guides(color = guide_legend(override.aes = list(alpha = 1), reverse = TRUE))
+  
+  ggplot2::ggsave(filename_i, width = 5, height = 5.5)
+  
+}
+
+
+for (i in 1:n_methods_Levine_13) {
+  
+  data_mds <- rbind(medians_truth_Levine_13, medians_Levine_13[[i]])
+  
+  # calculate distance matrix (euclidean distance)
+  d <- dist(data_mds)
+  
+  # calculate MDS
+  fit_mds <- cmdscale(d, k = 2)
+  
+  # plot
+  plot_data <- as.data.frame(fit_mds)
+  colnames(plot_data) <- c("x", "y")
+  plot_data$num <- as.character(c(1:nrow(medians_truth_Levine_13), 1:nrow(medians_Levine_13[[i]])))
+  plot_data$method <- rep(c("manually_gated", names(medians_Levine_13)[i]), 
+                          times = c(nrow(medians_truth_Levine_13), nrow(medians_Levine_13[[i]])), 
+                          levels = c("manually_gated", names(medians_Levine_13)[i]))
+  filename_i = paste0("../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_MDS_", 
+                      names(medians_Levine_13)[i], 
+                      "_Levine2015marrow13.pdf")
+  
+  plot_i <- 
+    ggplot(plot_data, aes(x = x, y = y, label = num, color = method)) + 
+    geom_point(alpha = 0) + 
+    geom_text(size = 3, show.legend = FALSE) + 
+    scale_color_manual(values = c("blue", "red")) + 
+    ggtitle(paste0("MDS plot: ", names(medians_Levine_13)[i], ", Levine_2015_marrow_13")) + 
+    xlab("MDS coordinate 1") + 
+    ylab("MDS coordinate 2") + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          legend.position = "bottom", 
+          legend.direction = "horizontal", 
+          legend.key = element_blank(), 
+          legend.title = element_blank()) + 
+    guides(color = guide_legend(override.aes = list(alpha = 1), reverse = TRUE))
+  
+  ggplot2::ggsave(filename_i, width = 5, height = 5.5)
+  
+}
+
+
+
+
+###################
+### T-SNE PLOTS ###
+###################
+
+
+for (i in 1:n_methods_Levine_32) {
+  
+  # prepare data for Rtsne
+  data_rtsne <- rbind(medians_truth_Levine_32, medians_Levine_32[[i]])
+  data_rtsne <- as.matrix(data_rtsne)
+  
+  # check for near-duplicate rows (need to remove if any)
+  if(any(duplicated(data_rtsne))) warning("duplicate rows")
+  
+  # run Rtsne (Barnes-Hut-SNE algorithm)
+  # note: use lower perplexity; default gives error
+  set.seed(123)
+  out_rtsne <- Rtsne(data_rtsne, pca = FALSE, verbose = FALSE, perplexity = 1)
+  
+  # plot
+  plot_data <- as.data.frame(out_rtsne$Y)
+  colnames(plot_data) <- c("x", "y")
+  plot_data$num <- as.character(c(1:nrow(medians_truth_Levine_32), 1:nrow(medians_Levine_32[[i]])))
+  plot_data$method <- rep(c("manually_gated", names(medians_Levine_32)[i]), 
+                          times = c(nrow(medians_truth_Levine_32), nrow(medians_Levine_32[[i]])), 
+                          levels = c("manually_gated", names(medians_Levine_32)[i]))
+  filename_i = paste0("../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_tSNE_", 
+                      names(medians_Levine_32)[i], 
+                      "_Levine2015marrow32.pdf")
+  
+  plot_i <- 
+    ggplot(plot_data, aes(x = x, y = y, label = num, color = method)) + 
+    geom_point(alpha = 0) + 
+    geom_text(size = 3, show.legend = FALSE) + 
+    scale_color_manual(values = c("blue", "red")) + 
+    ggtitle(paste0("t-SNE plot: ", names(medians_Levine_32)[i], ", Levine_2015_marrow_32")) + 
+    xlab("t-SNE coordinate 1") + 
+    ylab("t-SNE coordinate 2") + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          legend.position = "bottom", 
+          legend.direction = "horizontal", 
+          legend.key = element_blank(), 
+          legend.title = element_blank()) + 
+    guides(color = guide_legend(override.aes = list(alpha = 1), reverse = TRUE))
+  
+  ggplot2::ggsave(filename_i, width = 5, height = 5.5)
+  
+}
+
+
+for (i in 1:n_methods_Levine_13) {
+  
+  # prepare data for Rtsne
+  data_rtsne <- rbind(medians_truth_Levine_13, medians_Levine_13[[i]])
+  data_rtsne <- as.matrix(data_rtsne)
+  
+  # check for near-duplicate rows (need to remove if any)
+  if(any(duplicated(data_rtsne))) warning("duplicate rows")
+  
+  # run Rtsne (Barnes-Hut-SNE algorithm)
+  # note: use lower perplexity; default gives error
+  set.seed(123)
+  out_rtsne <- Rtsne(data_rtsne, pca = FALSE, verbose = FALSE, perplexity = 1)
+  
+  # plot
+  plot_data <- as.data.frame(out_rtsne$Y)
+  colnames(plot_data) <- c("x", "y")
+  plot_data$num <- as.character(c(1:nrow(medians_truth_Levine_13), 1:nrow(medians_Levine_13[[i]])))
+  plot_data$method <- rep(c("manually_gated", names(medians_Levine_13)[i]), 
+                          times = c(nrow(medians_truth_Levine_13), nrow(medians_Levine_13[[i]])), 
+                          levels = c("manually_gated", names(medians_Levine_13)[i]))
+  filename_i = paste0("../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_tSNE_", 
+                      names(medians_Levine_13)[i], 
+                      "_Levine2015marrow13.pdf")
+  
+  plot_i <- 
+    ggplot(plot_data, aes(x = x, y = y, label = num, color = method)) + 
+    geom_point(alpha = 0) + 
+    geom_text(size = 3, show.legend = FALSE) + 
+    scale_color_manual(values = c("blue", "red")) + 
+    ggtitle(paste0("t-SNE plot: ", names(medians_Levine_13)[i], ", Levine_2015_marrow_13")) + 
+    xlab("t-SNE coordinate 1") + 
+    ylab("t-SNE coordinate 2") + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          legend.position = "bottom", 
+          legend.direction = "horizontal", 
+          legend.key = element_blank(), 
+          legend.title = element_blank()) + 
+    guides(color = guide_legend(override.aes = list(alpha = 1), reverse = TRUE))
+  
+  ggplot2::ggsave(filename_i, width = 5, height = 5.5)
+  
+}
+
 
 
