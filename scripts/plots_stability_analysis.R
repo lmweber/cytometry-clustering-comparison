@@ -21,7 +21,7 @@ gg_pal <- c("#F8766D", "#00BA38", "#619CFF")
 custom_pal <- c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])
 hcl <- coords(as(hex2RGB(custom_pal), "polarLUV"))
 hcl[, "L"] <- 85
-hcl[, "C"] <- 35
+hcl[, "C"] <- 40
 custom_pal <- hex(polarLUV(hcl), fixup = TRUE)
 
 
