@@ -22,10 +22,10 @@ source("load_results_all_other_methods.R")
 ###########################
 
 # calculate using the top 5 methods for each data set, excluding the following:
-# (1) methods that use subsampled data (ACCENSE, DensVM, Rclusterpp), since consensus 
-# clustering requires same data for each method
-# (2) SamSPECTRAL: including it returns an error when running "cl_consensus"
-# (3) methods that give large numbers of clusters (FlowSOM, immunoClust, immunoClust_all,
+# - methods that use subsampled data (ACCENSE, DensVM, Rclusterpp) and methods that 
+# remove outliers (ACCENSE, immunoClust, SamSPECTRAL), since consensus clustering
+# requires same data for each method
+# - methods that give large numbers of clusters (FlowSOM, immunoClust, immunoClust_all,
 # SWIFT), since this greatly increases runtime; except for the Nilsson data set, which is
 # small enough that runtime remains fast
 

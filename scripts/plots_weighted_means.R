@@ -16,7 +16,7 @@
 # for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
 
 
-# number of cells per true clusters
+# number of cells per true population
 
 n_cells_truth_Levine_32 <- matrix(rep(tbl_truth_Levine_32, n_methods_Levine_32), ncol = n_methods_Levine_32)
 n_cells_truth_Levine_13 <- matrix(rep(tbl_truth_Levine_13, n_methods_Levine_13), ncol = n_methods_Levine_13)
@@ -24,7 +24,7 @@ n_cells_truth_Levine_13 <- matrix(rep(tbl_truth_Levine_13, n_methods_Levine_13),
 n_cells_truth_Levine_32
 n_cells_truth_Levine_13
 
-# mean F1 score across all true clusters (weighted by number of cells in true cluster)
+# mean F1 score across all true populations (weighted by number of cells in true population)
 
 mean_F1_Levine_32_weighted <- colSums(F1_df_Levine_32 * n_cells_truth_Levine_32) / colSums(n_cells_truth_Levine_32)
 mean_F1_Levine_13_weighted <- colSums(F1_df_Levine_13 * n_cells_truth_Levine_13) / colSums(n_cells_truth_Levine_13)
@@ -99,7 +99,7 @@ ggplot2::ggsave("../plots/Levine_2015_marrow_13/weighted_means/results_mean_F1_w
 # for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
 
 
-# mean precision and mean recall across all true clusters (weighted by number of cells in true cluster)
+# mean precision and mean recall across all true populations (weighted by number of cells in true population)
 
 mean_precision_Levine_32_weighted <- colSums(precision_df_Levine_32 * n_cells_truth_Levine_32) / colSums(n_cells_truth_Levine_32)
 mean_precision_Levine_13_weighted <- colSums(precision_df_Levine_13 * n_cells_truth_Levine_13) / colSums(n_cells_truth_Levine_13)
@@ -107,7 +107,7 @@ mean_precision_Levine_13_weighted <- colSums(precision_df_Levine_13 * n_cells_tr
 mean_recall_Levine_32_weighted <- colSums(recall_df_Levine_32 * n_cells_truth_Levine_32) / colSums(n_cells_truth_Levine_32)
 mean_recall_Levine_13_weighted <- colSums(recall_df_Levine_13 * n_cells_truth_Levine_13) / colSums(n_cells_truth_Levine_13)
 
-# arrange in descending order of mean F1 score (weighted by number of cells in true cluster)
+# arrange in descending order of mean F1 score (weighted by number of cells in true population)
 
 mean_precision_Levine_32_ord_weighted <- mean_precision_Levine_32_weighted[ord_Levine_32_weighted]
 mean_precision_Levine_13_ord_weighted <- mean_precision_Levine_13_weighted[ord_Levine_13_weighted]
