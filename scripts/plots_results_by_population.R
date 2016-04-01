@@ -44,13 +44,13 @@ titles_Levine_13 <- c("(A)   F1 score: Levine_2015_marrow_13",
                       "(C)   Recall: Levine_2015_marrow_13")
 
 
-filenames_Levine_32 <- c("../plots/Levine_2015_marrow_32/by_population/results_by_population_F1_Levine2015marrow32.pdf", 
-                         "../plots/Levine_2015_marrow_32/by_population/results_by_population_pr_Levine2015marrow32.pdf", 
-                         "../plots/Levine_2015_marrow_32/by_population/results_by_population_re_Levine2015marrow32.pdf")
+filenames_Levine_32 <- c("../plots/Levine_2015_marrow_32/by_population/heatmap_by_population_F1_Levine2015marrow32.pdf", 
+                         "../plots/Levine_2015_marrow_32/by_population/heatmap_by_population_pr_Levine2015marrow32.pdf", 
+                         "../plots/Levine_2015_marrow_32/by_population/heatmap_by_population_re_Levine2015marrow32.pdf")
 
-filenames_Levine_13 <- c("../plots/Levine_2015_marrow_13/by_population/results_by_population_F1_Levine2015marrow13.pdf", 
-                         "../plots/Levine_2015_marrow_13/by_population/results_by_population_pr_Levine2015marrow13.pdf", 
-                         "../plots/Levine_2015_marrow_13/by_population/results_by_population_re_Levine2015marrow13.pdf")
+filenames_Levine_13 <- c("../plots/Levine_2015_marrow_13/by_population/heatmap_by_population_F1_Levine2015marrow13.pdf", 
+                         "../plots/Levine_2015_marrow_13/by_population/heatmap_by_population_pr_Levine2015marrow13.pdf", 
+                         "../plots/Levine_2015_marrow_13/by_population/heatmap_by_population_re_Levine2015marrow13.pdf")
 
 
 # heatmaps of F1 score, precision, and recall for each true population
@@ -58,7 +58,7 @@ filenames_Levine_13 <- c("../plots/Levine_2015_marrow_13/by_population/results_b
 for (i in 1:length(df_Levine_32)) {
   pheatmap(df_Levine_32[[i]], color = colorRampPalette(brewer.pal(7, "GnBu"))(100), 
            breaks = seq(0, 1, length.out = 100), 
-           display_numbers = TRUE, number_color = "black", 
+           display_numbers = TRUE, number_color = "black", fontsize_number = 9, 
            cluster_rows = FALSE, cluster_cols = FALSE, 
            main = titles_Levine_32[i], filename = filenames_Levine_32[i], 
            width = 6, height = 6)
@@ -67,7 +67,7 @@ for (i in 1:length(df_Levine_32)) {
 for (i in 1:length(df_Levine_13)) {
   pheatmap(df_Levine_13[[i]], color = colorRampPalette(brewer.pal(7, "GnBu"))(100), 
            breaks = seq(0, 1, length.out = 100), 
-           display_numbers = TRUE, number_color = "black", 
+           display_numbers = TRUE, number_color = "black", fontsize_number = 9, 
            cluster_rows = FALSE, cluster_cols = FALSE, 
            main = titles_Levine_13[i], filename = filenames_Levine_13[i], 
            width = 6, height = 9)
