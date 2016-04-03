@@ -386,7 +386,7 @@ boxplots_stability_runtime_Levine_32 <-
   geom_boxplot(width = 0.4, outlier.size = 0.8) + 
   scale_fill_manual(values = alpha("mediumpurple", 0.4)) + 
   scale_color_manual(values = "mediumpurple") + 
-  ggtitle("Distribution of runtimes: Levine_2015_marrow_32") + 
+  ggtitle("Distributions of runtimes: Levine_2015_marrow_32") + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
@@ -409,7 +409,7 @@ boxplots_stability_runtime_Levine_13 <-
   geom_boxplot(width = 0.4, outlier.size = 0.8) + 
   scale_fill_manual(values = alpha("mediumpurple", 0.4)) + 
   scale_color_manual(values = "mediumpurple") + 
-  ggtitle("Distribution of runtimes: Levine_2015_marrow_13") + 
+  ggtitle("Distributions of runtimes: Levine_2015_marrow_13") + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
@@ -432,7 +432,7 @@ boxplots_stability_runtime_Nilsson <-
   geom_boxplot(width = 0.4, outlier.size = 0.8) + 
   scale_fill_manual(values = alpha("mediumpurple", 0.4)) + 
   scale_color_manual(values = "mediumpurple") + 
-  ggtitle("Distribution of runtimes: Nilsson_2013_HSC") + 
+  ggtitle("Distributions of runtimes: Nilsson_2013_HSC") + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
@@ -455,7 +455,7 @@ boxplots_stability_runtime_Mosmann <-
   geom_boxplot(width = 0.4, outlier.size = 0.8) + 
   scale_fill_manual(values = alpha("mediumpurple", 0.4)) + 
   scale_color_manual(values = "mediumpurple") + 
-  ggtitle("Distribution of runtimes: Mosmann_2014_activ") + 
+  ggtitle("Distributions of runtimes: Mosmann_2014_activ") + 
   ylab("seconds") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
