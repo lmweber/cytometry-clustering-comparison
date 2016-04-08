@@ -2,7 +2,7 @@
 
 This repository contains R scripts to reproduce the analyses and figures in our paper on comparing clustering methods for high-dimensional single-cell flow and mass cytometry data.
 
-A preprint of the paper is available from [bioRxiv](http://biorxiv.org/). (update bioRxiv link when submitted)
+A preprint of the paper is available from [bioRxiv](http://biorxiv.org/content/early/2016/04/07/047613).
 
 
 ## Overview
@@ -18,7 +18,7 @@ The comparisons showed that FlowSOM (available as a [Bioconductor package](http:
 
 All R scripts are saved in the [scripts](scripts/) folder.
 
-Each script contains comments explaining the purpose of the script, as well as the individual steps within it.
+Each script contains comments explaining the purpose of the script and the individual steps within it.
 
 The main R script to reproduce the figures shown in the paper is [scripts/plots_main_results.R](scripts/plots_main_results.R). R scripts to reproduce the data preprocessing steps are saved in [scripts/data_preparation_scripts](scripts/data_preparation_scripts/).
 
