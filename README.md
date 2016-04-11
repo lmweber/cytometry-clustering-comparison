@@ -2,7 +2,7 @@
 
 This repository contains R scripts to reproduce the analyses and figures in our paper on comparing clustering methods for high-dimensional single-cell flow and mass cytometry data.
 
-A preprint of the paper is available from [bioRxiv](http://biorxiv.org/content/early/2016/04/07/047613).
+A preprint of the paper is available on [bioRxiv](http://biorxiv.org/content/early/2016/04/07/047613).
 
 
 ## Overview
