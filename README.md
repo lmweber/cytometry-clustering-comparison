@@ -1,13 +1,13 @@
 # Comparison of clustering methods for high-dimensional single-cell flow and mass cytometry data
 
-This repository contains R scripts to reproduce the analyses and figures in our paper on comparing clustering methods for high-dimensional single-cell flow and mass cytometry data.
+This repository contains R scripts to reproduce the analyses and figures in our paper on comparing clustering methods for high-dimensional single-cell flow cytometry and mass cytometry (CyTOF) data.
 
 A preprint of the paper is available on [bioRxiv](http://biorxiv.org/content/early/2016/04/07/047613).
 
 
 ## Overview
 
-In this study, we compared the performance of 13 clustering methods (11 distinct methods and two variations) for automatically detecting clusters representing cell populations in high-dimensional flow and mass cytometry data sets. A list of the clustering methods can be found in Table 1 in the paper.
+In this study, we compared the performance of 13 clustering methods (11 distinct methods and two variations) for automatically detecting clusters representing cell populations in high-dimensional flow cytometry and mass cytometry (CyTOF) data sets. A list of the clustering methods can be found in Table 1 in the paper.
 
 We evaluated the clustering methods using four publicly available data sets from experiments in immunology, with cell population identities available from manual gating. A summary of the data sets is provided in Table 2 in the paper.
 
