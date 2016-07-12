@@ -1,16 +1,22 @@
 #########################################################################################
-# Function to match cluster labels with "true" (manually gated) population labels, and
-# calculate precision, recall, and F1 score
+# Function to match cluster labels with manual gating (reference standard) population
+# labels, and calculate precision, recall, and F1 score
 #
-# Lukas M. Weber, March 2016
+# Matching criterion: Hungarian algorithm (see Samusik et al. 2016). This method is 
+# appropriate for data sets with multiple populations of interest.
+#
+# Lukas Weber, July 2016
 #########################################################################################
+
+
+library(clue)  # contains implementation of Hungarian algorithm
 
 
 # arguments:
 # - clus_algorithm: cluster labels from algorithm
 # - clus_truth: true cluster labels
 # (for both arguments: length = number of cells; names = cluster labels (integers))
-helper_match_clusters_and_evaluate <- function(clus_algorithm, clus_truth) {
+helper_match_multiple_clusters_and_evaluate <- function(clus_algorithm, clus_truth) {
   
   # remove unassigned cells (NA's in clus_truth)
   unassigned <- is.na(clus_truth)
@@ -51,9 +57,16 @@ helper_match_clusters_and_evaluate <- function(clus_algorithm, clus_truth) {
   rownames(pr_mat) <- rownames(re_mat) <- rownames(F1_mat) <- names(tbl_algorithm)
   colnames(pr_mat) <- colnames(re_mat) <- colnames(F1_mat) <- names(tbl_truth)
   
-  # match labels using highest F1 score (note duplicates are allowed)
+  # match labels using Hungarian algorithm applied to matrix of F1 scores (Hungarian
+  # algorithm calculates an optimal one-to-one assignment, which is appropriate for data
+  # sets with multiple populations of interest)
   
-  labels_matched <- apply(F1_mat, 2, which.max)
+  # note Hungarian algorithm assumes n_rows <= n_cols (transpose matrix)
+  
+  labels_matched <- clue::solve_LSAP(t(F1_mat), maximum = TRUE)
+  
+  labels_matched <- as.numeric(labels_matched)
+  names(labels_matched) <- 1:length(labels_matched)
   
   # precision, recall, F1 score, and number of cells for each matched cluster
   

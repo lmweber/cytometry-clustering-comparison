@@ -3,7 +3,7 @@
 # for a given cluster. Note that data should already be transformed, e.g. using standard
 # asinh transform.
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, July 2016
 #########################################################################################
 
 
