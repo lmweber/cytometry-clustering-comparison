@@ -1,11 +1,11 @@
 #########################################################################################
-# R script to prepare benchmark data set Nilsson_2013_HSC
+# R script to prepare benchmark data set Nilsson_rare
 #
-# This is a 13-dimensional flow cytometry data set containing several cell populations,
+# This is a 13-dimensional flow cytometry data set containing several cell populations, 
 # including a rare population of hematopoietic stem cells (HSCs).
 #
-# This R script pre-processes the data set and exports it in a format for testing 
-# clustering algorithms. Gating was previously performed in Cytobank.
+# This R script pre-processes the data set, adds manually gated cell population labels, 
+# and exports it in .txt and .fcs formats. Gating was previously performed in Cytobank.
 #
 # Source: Figure 2 in the following paper:
 # Nilsson et al. (2013), "Frequency Determination of Rare Populations by Flow Cytometry: 
@@ -14,12 +14,14 @@
 # Link to paper: http://www.ncbi.nlm.nih.gov/pubmed/23839904
 # Link to data: http://flowrepository.org/id/FR-FCM-ZZ6L
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, July 2016
 #########################################################################################
 
 
-library(flowCore)
-library(magrittr)
+# load packages
+
+library(flowCore)  # from Bioconductor
+library(magrittr)  # from CRAN
 
 
 
@@ -145,8 +147,8 @@ table(data[, "label"])
 ### ARCSINH TRANSFORM ###
 #########################
 
-# apply arcsinh transform
-# use standard scale factor of 150 for flow cytometry data
+# arcsinh transform
+# using scale factor 150 for flow cytometry data (see Bendall et al. 2011, Supp. Fig. S2)
 
 data_notransform <- data
 
@@ -166,10 +168,10 @@ summary(data[, cols_to_scale])
 
 # save data files in TXT and FCS format
 
-write.table(data, file = "data/Nilsson_2013_HSC.txt", quote = FALSE, sep = "\t", row.names = FALSE)
-write.table(data_notransform, file = "data/Nilsson_2013_HSC_notransform.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data, file = "data/Nilsson_rare.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data_notransform, file = "data/Nilsson_rare_notransform.txt", quote = FALSE, sep = "\t", row.names = FALSE)
 
-flowCore::write.FCS(flowCore::flowFrame(data), filename = "data/Nilsson_2013_HSC.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_notransform), filename = "data/Nilsson_2013_HSC_notransform.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data), filename = "data/Nilsson_rare.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data_notransform), filename = "data/Nilsson_rare_notransform.fcs")
 
 

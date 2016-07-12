@@ -1,13 +1,13 @@
 #########################################################################################
-# R script to prepare benchmark data set Levine_2015_marrow_13
+# R script to prepare benchmark data set Levine_13dim
 # 
-# This data set is a 13-dimensional mass cytometry data set, consisting of expression
+# This is a 13-dimensional mass cytometry (CyTOF) data set, consisting of expression
 # levels of 13 surface marker proteins. Cluster labels are available for 24 manually
 # gated cell populations. Cells are healthy human bone marrow mononuclear cells (BMMCs),
 # from 1 individual.
 #
-# This R script pre-processes the data set and exports it in TXT and FCS formats, to make
-# it easier to use with clustering algorithms.
+# This R script pre-processes the data set, adds manually gated cell population labels, 
+# and exports it in .txt and .fcs formats.
 #
 # Source: "benchmark data set 1" in the following paper:
 # Levine et al. (2015), "Data-Driven Phenotypic Dissection of AML Reveals Progenitor-like
@@ -17,7 +17,7 @@
 # Link to data: https://www.cytobank.org/cytobank/experiments/46259 (download the FCS
 # files with Actions -> Export -> Download Files -> All FCS Files)
 # 
-# Lukas M. Weber, March 2016
+# Lukas Weber, July 2016
 #########################################################################################
 
 
@@ -38,7 +38,7 @@ library(magrittr)  # from CRAN
 # 13 surface markers (dimensions), 24 manually gated populations
 
 
-# read FCS filenames
+# FCS filenames
 # "unassigned" cells are those where cluster labels are unavailable
 
 files <- list.files("raw_data", pattern = "\\.fcs$", full.names = TRUE)
@@ -109,8 +109,8 @@ dim(data_unassigned)  # 85,297 unassigned cells
 ### ARCSINH TRANSFORM ###
 #########################
 
-# apply arcsinh transform
-# use standard scale factor of 5 for mass cytometry data
+# arcsinh transform
+# using scale factor 5 for CyTOF data (see Bendall et al. 2011, Supp. Fig. S2)
 
 data_notransform <- data
 data_notransform_unassigned <- data_unassigned
@@ -141,16 +141,16 @@ dim(data_combined_notransform)
 
 # export cell population names
 
-write.table(df_pop_names, file = "data/population_names_Levine_2015_marrow_13.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(df_pop_names, file = "data/population_names_Levine_13dim.txt", quote = FALSE, sep = "\t", row.names = FALSE)
 
 # save data files in TXT format
 
-write.table(data_combined, file = "data/Levine_2015_marrow_13.txt", quote = FALSE, sep = "\t", row.names = FALSE)
-write.table(data_combined_notransform, file = "data/Levine_2015_marrow_13_notransform.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data_combined, file = "data/Levine_13dim.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(data_combined_notransform, file = "data/Levine_13dim_notransform.txt", quote = FALSE, sep = "\t", row.names = FALSE)
 
 # save data files in FCS format
 
-flowCore::write.FCS(flowCore::flowFrame(data_combined), filename = "data/Levine_2015_marrow_13.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_combined_notransform), filename = "data/Levine_2015_marrow_13_notransform.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data_combined), filename = "data/Levine_13dim.fcs")
+flowCore::write.FCS(flowCore::flowFrame(data_combined_notransform), filename = "data/Levine_13dim_notransform.fcs")
 
 

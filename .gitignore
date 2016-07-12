@@ -8,19 +8,21 @@ C1omics_abstract/**
 drafts_slides_notes/**
 early_work/**
 gating_schemes/**
+ICML_extended_abstract/**
 paper/**
 parameters_spreadsheet/**
 plots/**
 plots_submission/**
-results_auto_n_clus/**
+poster_SIB_Days/**
+results_auto/**
 results_ensemble/**
-results_manual_n_clus/**
+results_manual/**
 results_range_k/**
 results_stability_analysis/**
 submission_files/**
 supplementary_info/**
 templates/**
-tex_file_from_Gosia/**
 tex_file_from_Charlotte/**
+tex_file_from_Gosia/**
 
 **/.RData
