@@ -194,7 +194,7 @@ sessionInfo()
 sink()
 
 # save R objects
-#save.image(file = "../results_auto/RData_files/results_FlowSOM_pre_meta.RData")
+save.image(file = "../results_auto/RData_files/results_FlowSOM_pre_meta.RData")
 
 
 
@@ -321,7 +321,7 @@ sessionInfo()
 sink()
 
 # save R objects
-#save.image(file = "../results_manual/RData_files/results_FlowSOM_pre_meta.RData")
+save.image(file = "../results_manual/RData_files/results_FlowSOM_pre_meta.RData")
 
 
 
@@ -428,7 +428,7 @@ sessionInfo()
 sink()
 
 # save R objects
-#save.image(file = "../results_auto/RData_files/results_FlowSOM.RData")
+save.image(file = "../results_auto/RData_files/results_FlowSOM.RData")
 
 
 
@@ -547,7 +547,7 @@ sessionInfo()
 sink()
 
 # save R objects
-#save.image(file = "../results_manual/RData_files/results_FlowSOM.RData")
+save.image(file = "../results_manual/RData_files/results_FlowSOM.RData")
 
 
 
