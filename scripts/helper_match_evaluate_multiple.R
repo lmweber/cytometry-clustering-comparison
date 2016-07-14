@@ -1,9 +1,10 @@
 #########################################################################################
-# Function to match cluster labels with manual gating (reference standard) population
-# labels, and calculate precision, recall, and F1 score
+# Function to match cluster labels with manual gating (reference standard) population 
+# labels and calculate precision, recall, and F1 score
 #
-# Matching criterion: Hungarian algorithm (see Samusik et al. 2016). This method is 
-# appropriate for data sets with multiple populations of interest.
+# Matching criterion: Hungarian algorithm (see Samusik et al. 2016)
+#
+# Use this function for data sets with multiple populations of interest
 #
 # Lukas Weber, July 2016
 #########################################################################################
@@ -16,7 +17,7 @@ library(clue)  # contains implementation of Hungarian algorithm
 # - clus_algorithm: cluster labels from algorithm
 # - clus_truth: true cluster labels
 # (for both arguments: length = number of cells; names = cluster labels (integers))
-helper_match_multiple_clusters_and_evaluate <- function(clus_algorithm, clus_truth) {
+helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
   
   # remove unassigned cells (NA's in clus_truth)
   unassigned <- is.na(clus_truth)
@@ -58,8 +59,7 @@ helper_match_multiple_clusters_and_evaluate <- function(clus_algorithm, clus_tru
   colnames(pr_mat) <- colnames(re_mat) <- colnames(F1_mat) <- names(tbl_truth)
   
   # match labels using Hungarian algorithm applied to matrix of F1 scores (Hungarian
-  # algorithm calculates an optimal one-to-one assignment, which is appropriate for data
-  # sets with multiple populations of interest)
+  # algorithm calculates an optimal one-to-one assignment)
   
   # note Hungarian algorithm assumes n_rows <= n_cols (transpose matrix)
   

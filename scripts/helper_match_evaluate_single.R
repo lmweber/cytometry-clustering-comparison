@@ -1,9 +1,10 @@
 #########################################################################################
 # Function to match cluster labels with manual gating (reference standard) population 
-# labels, and calculate precision, recall, and F1 score
+# labels and calculate precision, recall, and F1 score
 #
-# Matching criterion: maximum F1 score. This method is appropriate for data sets with a 
-# single (e.g. rare) population of interest.
+# Matching criterion: maximum F1 score
+#
+# Use this function for data sets with a single (e.g. rare) population of interest
 #
 # Lukas Weber, July 2016
 #########################################################################################
@@ -13,7 +14,7 @@
 # - clus_algorithm: cluster labels from algorithm
 # - clus_truth: true cluster labels (1 = rare cluster of interest, 0 = all others)
 # (for both arguments: length = number of cells; names = cluster labels (integers))
-helper_match_single_cluster_and_evaluate <- function(clus_algorithm, clus_truth) {
+helper_match_evaluate_single <- function(clus_algorithm, clus_truth) {
   
   tbl_algorithm <- table(clus_algorithm)
   tbl_truth <- table(clus_truth)
@@ -47,8 +48,7 @@ helper_match_single_cluster_and_evaluate <- function(clus_algorithm, clus_truth)
   rownames(pr_mat) <- rownames(re_mat) <- rownames(F1_mat) <- names(tbl_algorithm)
   colnames(pr_mat) <- colnames(re_mat) <- colnames(F1_mat) <- "1"  # one column only
   
-  # match labels using highest F1 score (note duplicates are allowed; this is appropriate
-  # when focusing on a single population of interest)
+  # match labels using highest F1 score (note duplicates are allowed)
   
   labels_matched <- apply(F1_mat, 2, which.max)
   

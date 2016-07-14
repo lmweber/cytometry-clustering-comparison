@@ -13,7 +13,7 @@ library(robustbase)
 # arguments:
 # - data: matrix of data (cells in rows, dimensions in columns)
 # - labels: cluster labels
-helper_calculate_cluster_medians <- function(data, labels) {
+helper_cluster_medians <- function(data, labels) {
   
   data <- as.data.frame(data)
   
