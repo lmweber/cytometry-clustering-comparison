@@ -162,9 +162,6 @@ sink(file = "../results_auto/session_info/session_info_flowMeans.txt")
 sessionInfo()
 sink()
 
-# save R objects
-save.image(file = "../results_auto/RData_files/results_flowMeans.RData")
-
 
 
 
@@ -269,9 +266,6 @@ write.table(runtimes, file = "../results_manual/runtimes/runtime_flowMeans.txt",
 sink(file = "../results_manual/session_info/session_info_flowMeans.txt")
 sessionInfo()
 sink()
-
-# save R objects
-save.image(file = "../results_manual/RData_files/results_flowMeans.RData")
 
 
 
