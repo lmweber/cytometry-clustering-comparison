@@ -1,7 +1,7 @@
 #########################################################################################
-# R script to run FlowSOM and FlowSOM_meta
+# R script to run FlowSOM_pre_meta and FlowSOM
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, July 2016
 #########################################################################################
 
 
@@ -10,546 +10,544 @@ library(FlowSOM)
 
 
 
+
 #################
 ### LOAD DATA ###
 #################
 
+# filenames
+
 DATA_DIR <- "../../benchmark_data_sets"
 
-file_Levine_32 <- file.path(DATA_DIR, "Levine_2015_marrow_32/data/Levine_2015_marrow_32.fcs")
-file_Levine_13 <- file.path(DATA_DIR, "Levine_2015_marrow_13/data/Levine_2015_marrow_13.fcs")
-file_Nilsson <- file.path(DATA_DIR, "Nilsson_2013_HSC/data/Nilsson_2013_HSC.fcs")
-file_Mosmann <- file.path(DATA_DIR, "Mosmann_2014_activ/data/Mosmann_2014_activ.fcs")
+files <- list(
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
+  FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
+  FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
+)
+
+# FlowCAP data sets are treated separately since they require clustering algorithms to be
+# run individually for each sample
+
+is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
 
 
 # FlowSOM requires input data as flowFrame objects
 
-data_Levine_32 <- flowCore::read.FCS(file_Levine_32, transformation = FALSE)
-data_Levine_13 <- flowCore::read.FCS(file_Levine_13, transformation = FALSE)
-data_Nilsson <- flowCore::read.FCS(file_Nilsson, transformation = FALSE)
-data_Mosmann <- flowCore::read.FCS(file_Mosmann, transformation = FALSE)
+data <- vector("list", length(files))
+names(data) <- names(files)
 
-head(data_Levine_32)
-head(data_Levine_13)
-head(data_Nilsson)
-head(data_Mosmann)
+for (i in 1:length(data)) {
+  f <- files[[i]]
+  
+  if (!is_FlowCAP[i]) {
+    data[[i]] <- flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE)
+    
+  } else {
+    smp <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+    smp <- smp[, "sample"]
+    d <- flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE)
+    data[[i]] <- split(d, smp)
+  }
+}
 
-dim(data_Levine_32)
-dim(data_Levine_13)
-dim(data_Nilsson)
-dim(data_Mosmann)
+head(data[[1]])
+head(data[[8]][[1]])
+
+sapply(data, length)
+
+sapply(data[!is_FlowCAP], dim)
+
+sapply(data[is_FlowCAP], function(d) {
+  sapply(d, function(d2) {
+    dim(d2)
+  })
+})
 
 
 # indices of protein marker columns
 
-marker_cols_Levine_32 <- 5:36
-marker_cols_Levine_13 <- 1:13
-marker_cols_Nilsson <- c(5:7, 9:18)
-marker_cols_Mosmann <- c(7:9, 11:21)
+marker_cols <- list(
+  Levine_32dim = 5:36, 
+  Levine_13dim = 1:13, 
+  Samusik_01   = 9:47, 
+  Samusik_all  = 9:47, 
+  Nilsson_rare = c(5:7, 9:18), 
+  Mosmann_rare = c(7:9, 11:21), 
+  FlowCAP_ND   = 3:12, 
+  FlowCAP_WNV  = 3:8
+)
 
-length(marker_cols_Levine_32)
-length(marker_cols_Levine_13)
-length(marker_cols_Nilsson)
-length(marker_cols_Mosmann)
-
-
-
-
-#################################################
-### Run FlowSOM: automatic number of clusters ###
-#################################################
-
-# run FlowSOM with default number of clusters for all data sets (10x10 grid or 100 clusters)
-
-set.seed(123)
-runtime_FlowSOM_Levine_32 <- system.time({
-  fSOM_Levine_32 <- FlowSOM::ReadInput(data_Levine_32, transform = FALSE, scale = FALSE)
-  fSOM_Levine_32 <- FlowSOM::BuildSOM(fSOM_Levine_32, colsToUse = marker_cols_Levine_32)
-  fSOM_Levine_32 <- FlowSOM::BuildMST(fSOM_Levine_32)
-})
+sapply(marker_cols, length)
 
 
-set.seed(123)
-runtime_FlowSOM_Levine_13 <- system.time({
-  fSOM_Levine_13 <- FlowSOM::ReadInput(data_Levine_13, transform = FALSE, scale = FALSE)
-  fSOM_Levine_13 <- FlowSOM::BuildSOM(fSOM_Levine_13, colsToUse = marker_cols_Levine_13)
-  fSOM_Levine_13 <- FlowSOM::BuildMST(fSOM_Levine_13)
-})
 
 
-set.seed(100)
-runtime_FlowSOM_Nilsson <- system.time({
-  fSOM_Nilsson <- FlowSOM::ReadInput(data_Nilsson, transform = FALSE, scale = FALSE)
-  fSOM_Nilsson <- FlowSOM::BuildSOM(fSOM_Nilsson, colsToUse = marker_cols_Nilsson)
-  fSOM_Nilsson <- FlowSOM::BuildMST(fSOM_Nilsson)
-})
+##########################################################
+### Run FlowSOM_pre_meta: automatic number of clusters ###
+##########################################################
 
+# run FlowSOM_pre_meta with default number of clusters for all data sets
 
-set.seed(123)
-runtime_FlowSOM_Mosmann <- system.time({
-  fSOM_Mosmann <- FlowSOM::ReadInput(data_Mosmann, transform = FALSE, scale = FALSE)
-  fSOM_Mosmann <- FlowSOM::BuildSOM(fSOM_Mosmann, colsToUse = marker_cols_Mosmann)
-  fSOM_Mosmann <- FlowSOM::BuildMST(fSOM_Mosmann)
-})
+# default is 10x10 grid, i.e. 100 clusters
 
+seed <- 1000
+out <- runtimes <- vector("list", length(data))
+names(out) <- names(runtimes) <- names(data)
 
-# plots
+for (i in 1:length(data)) {
+  
+  if (!is_FlowCAP[i]) {
+    set.seed(seed)
+    runtimes[[i]] <- system.time({
+      fSOM <- FlowSOM::ReadInput(data[[i]], transform = FALSE, scale = FALSE)
+      fSOM <- FlowSOM::BuildSOM(fSOM, colsToUse = marker_cols[[i]])
+      fSOM <- FlowSOM::BuildMST(fSOM)
+    })
+    out[[i]] <- fSOM
+    
+  } else {
+    # FlowCAP data sets: run clustering algorithm separately for each sample
+    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
+    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
+    
+    for (j in 1:length(data[[i]])) {
+      set.seed(seed)
+      runtimes[[i]][[j]] <- system.time({
+        fSOM <- FlowSOM::ReadInput(data[[i]][[j]], transform = FALSE, scale = FALSE)
+        fSOM <- FlowSOM::BuildSOM(fSOM, colsToUse = marker_cols[[i]])
+        fSOM <- FlowSOM::BuildMST(fSOM)
+      })
+      out[[i]][[j]] <- fSOM
+    }
+    
+    # FlowCAP data sets: sum runtimes over samples
+    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
+    runtimes_i <- colSums(runtimes_i)
+    names(runtimes_i) <- c("user", "system", "elapsed")
+    runtimes[[i]] <- runtimes_i
+  }
+}
 
-FlowSOM::PlotStars(fSOM_Levine_32)
-FlowSOM::PlotStars(fSOM_Levine_13)
-FlowSOM::PlotStars(fSOM_Nilsson)
-FlowSOM::PlotStars(fSOM_Mosmann)
+# store output and runtimes for meta-clustering step below
+out_pre_meta_auto <- out
+runtimes_pre_meta_auto <- runtimes
 
+# example of FlowSOM plots (one data set only)
+FlowSOM::PlotStars(out[[1]])
+
+# example showing how to extract cluster labels (one data set only)
+str(out[[1]]$map)
+head(out[[1]]$map$mapping)
+dim(out[[1]]$map$mapping)
 
 # extract cluster labels
+clus <- vector("list", length(data))
+names(clus) <- names(data)
 
-str(fSOM_Levine_32$map)
+for (i in 1:length(clus)) {
+  if (!is_FlowCAP[i]) {
+    clus[[i]] <- out[[i]]$map$mapping[, 1]
+    
+  } else {
+    # FlowCAP data sets
+    clus_list_i <- lapply(out[[i]], function(o) o$map$mapping[, 1])
+    
+    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
+    # e.g. sample 1, cluster 3 -> cluster label 1.3
+    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
+    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
+    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
+  }
+}
 
-head(fSOM_Levine_32$map$mapping)
-dim(fSOM_Levine_32$map$mapping)
-
-
-clus_FlowSOM_Levine_32 <- fSOM_Levine_32$map$mapping[, 1]
-clus_FlowSOM_Levine_13 <- fSOM_Levine_13$map$mapping[, 1]
-clus_FlowSOM_Nilsson <- fSOM_Nilsson$map$mapping[, 1]
-clus_FlowSOM_Mosmann <- fSOM_Mosmann$map$mapping[, 1]
-
-length(clus_FlowSOM_Levine_32)
-length(clus_FlowSOM_Levine_13)
-length(clus_FlowSOM_Nilsson)
-length(clus_FlowSOM_Mosmann)
-
+sapply(clus, length)
 
 # cluster sizes and number of clusters
-
-table(clus_FlowSOM_Levine_32)
-table(clus_FlowSOM_Levine_13)
-table(clus_FlowSOM_Nilsson)
-table(clus_FlowSOM_Mosmann)
-
-length(table(clus_FlowSOM_Levine_32))
-length(table(clus_FlowSOM_Levine_13))
-length(table(clus_FlowSOM_Nilsson))
-length(table(clus_FlowSOM_Mosmann))
-
+# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
+table(clus[[1]])
+sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
+files_labels <- paste0("../results_auto/FlowSOM_pre_meta/FlowSOM_pre_meta_labels_", 
+                       names(clus), ".txt")
 
-res_FlowSOM_Levine_32 <- data.frame(label = clus_FlowSOM_Levine_32)
-res_FlowSOM_Levine_13 <- data.frame(label = clus_FlowSOM_Levine_13)
-res_FlowSOM_Nilsson <- data.frame(label = clus_FlowSOM_Nilsson)
-res_FlowSOM_Mosmann <- data.frame(label = clus_FlowSOM_Mosmann)
+for (i in 1:length(files_labels)) {
+  res_i <- data.frame(label = clus[[i]])
+  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
 
-write.table(res_FlowSOM_Levine_32, 
-            file = "../results_auto/FlowSOM/FlowSOM_labels_Levine_2015_marrow_32.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_Levine_13, 
-            file = "../results_auto/FlowSOM/FlowSOM_labels_Levine_2015_marrow_13.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_Nilsson, 
-            file = "../results_auto/FlowSOM/FlowSOM_labels_Nilsson_2013_HSC.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_Mosmann, 
-            file = "../results_auto/FlowSOM/FlowSOM_labels_Mosmann_2014_activ.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
+# save runtimes
+runtimes <- lapply(runtimes, function(r) r["elapsed"])
+runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-
-# save runtime
-
-runtime_FlowSOM <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_FlowSOM_Levine_32["elapsed"], 
-  Levine_2015_marrow_13 = runtime_FlowSOM_Levine_13["elapsed"], 
-  Nilsson_2013_HSC = runtime_FlowSOM_Nilsson["elapsed"], 
-  Mosmann_2014_activ = runtime_FlowSOM_Mosmann["elapsed"], 
-  row.names = "runtime"))
-
-write.table(runtime_FlowSOM, file = "../results_auto/runtime/runtime_FlowSOM.txt", quote = FALSE, sep = "\t")
-
+write.table(runtimes, file = "../results_auto/runtime/runtime_FlowSOM_pre_meta.txt", 
+            quote = FALSE, sep = "\t")
 
 # save session information
+sink(file = "../results_auto/session_info/session_info_FlowSOM_pre_meta.txt")
+sessionInfo()
+sink()
 
+# save R objects
+#save.image(file = "../results_auto/RData_files/results_FlowSOM_pre_meta.RData")
+
+
+
+
+##################################################################
+### Run FlowSOM_pre_meta: manually selected number of clusters ###
+##################################################################
+
+# run FlowSOM_pre_meta with manually selected number of clusters
+
+# grid size 20x20 (400 clusters) for Mosmann_rare (data set with very rare population);
+# and grid size 10x10 (100 clusters, i.e. default) for all other data sets
+
+# grid sizes
+grid_size <- list(
+  Levine_32dim = 10, 
+  Levine_13dim = 10, 
+  Samusik_01   = 10, 
+  Samusik_all  = 10, 
+  Nilsson_rare = 10, 
+  Mosmann_rare = 20, 
+  FlowCAP_ND   = 10, 
+  FlowCAP_WNV  = 10
+)
+
+seed <- 1000
+out <- runtimes <- vector("list", length(data))
+names(out) <- names(runtimes) <- names(data)
+
+for (i in 1:length(data)) {
+  
+  if (!is_FlowCAP[i]) {
+    set.seed(seed)
+    runtimes[[i]] <- system.time({
+      fSOM <- FlowSOM::ReadInput(data[[i]], transform = FALSE, scale = FALSE)
+      fSOM <- FlowSOM::BuildSOM(fSOM, colsToUse = marker_cols[[i]], 
+                                xdim = grid_size[[i]], ydim = grid_size[[i]])
+      fSOM <- FlowSOM::BuildMST(fSOM)
+    })
+    out[[i]] <- fSOM
+    
+  } else {
+    # FlowCAP data sets: run clustering algorithm separately for each sample
+    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
+    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
+    
+    for (j in 1:length(data[[i]])) {
+      set.seed(seed)
+      runtimes[[i]][[j]] <- system.time({
+        fSOM <- FlowSOM::ReadInput(data[[i]][[j]], transform = FALSE, scale = FALSE)
+        fSOM <- FlowSOM::BuildSOM(fSOM, colsToUse = marker_cols[[i]], 
+                                  xdim = grid_size[[i]], ydim = grid_size[[i]])
+        fSOM <- FlowSOM::BuildMST(fSOM)
+      })
+      out[[i]][[j]] <- fSOM
+    }
+    
+    # FlowCAP data sets: sum runtimes over samples
+    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
+    runtimes_i <- colSums(runtimes_i)
+    names(runtimes_i) <- c("user", "system", "elapsed")
+    runtimes[[i]] <- runtimes_i
+  }
+}
+
+# store output and runtimes for meta-clustering step below
+out_pre_meta_manual <- out
+runtimes_pre_meta_manual <- runtimes
+
+# example of FlowSOM plots (one data set only)
+FlowSOM::PlotStars(out[[1]])
+
+# example showing how to extract cluster labels (one data set only)
+str(out[[1]]$map)
+head(out[[1]]$map$mapping)
+dim(out[[1]]$map$mapping)
+
+# extract cluster labels
+clus <- vector("list", length(data))
+names(clus) <- names(data)
+
+for (i in 1:length(clus)) {
+  if (!is_FlowCAP[i]) {
+    clus[[i]] <- out[[i]]$map$mapping[, 1]
+    
+  } else {
+    # FlowCAP data sets
+    clus_list_i <- lapply(out[[i]], function(o) o$map$mapping[, 1])
+    
+    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
+    # e.g. sample 1, cluster 3 -> cluster label 1.3
+    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
+    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
+    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
+  }
+}
+
+sapply(clus, length)
+
+# cluster sizes and number of clusters
+# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
+table(clus[[1]])
+sapply(clus, function(cl) length(table(cl)))
+
+# save cluster labels
+files_labels <- paste0("../results_manual/FlowSOM_pre_meta/FlowSOM_pre_meta_labels_", 
+                       names(clus), ".txt")
+
+for (i in 1:length(files_labels)) {
+  res_i <- data.frame(label = clus[[i]])
+  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
+
+# save runtimes
+runtimes <- lapply(runtimes, function(r) r["elapsed"])
+runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
+
+write.table(runtimes, file = "../results_manual/runtime/runtime_FlowSOM_pre_meta.txt", 
+            quote = FALSE, sep = "\t")
+
+# save session information
+sink(file = "../results_manual/session_info/session_info_FlowSOM_pre_meta.txt")
+sessionInfo()
+sink()
+
+# save R objects
+#save.image(file = "../results_manual/RData_files/results_FlowSOM_pre_meta.RData")
+
+
+
+
+###################################################################################
+### Run FlowSOM (additional meta-clustering step): automatic number of clusters ###
+###################################################################################
+
+# run FlowSOM (additional meta-clustering step) with automatic selection of number of clusters
+
+# using results from above (stored in object "out_pre_meta_auto")
+
+seed <- 1000
+out <- runtimes <- vector("list", length(out_pre_meta_auto))
+names(out) <- names(runtimes) <- names(out_pre_meta_auto)
+
+for (i in 1:length(out_pre_meta_auto)) {
+  if (!is_FlowCAP[i]) {
+    set.seed(seed)
+    runtimes[[i]] <- system.time({
+      meta <- FlowSOM::MetaClustering(out_pre_meta_auto[[i]]$map$codes, method = "metaClustering_consensus")
+    })
+    out[[i]] <- meta
+    
+  } else {
+    # FlowCAP data sets: run clustering algorithm separately for each sample
+    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
+    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
+    
+    for (j in 1:length(data[[i]])) {
+      set.seed(seed)
+      runtimes[[i]][[j]] <- system.time({
+        meta <- FlowSOM::MetaClustering(out_pre_meta_auto[[i]][[j]]$map$codes, method = "metaClustering_consensus")
+      })
+      out[[i]][[j]] <- meta
+    }
+    
+    # FlowCAP data sets: sum runtimes over samples
+    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
+    runtimes_i <- colSums(runtimes_i)
+    names(runtimes_i) <- c("user", "system", "elapsed")
+    runtimes[[i]] <- runtimes_i
+  }
+}
+
+# combine runtimes
+for (i in 1:length(runtimes)) {
+  runtimes[[i]] <- runtimes_pre_meta_auto[[i]] + runtimes[[i]]
+}
+
+# check cluster labels (one data set only)
+out[[1]]
+out[[8]][[1]]
+
+# extract cluster labels
+clus <- vector("list", length(data))
+names(clus) <- names(data)
+
+for (i in 1:length(clus)) {
+  if (!is_FlowCAP[i]) {
+    clus[[i]] <- out[[i]][out_pre_meta_auto[[i]]$map$mapping[, 1]]
+    
+  } else {
+    # FlowCAP data sets
+    clus_list_i <- vector("list", length(out_pre_meta_auto[[i]]))
+    names(clus_list_i) <- names(out_pre_meta_auto[[i]])
+    for (j in 1:length(clus_list_i)) {
+      clus_list_i[[j]] <- out[[i]][[j]][out_pre_meta_auto[[i]][[j]]$map$mapping[, 1]]
+    }
+    
+    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
+    # e.g. sample 1, cluster 3 -> cluster label 1.3
+    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
+    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
+    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
+  }
+}
+
+sapply(clus, length)
+
+# cluster sizes and number of clusters
+# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
+table(clus[[1]])
+sapply(clus, function(cl) length(table(cl)))
+
+# save cluster labels
+files_labels <- paste0("../results_auto/FlowSOM/FlowSOM_labels_", names(clus), ".txt")
+
+for (i in 1:length(files_labels)) {
+  res_i <- data.frame(label = clus[[i]])
+  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
+
+# save runtimes
+runtimes <- lapply(runtimes, function(r) r["elapsed"])
+runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
+
+write.table(runtimes, file = "../results_auto/runtime/runtime_FlowSOM.txt", 
+            quote = FALSE, sep = "\t")
+
+# save session information
 sink(file = "../results_auto/session_info/session_info_FlowSOM.txt")
 sessionInfo()
 sink()
 
-
 # save R objects
-
-save.image(file = "../results_auto/RData_files/results_FlowSOM.RData")
-
+#save.image(file = "../results_auto/RData_files/results_FlowSOM.RData")
 
 
 
-######################################################
-### Run FlowSOM_meta: automatic number of clusters ###
-######################################################
 
-# run metaclustering step (i.e. FlowSOM_meta) with automatic selection of number of clusters
+###########################################################################################
+### Run FlowSOM (additional meta-clustering step): manually selected number of clusters ###
+###########################################################################################
 
-set.seed(123)
-runtime_FlowSOM_meta_Levine_32_auto <- system.time({
-  meta_clustering_Levine_32_auto <- FlowSOM::MetaClustering(fSOM_Levine_32$map$codes, method = "metaClustering_consensus")
-})
+# run FlowSOM (additional meta-clustering step) with manually selected number of clusters
 
-set.seed(123)
-runtime_FlowSOM_meta_Levine_13_auto <- system.time({
-  meta_clustering_Levine_13_auto <- FlowSOM::MetaClustering(fSOM_Levine_13$map$codes, method = "metaClustering_consensus")
-})
+# using results from above (stored in object "out_pre_meta_manual")
 
-set.seed(100)
-runtime_FlowSOM_meta_Nilsson_auto <- system.time({
-  meta_clustering_Nilsson_auto <- FlowSOM::MetaClustering(fSOM_Nilsson$map$codes, method = "metaClustering_consensus")
-})
+# number of clusters k
+k <- list(
+  Levine_32dim = 40, 
+  Levine_13dim = 40, 
+  Samusik_01   = 40, 
+  Samusik_all  = 40, 
+  Nilsson_rare = 40, 
+  Mosmann_rare = 40, 
+  FlowCAP_ND   = 7, 
+  FlowCAP_WNV  = 4
+)
 
-set.seed(123)
-runtime_FlowSOM_meta_Mosmann_auto <- system.time({
-  meta_clustering_Mosmann_auto <- FlowSOM::MetaClustering(fSOM_Mosmann$map$codes, method = "metaClustering_consensus")
-})
+seed <- 1000
+out <- runtimes <- vector("list", length(out_pre_meta_manual))
+names(out) <- names(runtimes) <- names(out_pre_meta_manual)
 
+for (i in 1:length(out_pre_meta_manual)) {
+  if (!is_FlowCAP[i]) {
+    set.seed(seed)
+    runtimes[[i]] <- system.time({
+      meta <- FlowSOM::metaClustering_consensus(out_pre_meta_manual[[i]]$map$codes, k = k[[i]])
+    })
+    out[[i]] <- meta
+    
+  } else {
+    # FlowCAP data sets: run clustering algorithm separately for each sample
+    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
+    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
+    
+    for (j in 1:length(data[[i]])) {
+      set.seed(seed)
+      runtimes[[i]][[j]] <- system.time({
+        meta <- FlowSOM::metaClustering_consensus(out_pre_meta_manual[[i]][[j]]$map$codes, k = k[[i]])
+      })
+      out[[i]][[j]] <- meta
+    }
+    
+    # FlowCAP data sets: sum runtimes over samples
+    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
+    runtimes_i <- colSums(runtimes_i)
+    names(runtimes_i) <- c("user", "system", "elapsed")
+    runtimes[[i]] <- runtimes_i
+  }
+}
 
-# combine runtime
+# combine runtimes
+for (i in 1:length(runtimes)) {
+  runtimes[[i]] <- runtimes_pre_meta_manual[[i]] + runtimes[[i]]
+}
 
-runtime_FlowSOM_meta_Levine_32_auto <- runtime_FlowSOM_Levine_32 + runtime_FlowSOM_meta_Levine_32_auto
-runtime_FlowSOM_meta_Levine_13_auto <- runtime_FlowSOM_Levine_13 + runtime_FlowSOM_meta_Levine_13_auto
-runtime_FlowSOM_meta_Nilsson_auto <- runtime_FlowSOM_Nilsson + runtime_FlowSOM_meta_Nilsson_auto
-runtime_FlowSOM_meta_Mosmann_auto <- runtime_FlowSOM_Mosmann + runtime_FlowSOM_meta_Mosmann_auto
-
+# check cluster labels (one data set only)
+out[[1]]
+out[[8]][[1]]
 
 # extract cluster labels
+clus <- vector("list", length(data))
+names(clus) <- names(data)
 
-meta_clustering_Levine_32_auto
-meta_clustering_Levine_13_auto
-meta_clustering_Nilsson_auto
-meta_clustering_Mosmann_auto
+for (i in 1:length(clus)) {
+  if (!is_FlowCAP[i]) {
+    clus[[i]] <- out[[i]][out_pre_meta_manual[[i]]$map$mapping[, 1]]
+    
+  } else {
+    # FlowCAP data sets
+    clus_list_i <- vector("list", length(out_pre_meta_manual[[i]]))
+    names(clus_list_i) <- names(out_pre_meta_manual[[i]])
+    for (j in 1:length(clus_list_i)) {
+      clus_list_i[[j]] <- out[[i]][[j]][out_pre_meta_manual[[i]][[j]]$map$mapping[, 1]]
+    }
+    
+    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
+    # e.g. sample 1, cluster 3 -> cluster label 1.3
+    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
+    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
+    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
+  }
+}
 
-clus_FlowSOM_meta_Levine_32_auto <- meta_clustering_Levine_32_auto[fSOM_Levine_32$map$mapping[, 1]]
-clus_FlowSOM_meta_Levine_13_auto <- meta_clustering_Levine_13_auto[fSOM_Levine_13$map$mapping[, 1]]
-clus_FlowSOM_meta_Nilsson_auto <- meta_clustering_Nilsson_auto[fSOM_Nilsson$map$mapping[, 1]]
-clus_FlowSOM_meta_Mosmann_auto <- meta_clustering_Mosmann_auto[fSOM_Mosmann$map$mapping[, 1]]
-
-length(clus_FlowSOM_meta_Levine_32_auto)
-length(clus_FlowSOM_meta_Levine_13_auto)
-length(clus_FlowSOM_meta_Nilsson_auto)
-length(clus_FlowSOM_meta_Mosmann_auto)
-
+sapply(clus, length)
 
 # cluster sizes and number of clusters
-
-table(clus_FlowSOM_meta_Levine_32_auto)
-table(clus_FlowSOM_meta_Levine_13_auto)
-table(clus_FlowSOM_meta_Nilsson_auto)
-table(clus_FlowSOM_meta_Mosmann_auto)
-
-length(table(clus_FlowSOM_meta_Levine_32_auto))
-length(table(clus_FlowSOM_meta_Levine_13_auto))
-length(table(clus_FlowSOM_meta_Nilsson_auto))
-length(table(clus_FlowSOM_meta_Mosmann_auto))
-
+# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
+table(clus[[1]])
+sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
+files_labels <- paste0("../results_manual/FlowSOM/FlowSOM_labels_", names(clus), ".txt")
 
-res_FlowSOM_meta_Levine_32_auto <- data.frame(label = clus_FlowSOM_meta_Levine_32_auto)
-res_FlowSOM_meta_Levine_13_auto <- data.frame(label = clus_FlowSOM_meta_Levine_13_auto)
-res_FlowSOM_meta_Nilsson_auto <- data.frame(label = clus_FlowSOM_meta_Nilsson_auto)
-res_FlowSOM_meta_Mosmann_auto <- data.frame(label = clus_FlowSOM_meta_Mosmann_auto)
+for (i in 1:length(files_labels)) {
+  res_i <- data.frame(label = clus[[i]])
+  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
 
-write.table(res_FlowSOM_meta_Levine_32_auto, 
-            file = "../results_auto/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_32.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_meta_Levine_13_auto, 
-            file = "../results_auto/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_13.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_meta_Nilsson_auto, 
-            file = "../results_auto/FlowSOM_meta/FlowSOM_meta_labels_Nilsson_2013_HSC.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_meta_Mosmann_auto, 
-            file = "../results_auto/FlowSOM_meta/FlowSOM_meta_labels_Mosmann_2014_activ.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
+# save runtimes
+runtimes <- lapply(runtimes, function(r) r["elapsed"])
+runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-
-# save runtime
-
-runtime_FlowSOM_meta_auto <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_FlowSOM_meta_Levine_32_auto["elapsed"], 
-  Levine_2015_marrow_13 = runtime_FlowSOM_meta_Levine_13_auto["elapsed"], 
-  Nilsson_2013_HSC = runtime_FlowSOM_meta_Nilsson_auto["elapsed"], 
-  Mosmann_2014_activ = runtime_FlowSOM_meta_Mosmann_auto["elapsed"], 
-  row.names = "runtime"))
-
-write.table(runtime_FlowSOM_meta_auto, 
-            file = "../results_auto/runtime/runtime_FlowSOM_meta.txt", 
+write.table(runtimes, file = "../results_manual/runtime/runtime_FlowSOM.txt", 
             quote = FALSE, sep = "\t")
 
-
 # save session information
-
-sink(file = "../results_auto/session_info/session_info_FlowSOM_meta.txt")
-sessionInfo()
-sink()
-
-
-# save R objects
-
-save.image(file = "../results_auto/RData_files/results_FlowSOM_meta.RData")
-
-
-
-
-#########################################################
-### Run FlowSOM: manually selected number of clusters ###
-#########################################################
-
-# run FlowSOM with manually selected number of clusters (e.g. 10x10 or 20x20 grid)
-
-
-# grid size (e.g. 10x10 or 20x20 grid, i.e. 100 or 400 clusters)
-grid_Levine_32 <- 10
-grid_Levine_13 <- 10
-grid_Nilsson <- 10
-grid_Mosmann <- 20
-
-
-set.seed(123)
-runtime_FlowSOM_Levine_32 <- system.time({
-  fSOM_Levine_32 <- FlowSOM::ReadInput(data_Levine_32, transform = FALSE, scale = FALSE)
-  fSOM_Levine_32 <- FlowSOM::BuildSOM(fSOM_Levine_32, colsToUse = marker_cols_Levine_32, 
-                                      xdim = grid_Levine_32, ydim = grid_Levine_32)
-  fSOM_Levine_32 <- FlowSOM::BuildMST(fSOM_Levine_32)
-})
-
-
-set.seed(123)
-runtime_FlowSOM_Levine_13 <- system.time({
-  fSOM_Levine_13 <- FlowSOM::ReadInput(data_Levine_13, transform = FALSE, scale = FALSE)
-  fSOM_Levine_13 <- FlowSOM::BuildSOM(fSOM_Levine_13, colsToUse = marker_cols_Levine_13, 
-                                      xdim = grid_Levine_13, ydim = grid_Levine_13)
-  fSOM_Levine_13 <- FlowSOM::BuildMST(fSOM_Levine_13)
-})
-
-
-set.seed(100)
-runtime_FlowSOM_Nilsson <- system.time({
-  fSOM_Nilsson <- FlowSOM::ReadInput(data_Nilsson, transform = FALSE, scale = FALSE)
-  fSOM_Nilsson <- FlowSOM::BuildSOM(fSOM_Nilsson, colsToUse = marker_cols_Nilsson, 
-                                    xdim = grid_Nilsson, ydim = grid_Nilsson)
-  fSOM_Nilsson <- FlowSOM::BuildMST(fSOM_Nilsson)
-})
-
-
-set.seed(123)
-runtime_FlowSOM_Mosmann <- system.time({
-  fSOM_Mosmann <- FlowSOM::ReadInput(data_Mosmann, transform = FALSE, scale = FALSE)
-  fSOM_Mosmann <- FlowSOM::BuildSOM(fSOM_Mosmann, colsToUse = marker_cols_Mosmann, 
-                                    xdim = grid_Mosmann, ydim = grid_Mosmann)
-  fSOM_Mosmann <- FlowSOM::BuildMST(fSOM_Mosmann)
-})
-
-
-# plots
-
-FlowSOM::PlotStars(fSOM_Levine_32)
-FlowSOM::PlotStars(fSOM_Levine_13)
-FlowSOM::PlotStars(fSOM_Nilsson)
-FlowSOM::PlotStars(fSOM_Mosmann)
-
-
-# extract cluster labels
-
-str(fSOM_Levine_32$map)
-
-head(fSOM_Levine_32$map$mapping)
-dim(fSOM_Levine_32$map$mapping)
-
-
-clus_FlowSOM_Levine_32 <- fSOM_Levine_32$map$mapping[, 1]
-clus_FlowSOM_Levine_13 <- fSOM_Levine_13$map$mapping[, 1]
-clus_FlowSOM_Nilsson <- fSOM_Nilsson$map$mapping[, 1]
-clus_FlowSOM_Mosmann <- fSOM_Mosmann$map$mapping[, 1]
-
-length(clus_FlowSOM_Levine_32)
-length(clus_FlowSOM_Levine_13)
-length(clus_FlowSOM_Nilsson)
-length(clus_FlowSOM_Mosmann)
-
-
-# cluster sizes and number of clusters
-
-table(clus_FlowSOM_Levine_32)
-table(clus_FlowSOM_Levine_13)
-table(clus_FlowSOM_Nilsson)
-table(clus_FlowSOM_Mosmann)
-
-length(table(clus_FlowSOM_Levine_32))
-length(table(clus_FlowSOM_Levine_13))
-length(table(clus_FlowSOM_Nilsson))
-length(table(clus_FlowSOM_Mosmann))
-
-
-# save cluster labels
-
-res_FlowSOM_Levine_32 <- data.frame(label = clus_FlowSOM_Levine_32)
-res_FlowSOM_Levine_13 <- data.frame(label = clus_FlowSOM_Levine_13)
-res_FlowSOM_Nilsson <- data.frame(label = clus_FlowSOM_Nilsson)
-res_FlowSOM_Mosmann <- data.frame(label = clus_FlowSOM_Mosmann)
-
-write.table(res_FlowSOM_Levine_32, 
-            file = "../results_manual/FlowSOM/FlowSOM_labels_Levine_2015_marrow_32.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_Levine_13, 
-            file = "../results_manual/FlowSOM/FlowSOM_labels_Levine_2015_marrow_13.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_Nilsson, 
-            file = "../results_manual/FlowSOM/FlowSOM_labels_Nilsson_2013_HSC.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_Mosmann, 
-            file = "../results_manual/FlowSOM/FlowSOM_labels_Mosmann_2014_activ.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-
-
-# save runtime
-
-runtime_FlowSOM <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_FlowSOM_Levine_32["elapsed"], 
-  Levine_2015_marrow_13 = runtime_FlowSOM_Levine_13["elapsed"], 
-  Nilsson_2013_HSC = runtime_FlowSOM_Nilsson["elapsed"], 
-  Mosmann_2014_activ = runtime_FlowSOM_Mosmann["elapsed"], 
-  row.names = "runtime"))
-
-write.table(runtime_FlowSOM, file = "../results_manual/runtime/runtime_FlowSOM.txt", quote = FALSE, sep = "\t")
-
-
-# save session information
-
 sink(file = "../results_manual/session_info/session_info_FlowSOM.txt")
 sessionInfo()
 sink()
 
-
 # save R objects
+#save.image(file = "../results_manual/RData_files/results_FlowSOM.RData")
 
-save.image(file = "../results_manual/RData_files/results_FlowSOM.RData")
-
-
-
-
-##############################################################
-### Run FlowSOM_meta: manually selected number of clusters ###
-##############################################################
-
-# run metaclustering step (i.e. FlowSOM_meta) with manual selection of number of clusters
-
-
-# number of clusters
-k_Levine_32 <- 40
-k_Levine_13 <- 40
-k_Nilsson <- 40
-k_Mosmann <- 40
-
-
-set.seed(123)
-runtime_FlowSOM_meta_Levine_32_manual <- system.time({
-  meta_clustering_Levine_32_manual <- FlowSOM::metaClustering_consensus(fSOM_Levine_32$map$codes, k = k_Levine_32)
-})
-
-set.seed(123)
-runtime_FlowSOM_meta_Levine_13_manual <- system.time({
-  meta_clustering_Levine_13_manual <- FlowSOM::metaClustering_consensus(fSOM_Levine_13$map$codes, k = k_Levine_13)
-})
-
-set.seed(100)
-runtime_FlowSOM_meta_Nilsson_manual <- system.time({
-  meta_clustering_Nilsson_manual <- FlowSOM::metaClustering_consensus(fSOM_Nilsson$map$codes, k = k_Nilsson)
-})
-
-set.seed(123)
-runtime_FlowSOM_meta_Mosmann_manual <- system.time({
-  meta_clustering_Mosmann_manual <- FlowSOM::metaClustering_consensus(fSOM_Mosmann$map$codes, k = k_Mosmann)
-})
-
-
-# combine runtime
-
-runtime_FlowSOM_meta_Levine_32_manual <- runtime_FlowSOM_Levine_32 + runtime_FlowSOM_meta_Levine_32_manual
-runtime_FlowSOM_meta_Levine_13_manual <- runtime_FlowSOM_Levine_13 + runtime_FlowSOM_meta_Levine_13_manual
-runtime_FlowSOM_meta_Nilsson_manual <- runtime_FlowSOM_Nilsson + runtime_FlowSOM_meta_Nilsson_manual
-runtime_FlowSOM_meta_Mosmann_manual <- runtime_FlowSOM_Mosmann + runtime_FlowSOM_meta_Mosmann_manual
-
-
-# extract cluster labels
-
-meta_clustering_Levine_32_manual
-meta_clustering_Levine_13_manual
-meta_clustering_Nilsson_manual
-meta_clustering_Mosmann_manual
-
-clus_FlowSOM_meta_Levine_32_manual <- meta_clustering_Levine_32_manual[fSOM_Levine_32$map$mapping[, 1]]
-clus_FlowSOM_meta_Levine_13_manual <- meta_clustering_Levine_13_manual[fSOM_Levine_13$map$mapping[, 1]]
-clus_FlowSOM_meta_Nilsson_manual <- meta_clustering_Nilsson_manual[fSOM_Nilsson$map$mapping[, 1]]
-clus_FlowSOM_meta_Mosmann_manual <- meta_clustering_Mosmann_manual[fSOM_Mosmann$map$mapping[, 1]]
-
-length(clus_FlowSOM_meta_Levine_32_manual)
-length(clus_FlowSOM_meta_Levine_13_manual)
-length(clus_FlowSOM_meta_Nilsson_manual)
-length(clus_FlowSOM_meta_Mosmann_manual)
-
-
-# cluster sizes and number of clusters
-
-table(clus_FlowSOM_meta_Levine_32_manual)
-table(clus_FlowSOM_meta_Levine_13_manual)
-table(clus_FlowSOM_meta_Nilsson_manual)
-table(clus_FlowSOM_meta_Mosmann_manual)
-
-length(table(clus_FlowSOM_meta_Levine_32_manual))
-length(table(clus_FlowSOM_meta_Levine_13_manual))
-length(table(clus_FlowSOM_meta_Nilsson_manual))
-length(table(clus_FlowSOM_meta_Mosmann_manual))
-
-
-# save cluster labels
-
-res_FlowSOM_meta_Levine_32_manual <- data.frame(label = clus_FlowSOM_meta_Levine_32_manual)
-res_FlowSOM_meta_Levine_13_manual <- data.frame(label = clus_FlowSOM_meta_Levine_13_manual)
-res_FlowSOM_meta_Nilsson_manual <- data.frame(label = clus_FlowSOM_meta_Nilsson_manual)
-res_FlowSOM_meta_Mosmann_manual <- data.frame(label = clus_FlowSOM_meta_Mosmann_manual)
-
-write.table(res_FlowSOM_meta_Levine_32_manual, 
-            file = "../results_manual/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_32.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_meta_Levine_13_manual, 
-            file = "../results_manual/FlowSOM_meta/FlowSOM_meta_labels_Levine_2015_marrow_13.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_meta_Nilsson_manual, 
-            file = "../results_manual/FlowSOM_meta/FlowSOM_meta_labels_Nilsson_2013_HSC.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_FlowSOM_meta_Mosmann_manual, 
-            file = "../results_manual/FlowSOM_meta/FlowSOM_meta_labels_Mosmann_2014_activ.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-
-
-# save runtime
-
-runtime_FlowSOM_meta_manual <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_FlowSOM_meta_Levine_32_manual["elapsed"], 
-  Levine_2015_marrow_13 = runtime_FlowSOM_meta_Levine_13_manual["elapsed"], 
-  Nilsson_2013_HSC = runtime_FlowSOM_meta_Nilsson_manual["elapsed"], 
-  Mosmann_2014_activ = runtime_FlowSOM_meta_Mosmann_manual["elapsed"], 
-  row.names = "runtime"))
-
-write.table(runtime_FlowSOM_meta_manual, 
-            file = "../results_manual/runtime/runtime_FlowSOM_meta.txt", 
-            quote = FALSE, sep = "\t")
-
-
-# save session information
-
-sink(file = "../results_manual/session_info/session_info_FlowSOM_meta.txt")
-sessionInfo()
-sink()
-
-
-# save R objects
-
-save.image(file = "../results_manual/RData_files/results_FlowSOM_meta.RData")
 
 
