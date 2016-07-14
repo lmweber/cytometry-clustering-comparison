@@ -3,12 +3,11 @@
 # labels and calculate precision, recall, and F1 score; for FlowCAP data sets
 #
 # Matching criterion: maximum F1 score
-# Averages across populations: unweighted
+# Averages across populations: weighted by number of cells in true population
 #
-# Use this function for FlowCAP-I data sets. Using max F1 score since Hungarian algorithm
-# requires no. of clusters >= no. of true populations, which is not always the case for 
-# the FlowCAP data sets. Results are averaged across populations for each sample, and
-# returned individually by sample.
+# Alternative function for FlowCAP-I data sets. Using same methodology as in FlowCAP 
+# paper (Aghaeepour et al. 2013), i.e. max F1 score and weighting. Results are averaged 
+# across populations for each sample, and returned individually by sample.
 #
 # Lukas Weber, July 2016
 #########################################################################################
@@ -18,7 +17,7 @@
 # - clus_algorithm: cluster labels from algorithm
 # - clus_truth: true cluster labels
 # (for both arguments: length = number of cells; names = cluster labels (integers))
-helper_match_evaluate_FlowCAP <- function(clus_algorithm, clus_truth) {
+helper_match_evaluate_FlowCAP_alt <- function(clus_algorithm, clus_truth) {
   
   # split cluster labels by sample
   
@@ -96,15 +95,19 @@ helper_match_evaluate_FlowCAP <- function(clus_algorithm, clus_truth) {
       n_cells_matched[i] <- sum(clus_algorithm == labels_matched[i], na.rm = TRUE)
     }
     
+    # keep tbl_truth for calculating weighted means
     res[[z]] <- list(pr = pr, re = re, F1 = F1, 
-                     labels_matched = labels_matched, n_cells_matched = n_cells_matched)
+                     labels_matched = labels_matched, n_cells_matched = n_cells_matched, 
+                     tbl_truth = tbl_truth)
   }
   
   # calculate mean precision, recall, F1 (across populations; return for each sample)
   
-  mean_pr <- sapply(res, function(s) mean(s$pr))
-  mean_re <- sapply(res, function(s) mean(s$re))
-  mean_F1 <- sapply(res, function(s) mean(s$F1))
+  # with weighting by true population size
+  
+  mean_pr <- sapply(res, function(s) sum(s$pr * as.numeric(s$tbl_truth)) / sum(as.numeric(s$tbl_truth)))
+  mean_re <- sapply(res, function(s) sum(s$re * as.numeric(s$tbl_truth)) / sum(as.numeric(s$tbl_truth)))
+  mean_F1 <- sapply(res, function(s) sum(s$F1 * as.numeric(s$tbl_truth)) / sum(as.numeric(s$tbl_truth)))
   
   return(list(mean_pr = mean_pr, mean_re = mean_re, mean_F1 = mean_F1))
 }
