@@ -36,7 +36,7 @@ files <- list(
 is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
 
 
-# FlowSOM requires input data as flowFrame objects
+# load data files: FlowSOM requires input data as flowFrame objects
 
 data <- vector("list", length(files))
 names(data) <- names(files)
@@ -158,7 +158,7 @@ for (i in 1:length(clus)) {
     clus_list_i <- lapply(out[[i]], function(o) o$map$mapping[, 1])
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
-    # e.g. sample 1, cluster 3 -> cluster label 1.3
+    # e.g. sample 1, cluster 3 -> cluster label 1_3
     names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
     clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
     clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
@@ -185,7 +185,7 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_auto/runtime/runtime_FlowSOM_pre_meta.txt", 
+write.table(runtimes, file = "../results_auto/runtimes/runtime_FlowSOM_pre_meta.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
@@ -312,7 +312,7 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_manual/runtime/runtime_FlowSOM_pre_meta.txt", 
+write.table(runtimes, file = "../results_manual/runtimes/runtime_FlowSOM_pre_meta.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
@@ -419,7 +419,7 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_auto/runtime/runtime_FlowSOM.txt", 
+write.table(runtimes, file = "../results_auto/runtimes/runtime_FlowSOM.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
@@ -538,7 +538,7 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_manual/runtime/runtime_FlowSOM.txt", 
+write.table(runtimes, file = "../results_manual/runtimes/runtime_FlowSOM.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
