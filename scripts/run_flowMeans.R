@@ -38,12 +38,35 @@ is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
 
 # load data files
 
-data <- lapply(files, function(f) {
-  flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
-})
+data <- vector("list", length(files))
+names(data) <- names(files)
+
+for (i in 1:length(data)) {
+  f <- files[[i]]
+  
+  if (!is_FlowCAP[i]) {
+    data[[i]] <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+    
+  } else {
+    smp <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+    smp <- smp[, "sample"]
+    d <- flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE)
+    d <- flowCore::split(d, smp)
+    data[[i]] <- lapply(d, function(s) flowCore::exprs(s))
+  }
+}
 
 head(data[[1]])
-sapply(data, dim)
+head(data[[8]][[1]])
+
+sapply(data, length)
+
+sapply(data[!is_FlowCAP], dim)
+sapply(data[is_FlowCAP], function(d) {
+  sapply(d, function(d2) {
+    dim(d2)
+  })
+})
 
 
 # indices of protein marker columns
@@ -58,17 +81,27 @@ marker_cols <- list(
   FlowCAP_ND   = 3:12, 
   FlowCAP_WNV  = 3:8
 )
-
 sapply(marker_cols, length)
 
 
 # subset data: protein marker columns only
 
 for (i in 1:length(data)) {
-  data[[i]] <- data[[i]][, marker_cols[[i]]]
+  if (!is_FlowCAP[i]) {
+    data[[i]] <- data[[i]][, marker_cols[[i]]]
+  } else {
+    for (j in 1:length(data[[i]])) {
+      data[[i]][[j]] <- data[[i]][[j]][, marker_cols[[i]]]
+    }
+  }
 }
 
-sapply(data, dim)
+sapply(data[!is_FlowCAP], dim)
+sapply(data[is_FlowCAP], function(d) {
+  sapply(d, function(d2) {
+    dim(d2)
+  })
+})
 
 
 
@@ -125,7 +158,7 @@ for (i in 1:length(clus)) {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
-      clus[[i]][[j]] <- out[[i]][[j]]@Label
+      clus_list_i[[j]] <- out[[i]][[j]]@Label
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
@@ -161,7 +194,7 @@ write.table(runtimes, file = "../results_auto/runtimes/runtime_flowMeans.txt",
 
 # save session information
 sink(file = "../results_auto/session_info/session_info_flowMeans.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
 cat("flowMeans automatic : all runs complete\n")
@@ -270,7 +303,7 @@ write.table(runtimes, file = "../results_manual/runtimes/runtime_flowMeans.txt",
 
 # save session information
 sink(file = "../results_manual/session_info/session_info_flowMeans.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
 cat("flowMeans manual : all runs complete\n")

@@ -36,7 +36,7 @@ files <- list(
 is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
 
 
-# load data files: FlowSOM requires input data as flowFrame objects
+# load data files: FlowSOM requires flowFrame objects
 
 data <- vector("list", length(files))
 names(data) <- names(files)
@@ -51,7 +51,7 @@ for (i in 1:length(data)) {
     smp <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
     smp <- smp[, "sample"]
     d <- flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE)
-    data[[i]] <- split(d, smp)
+    data[[i]] <- flowCore::split(d, smp)
   }
 }
 
@@ -61,7 +61,6 @@ head(data[[8]][[1]])
 sapply(data, length)
 
 sapply(data[!is_FlowCAP], dim)
-
 sapply(data[is_FlowCAP], function(d) {
   sapply(d, function(d2) {
     dim(d2)
@@ -81,7 +80,6 @@ marker_cols <- list(
   FlowCAP_ND   = 3:12, 
   FlowCAP_WNV  = 3:8
 )
-
 sapply(marker_cols, length)
 
 
@@ -192,7 +190,7 @@ write.table(runtimes, file = "../results_auto/runtimes/runtime_FlowSOM_pre_meta.
 
 # save session information
 sink(file = "../results_auto/session_info/session_info_FlowSOM_pre_meta.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
 cat("FlowSOM_pre_meta automatic : all runs complete\n")
@@ -320,7 +318,7 @@ write.table(runtimes, file = "../results_manual/runtimes/runtime_FlowSOM_pre_met
 
 # save session information
 sink(file = "../results_manual/session_info/session_info_FlowSOM_pre_meta.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
 cat("FlowSOM_pre_meta manual : all runs complete\n")
@@ -428,7 +426,7 @@ write.table(runtimes, file = "../results_auto/runtimes/runtime_FlowSOM.txt",
 
 # save session information
 sink(file = "../results_auto/session_info/session_info_FlowSOM.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
 cat("FlowSOM automatic : all runs complete\n")
@@ -548,7 +546,7 @@ write.table(runtimes, file = "../results_manual/runtimes/runtime_FlowSOM.txt",
 
 # save session information
 sink(file = "../results_manual/session_info/session_info_FlowSOM.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
 cat("FlowSOM manual : all runs complete\n")
