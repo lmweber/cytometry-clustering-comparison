@@ -164,7 +164,7 @@ sink(file = "../results_auto/session_info/session_info_flowMeans.txt")
 sessionInfo()
 sink()
 
-cat("flowMeans automatic: all runs complete\n")
+cat("flowMeans automatic : all runs complete\n")
 
 
 
@@ -273,7 +273,7 @@ sink(file = "../results_manual/session_info/session_info_flowMeans.txt")
 sessionInfo()
 sink()
 
-cat("flowMeans manual: all runs complete\n")
+cat("flowMeans manual : all runs complete\n")
 
 
 

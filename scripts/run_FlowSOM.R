@@ -195,7 +195,7 @@ sink(file = "../results_auto/session_info/session_info_FlowSOM_pre_meta.txt")
 sessionInfo()
 sink()
 
-cat("FlowSOM_pre_meta automatic: all runs complete\n")
+cat("FlowSOM_pre_meta automatic : all runs complete\n")
 
 
 
@@ -323,7 +323,7 @@ sink(file = "../results_manual/session_info/session_info_FlowSOM_pre_meta.txt")
 sessionInfo()
 sink()
 
-cat("FlowSOM_pre_meta manual: all runs complete\n")
+cat("FlowSOM_pre_meta manual : all runs complete\n")
 
 
 
@@ -431,7 +431,7 @@ sink(file = "../results_auto/session_info/session_info_FlowSOM.txt")
 sessionInfo()
 sink()
 
-cat("FlowSOM automatic: all runs complete\n")
+cat("FlowSOM automatic : all runs complete\n")
 
 
 
@@ -551,7 +551,7 @@ sink(file = "../results_manual/session_info/session_info_FlowSOM.txt")
 sessionInfo()
 sink()
 
-cat("FlowSOM manual: all runs complete\n")
+cat("FlowSOM manual : all runs complete\n")
 
 
 
