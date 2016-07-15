@@ -90,6 +90,7 @@ for (i in 1:length(data)) {
     runtimes[[i]] <- system.time({
       out[[i]] <- flowMeans(data[[i]], Standardize = FALSE)
     })
+    cat("data set", names(data[i]), ": run complete\n")
     
   } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
@@ -102,6 +103,7 @@ for (i in 1:length(data)) {
         out[[i]][[j]] <- flowMeans(data[[i]][[j]], Standardize = FALSE)
       })
     }
+    cat("data set", names(data[i]), ": run complete\n")
     
     # FlowCAP data sets: sum runtimes over samples
     runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
@@ -162,6 +164,8 @@ sink(file = "../results_auto/session_info/session_info_flowMeans.txt")
 sessionInfo()
 sink()
 
+cat("flowMeans automatic: all runs complete\n")
+
 
 
 
@@ -195,6 +199,7 @@ for (i in 1:length(data)) {
     runtimes[[i]] <- system.time({
       out[[i]] <- flowMeans(data[[i]], Standardize = FALSE, NumC = k[[i]])
     })
+    cat("data set", names(data[i]), ": run complete\n")
     
   } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
@@ -207,6 +212,7 @@ for (i in 1:length(data)) {
         out[[i]][[j]] <- flowMeans(data[[i]][[j]], Standardize = FALSE, NumC = k[[i]])
       })
     }
+    cat("data set", names(data[i]), ": run complete\n")
     
     # FlowCAP data sets: sum runtimes over samples
     runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
@@ -266,6 +272,8 @@ write.table(runtimes, file = "../results_manual/runtimes/runtime_flowMeans.txt",
 sink(file = "../results_manual/session_info/session_info_flowMeans.txt")
 sessionInfo()
 sink()
+
+cat("flowMeans manual: all runs complete\n")
 
 
 

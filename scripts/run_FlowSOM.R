@@ -109,6 +109,7 @@ for (i in 1:length(data)) {
       fSOM <- FlowSOM::BuildMST(fSOM)
     })
     out[[i]] <- fSOM
+    cat("data set", names(data[i]), ": run complete\n")
     
   } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
@@ -124,6 +125,7 @@ for (i in 1:length(data)) {
       })
       out[[i]][[j]] <- fSOM
     }
+    cat("data set", names(data[i]), ": run complete\n")
     
     # FlowCAP data sets: sum runtimes over samples
     runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
@@ -193,6 +195,8 @@ sink(file = "../results_auto/session_info/session_info_FlowSOM_pre_meta.txt")
 sessionInfo()
 sink()
 
+cat("FlowSOM_pre_meta automatic: all runs complete\n")
+
 
 
 
@@ -232,6 +236,7 @@ for (i in 1:length(data)) {
       fSOM <- FlowSOM::BuildMST(fSOM)
     })
     out[[i]] <- fSOM
+    cat("data set", names(data[i]), ": run complete\n")
     
   } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
@@ -248,6 +253,7 @@ for (i in 1:length(data)) {
       })
       out[[i]][[j]] <- fSOM
     }
+    cat("data set", names(data[i]), ": run complete\n")
     
     # FlowCAP data sets: sum runtimes over samples
     runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
@@ -317,6 +323,8 @@ sink(file = "../results_manual/session_info/session_info_FlowSOM_pre_meta.txt")
 sessionInfo()
 sink()
 
+cat("FlowSOM_pre_meta manual: all runs complete\n")
+
 
 
 
@@ -339,6 +347,7 @@ for (i in 1:length(out_pre_meta_auto)) {
       meta <- FlowSOM::MetaClustering(out_pre_meta_auto[[i]]$map$codes, method = "metaClustering_consensus")
     })
     out[[i]] <- meta
+    cat("data set", names(data[i]), ": run complete\n")
     
   } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
@@ -352,6 +361,7 @@ for (i in 1:length(out_pre_meta_auto)) {
       })
       out[[i]][[j]] <- meta
     }
+    cat("data set", names(data[i]), ": run complete\n")
     
     # FlowCAP data sets: sum runtimes over samples
     runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
@@ -421,6 +431,8 @@ sink(file = "../results_auto/session_info/session_info_FlowSOM.txt")
 sessionInfo()
 sink()
 
+cat("FlowSOM automatic: all runs complete\n")
+
 
 
 
@@ -455,6 +467,7 @@ for (i in 1:length(out_pre_meta_manual)) {
       meta <- FlowSOM::metaClustering_consensus(out_pre_meta_manual[[i]]$map$codes, k = k[[i]])
     })
     out[[i]] <- meta
+    cat("data set", names(data[i]), ": run complete\n")
     
   } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
@@ -468,6 +481,7 @@ for (i in 1:length(out_pre_meta_manual)) {
       })
       out[[i]][[j]] <- meta
     }
+    cat("data set", names(data[i]), ": run complete\n")
     
     # FlowCAP data sets: sum runtimes over samples
     runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
@@ -536,6 +550,8 @@ write.table(runtimes, file = "../results_manual/runtimes/runtime_FlowSOM.txt",
 sink(file = "../results_manual/session_info/session_info_FlowSOM.txt")
 sessionInfo()
 sink()
+
+cat("FlowSOM manual: all runs complete\n")
 
 
 
