@@ -112,6 +112,18 @@ sapply(data[is_FlowCAP], function(d) {
 
 # run flowMeans with automatic selection of number of clusters
 
+# standardization (FlowCAP data sets give error unless TRUE)
+standardize <- list(
+  Levine_32dim = FALSE, 
+  Levine_13dim = FALSE, 
+  Samusik_01   = FALSE, 
+  Samusik_all  = FALSE, 
+  Nilsson_rare = FALSE, 
+  Mosmann_rare = FALSE, 
+  FlowCAP_ND   = TRUE, 
+  FlowCAP_WNV  = TRUE
+)
+
 seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
@@ -121,7 +133,7 @@ for (i in 1:length(data)) {
   if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
-      out[[i]] <- flowMeans(data[[i]], Standardize = FALSE)
+      out[[i]] <- flowMeans(data[[i]], Standardize = standardize[[i]])
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -133,7 +145,7 @@ for (i in 1:length(data)) {
     for (j in 1:length(data[[i]])) {
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- flowMeans(data[[i]][[j]], Standardize = FALSE)
+        out[[i]][[j]] <- flowMeans(data[[i]][[j]], Standardize = standardize[[i]])
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
@@ -208,7 +220,6 @@ cat("flowMeans automatic : all runs complete\n")
 
 # run flowMeans with manual selection of number of clusters
 
-
 # number of clusters k
 k <- list(
   Levine_32dim = 40, 
@@ -221,6 +232,18 @@ k <- list(
   FlowCAP_WNV  = 4
 )
 
+# standardization (FlowCAP data sets give error unless TRUE)
+standardize <- list(
+  Levine_32dim = FALSE, 
+  Levine_13dim = FALSE, 
+  Samusik_01   = FALSE, 
+  Samusik_all  = FALSE, 
+  Nilsson_rare = FALSE, 
+  Mosmann_rare = FALSE, 
+  FlowCAP_ND   = TRUE, 
+  FlowCAP_WNV  = TRUE
+)
+
 seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
@@ -230,7 +253,7 @@ for (i in 1:length(data)) {
   if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
-      out[[i]] <- flowMeans(data[[i]], Standardize = FALSE, NumC = k[[i]])
+      out[[i]] <- flowMeans(data[[i]], Standardize = standardize[[i]], NumC = k[[i]])
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -242,7 +265,7 @@ for (i in 1:length(data)) {
     for (j in 1:length(data[[i]])) {
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- flowMeans(data[[i]][[j]], Standardize = FALSE, NumC = k[[i]])
+        out[[i]][[j]] <- flowMeans(data[[i]][[j]], Standardize = standardize[[i]], NumC = k[[i]])
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
