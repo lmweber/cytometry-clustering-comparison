@@ -123,7 +123,6 @@ sapply(data[is_FlowCAP], function(d) {
 
 setwd("../../algorithms/FLOCK")
 
-
 # run FLOCK with automatic selection of number of clusters (manual selection is not available)
 
 out <- runtimes <- vector("list", length(data))
@@ -200,6 +199,9 @@ sapply(clus, length)
 # (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
 table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
+
+# return to scripts directory
+setwd("../../clustering_comparison_paper/scripts")
 
 # save cluster labels
 files_labels <- paste0("../results_auto/FLOCK/FLOCK_labels_", 
