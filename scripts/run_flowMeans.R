@@ -112,6 +112,8 @@ sapply(data[is_FlowCAP], function(d) {
 
 # run flowMeans with automatic selection of number of clusters
 
+# note some of the FlowCAP_ND data sets give errors; skip these
+
 seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
@@ -211,6 +213,8 @@ cat("flowMeans automatic : all runs complete\n")
 
 # run flowMeans with manual selection of number of clusters
 
+# note some of the FlowCAP_ND data sets give errors; skip these
+
 # number of clusters k
 k <- list(
   Levine_32dim = 40, 
@@ -242,6 +246,9 @@ for (i in 1:length(data)) {
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
     
     for (j in 1:length(data[[i]])) {
+      # some of the FlowCAP_ND data sets give errors; skip these
+      if ((i == 7) & (j %in% c(8, 9, 25))) next
+      
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
         out[[i]][[j]] <- flowMeans(data[[i]][[j]], Standardize = FALSE, NumC = k[[i]])
