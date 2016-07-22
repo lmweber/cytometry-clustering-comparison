@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run Rclusterpp
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, July 2016
 #########################################################################################
 
 
@@ -9,91 +9,115 @@ library(flowCore)
 library(Rclusterpp)
 
 
-# note: subsampling is required for larger data sets due to slow runtime
-
 
 
 #################
 ### LOAD DATA ###
 #################
 
+# filenames
+
 DATA_DIR <- "../../benchmark_data_sets"
 
-file_Levine_32 <- file.path(DATA_DIR, "Levine_2015_marrow_32/data/Levine_2015_marrow_32.fcs")
-file_Levine_13 <- file.path(DATA_DIR, "Levine_2015_marrow_13/data/Levine_2015_marrow_13.fcs")
-file_Nilsson <- file.path(DATA_DIR, "Nilsson_2013_HSC/data/Nilsson_2013_HSC.fcs")
-file_Mosmann <- file.path(DATA_DIR, "Mosmann_2014_activ/data/Mosmann_2014_activ.fcs")
+files <- list(
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
+  FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
+  FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
+)
 
-data_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_Levine_32, transformation = FALSE))
-data_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_Levine_13, transformation = FALSE))
-data_Nilsson <- flowCore::exprs(flowCore::read.FCS(file_Nilsson, transformation = FALSE))
-data_Mosmann <- flowCore::exprs(flowCore::read.FCS(file_Mosmann, transformation = FALSE))
+# FlowCAP data sets are treated separately since they require clustering algorithms to be
+# run individually for each sample
 
-head(data_Levine_32)
-head(data_Levine_13)
-head(data_Nilsson)
-head(data_Mosmann)
-
-dim(data_Levine_32)
-dim(data_Levine_13)
-dim(data_Nilsson)
-dim(data_Mosmann)
+is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
 
 
-# subsampling (required for larger data sets due to slow runtime)
+# load data files
 
-n_sub_Levine_32 <- min(100000, nrow(data_Levine_32))
-n_sub_Levine_13 <- min(100000, nrow(data_Levine_13))
-n_sub_Nilsson <- min(100000, nrow(data_Nilsson))
-n_sub_Mosmann <- min(100000, nrow(data_Mosmann))
+data <- vector("list", length(files))
+names(data) <- names(files)
 
-data_Levine_32 <- data_Levine_32[sample(1:nrow(data_Levine_32), n_sub_Levine_32, replace = FALSE), ]
-data_Levine_13 <- data_Levine_13[sample(1:nrow(data_Levine_13), n_sub_Levine_13, replace = FALSE), ]
-data_Nilsson <- data_Nilsson[sample(1:nrow(data_Nilsson), n_sub_Nilsson, replace = FALSE), ]
-data_Mosmann <- data_Mosmann[sample(1:nrow(data_Mosmann), n_sub_Mosmann, replace = FALSE), ]
+for (i in 1:length(data)) {
+  f <- files[[i]]
+  
+  if (!is_FlowCAP[i]) {
+    data[[i]] <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+    
+  } else {
+    smp <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+    smp <- smp[, "sample"]
+    d <- flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE)
+    d <- flowCore::split(d, smp)
+    data[[i]] <- lapply(d, function(s) flowCore::exprs(s))
+  }
+}
 
-dim(data_Levine_32)
-dim(data_Levine_13)
-dim(data_Nilsson)
-dim(data_Mosmann)
+head(data[[1]])
+head(data[[8]][[1]])
+
+sapply(data, length)
+
+sapply(data[!is_FlowCAP], dim)
+sapply(data[is_FlowCAP], function(d) {
+  sapply(d, function(d2) {
+    dim(d2)
+  })
+})
 
 
-# save subsampled data (contains true population labels for subsampled rows)
+# subsampling for data sets with excessive runtime (> 1 day on server)
 
-flowCore::write.FCS(flowCore::flowFrame(data_Levine_32), 
-                    filename = "../results_manual/Rclusterpp/Levine_2015_marrow_32_sub.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_Levine_13), 
-                    filename = "../results_manual/Rclusterpp/Levine_2015_marrow_13_sub.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_Nilsson), 
-                    filename = "../results_manual/Rclusterpp/Nilsson_2013_HSC_sub.fcs")
-flowCore::write.FCS(flowCore::flowFrame(data_Mosmann), 
-                    filename = "../results_manual/Rclusterpp/Mosmann_2014_activ_sub.fcs")
+ix_subsample <- c(1, 2, 4, 6)
+n_sub <- 100000
+
+for (i in ix_subsample) {
+  set.seed(123)
+  data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+  
+  # save subsampled population IDs
+  true_labels_i <- data[[i]][, "label", drop = FALSE]
+  file_true_labels_i <- paste0("../results_manual/Rclusterpp/true_labels_", names(data)[i], ".txt")
+  write.table(true_labels_i, file = file_true_labels_i, row.names = FALSE, quote = FALSE, sep = "\t")
+}
 
 
 # indices of protein marker columns
 
-marker_cols_Levine_32 <- 5:36
-marker_cols_Levine_13 <- 1:13
-marker_cols_Nilsson <- c(5:7, 9:18)
-marker_cols_Mosmann <- c(7:9, 11:21)
+marker_cols <- list(
+  Levine_32dim = 5:36, 
+  Levine_13dim = 1:13, 
+  Samusik_01   = 9:47, 
+  Samusik_all  = 9:47, 
+  Nilsson_rare = c(5:7, 9:18), 
+  Mosmann_rare = c(7:9, 11:21), 
+  FlowCAP_ND   = 3:12, 
+  FlowCAP_WNV  = 3:8
+)
+sapply(marker_cols, length)
 
-length(marker_cols_Levine_32)
-length(marker_cols_Levine_13)
-length(marker_cols_Nilsson)
-length(marker_cols_Mosmann)
 
+# subset data: protein marker columns only
 
-# subset columns
+for (i in 1:length(data)) {
+  if (!is_FlowCAP[i]) {
+    data[[i]] <- data[[i]][, marker_cols[[i]]]
+  } else {
+    for (j in 1:length(data[[i]])) {
+      data[[i]][[j]] <- data[[i]][[j]][, marker_cols[[i]]]
+    }
+  }
+}
 
-data_Levine_32 <- data_Levine_32[, marker_cols_Levine_32]
-data_Levine_13 <- data_Levine_13[, marker_cols_Levine_13]
-data_Nilsson <- data_Nilsson[, marker_cols_Nilsson]
-data_Mosmann <- data_Mosmann[, marker_cols_Mosmann]
-
-dim(data_Levine_32)
-dim(data_Levine_13)
-dim(data_Nilsson)
-dim(data_Mosmann)
+sapply(data[!is_FlowCAP], dim)
+sapply(data[is_FlowCAP], function(d) {
+  sapply(d, function(d2) {
+    dim(d2)
+  })
+})
 
 
 
@@ -107,110 +131,110 @@ dim(data_Mosmann)
 
 n_cores <- 16
 
+# number of clusters k
+k <- list(
+  Levine_32dim = 40, 
+  Levine_13dim = 40, 
+  Samusik_01   = 40, 
+  Samusik_all  = 40, 
+  Nilsson_rare = 40, 
+  Mosmann_rare = 40, 
+  FlowCAP_ND   = 7, 
+  FlowCAP_WNV  = 4
+)
 
-set.seed(123)
-Rclusterpp.setThreads(n_cores)  # set number of cores
-runtime_Levine_32 <- system.time({
-  out_Rclusterpp_Levine_32 <- Rclusterpp.hclust(data_Levine_32, method = "average", distance = "euclidean")
-})
+seed <- 123
+out <- runtimes <- vector("list", length(data))
+names(out) <- names(runtimes) <- names(data)
 
+for (i in 1:length(data)) {
+  
+  if (!is_FlowCAP[i]) {
+    set.seed(seed)
+    runtimes[[i]] <- system.time({
+      # set number of cores
+      Rclusterpp.setThreads(n_cores)
+      out[[i]] <- Rclusterpp.hclust(data[[i]], method = "average", distance = "euclidean")
+    })
+    cat("data set", names(data[i]), ": run complete\n")
+    
+  } else {
+    # FlowCAP data sets: run clustering algorithm separately for each sample
+    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
+    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
+    
+    for (j in 1:length(data[[i]])) {
+      set.seed(seed)
+      runtimes[[i]][[j]] <- system.time({
+        # set number of cores
+        Rclusterpp.setThreads(n_cores)
+        out[[i]][[j]] <- Rclusterpp.hclust(data[[i]][[j]], method = "average", distance = "euclidean")
+      })
+    }
+    cat("data set", names(data[i]), ": run complete\n")
+    
+    # FlowCAP data sets: sum runtimes over samples
+    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
+    runtimes_i <- colSums(runtimes_i)
+    names(runtimes_i) <- c("user", "system", "elapsed")
+    runtimes[[i]] <- runtimes_i
+  }
+}
 
-set.seed(123)
-Rclusterpp.setThreads(n_cores)  # set number of cores
-runtime_Levine_13 <- system.time({
-  out_Rclusterpp_Levine_13 <- Rclusterpp.hclust(data_Levine_13, method = "average", distance = "euclidean")
-})
+# extract cluster labels
+clus <- vector("list", length(data))
+names(clus) <- names(data)
 
+for (i in 1:length(clus)) {
+  if (!is_FlowCAP[i]) {
+    # cut dendrogram at k and extract cluster labels
+    clus[[i]] <- cutree(out[[i]], k = k[[i]])
 
-set.seed(123)
-Rclusterpp.setThreads(n_cores)  # set number of cores
-runtime_Nilsson <- system.time({
-  out_Rclusterpp_Nilsson <- Rclusterpp.hclust(data_Nilsson, method = "average", distance = "euclidean")
-})
+  } else {
+    # FlowCAP data sets
+    clus_list_i <- vector("list", length(data[[i]]))
+    for (j in 1:length(data[[i]])) {
+      # cut dendrogram at k and extract cluster labels
+      clus[[i]][[j]] <- cutree(out[[i]][[j]], k = k[[i]])
+    }
+    
+    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
+    # e.g. sample 1, cluster 3 -> cluster label 1_3
+    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
+    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
+    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
+  }
+}
 
-
-set.seed(123)
-Rclusterpp.setThreads(n_cores)  # set number of cores
-runtime_Mosmann <- system.time({
-  out_Rclusterpp_Mosmann <- Rclusterpp.hclust(data_Mosmann, method = "average", distance = "euclidean")
-})
-
-
-# cut dendrogram at an arbitrary number of clusters k and extract cluster labels
-
-k_Levine_32 <- 40
-k_Levine_13 <- 40
-k_Nilsson <- 40
-k_Mosmann <- 40
-
-clus_Rclusterpp_Levine_32 <- cutree(out_Rclusterpp_Levine_32, k = k_Levine_32)
-clus_Rclusterpp_Levine_13 <- cutree(out_Rclusterpp_Levine_13, k = k_Levine_13)
-clus_Rclusterpp_Nilsson <- cutree(out_Rclusterpp_Nilsson, k = k_Nilsson)
-clus_Rclusterpp_Mosmann <- cutree(out_Rclusterpp_Mosmann, k = k_Mosmann)
-
-length(clus_Rclusterpp_Levine_32)
-length(clus_Rclusterpp_Levine_13)
-length(clus_Rclusterpp_Nilsson)
-length(clus_Rclusterpp_Mosmann)
-
+sapply(clus, length)
 
 # cluster sizes and number of clusters
-
-table(clus_Rclusterpp_Levine_32)
-table(clus_Rclusterpp_Levine_13)
-table(clus_Rclusterpp_Nilsson)
-table(clus_Rclusterpp_Mosmann)
-
-length(table(clus_Rclusterpp_Levine_32))
-length(table(clus_Rclusterpp_Levine_13))
-length(table(clus_Rclusterpp_Nilsson))
-length(table(clus_Rclusterpp_Mosmann))
-
+# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
+table(clus[[1]])
+sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
+files_labels <- paste0("../results_manual/Rclusterpp/Rclusterpp_labels_", 
+                       names(clus), ".txt")
 
-res_Rclusterpp_Levine_32 <- data.frame(label = clus_Rclusterpp_Levine_32)
-res_Rclusterpp_Levine_13 <- data.frame(label = clus_Rclusterpp_Levine_13)
-res_Rclusterpp_Nilsson <- data.frame(label = clus_Rclusterpp_Nilsson)
-res_Rclusterpp_Mosmann <- data.frame(label = clus_Rclusterpp_Mosmann)
+for (i in 1:length(files_labels)) {
+  res_i <- data.frame(label = clus[[i]])
+  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
 
-write.table(res_Rclusterpp_Levine_32, 
-            file = "../results_manual/Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_32.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_Rclusterpp_Levine_13, 
-            file = "../results_manual/Rclusterpp/Rclusterpp_labels_Levine_2015_marrow_13.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_Rclusterpp_Nilsson, 
-            file = "../results_manual/Rclusterpp/Rclusterpp_labels_Nilsson_2013_HSC.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_Rclusterpp_Mosmann, 
-            file = "../results_manual/Rclusterpp/Rclusterpp_labels_Mosmann_2014_activ.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
+# save runtimes
+runtimes <- lapply(runtimes, function(r) r["elapsed"])
+runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-
-# save runtime
-
-runtime_Rclusterpp <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_Levine_32["elapsed"], 
-  Levine_2015_marrow_13 = runtime_Levine_13["elapsed"], 
-  Nilsson_2013_HSC = runtime_Nilsson["elapsed"], 
-  Mosmann_2014_activ = runtime_Mosmann["elapsed"], 
-  row.names = "runtime"))
-
-write.table(runtime_Rclusterpp, 
-            file = "../results_manual/runtime/runtime_Rclusterpp.txt", 
+write.table(runtimes, file = "../results_manual/runtimes/runtime_Rclusterpp.txt", 
             quote = FALSE, sep = "\t")
 
-
 # save session information
-
 sink(file = "../results_manual/session_info/session_info_Rclusterpp.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
+cat("Rclusterpp manual : all runs complete\n")
 
-# save R objects
-
-save.image(file = "../results_manual/RData_files/results_Rclusterpp.RData")
 
 

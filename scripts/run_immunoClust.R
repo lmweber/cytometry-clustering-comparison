@@ -82,14 +82,14 @@ for (i in ix_subsample) {
   data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
   
   # save subsampled population IDs
-  true_labels_i <- data[[i]]$label
+  true_labels_i <- data[[i]][, "label", drop = FALSE]
   files_true_labels_i <- paste0(c("../results_auto/immunoClust/true_labels_", 
                                   "../results_auto/immunoClust_all/true_labels_", 
                                   "../results_manual/immunoClust/true_labels_", 
                                   "../results_manual/immunoClust_all/true_labels_"), 
                                 names(data)[i], ".txt")
   for (f in files_true_labels_i) {
-    write.table(res_true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
+    write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
   }
 }
 
