@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to run SamSPECTRAL
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, July 2016
 #########################################################################################
 
 
@@ -10,57 +10,98 @@ library(SamSPECTRAL)
 
 
 
+
 #################
 ### LOAD DATA ###
 #################
 
+# filenames
+
 DATA_DIR <- "../../benchmark_data_sets"
 
-file_Levine_32 <- file.path(DATA_DIR, "Levine_2015_marrow_32/data/Levine_2015_marrow_32.fcs")
-file_Levine_13 <- file.path(DATA_DIR, "Levine_2015_marrow_13/data/Levine_2015_marrow_13.fcs")
-file_Nilsson <- file.path(DATA_DIR, "Nilsson_2013_HSC/data/Nilsson_2013_HSC.fcs")
-file_Mosmann <- file.path(DATA_DIR, "Mosmann_2014_activ/data/Mosmann_2014_activ.fcs")
+files <- list(
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
+  FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
+  FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
+)
 
-data_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_Levine_32, transformation = FALSE))
-data_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_Levine_13, transformation = FALSE))
-data_Nilsson <- flowCore::exprs(flowCore::read.FCS(file_Nilsson, transformation = FALSE))
-data_Mosmann <- flowCore::exprs(flowCore::read.FCS(file_Mosmann, transformation = FALSE))
+# FlowCAP data sets are treated separately since they require clustering algorithms to be
+# run individually for each sample
 
-head(data_Levine_32)
-head(data_Levine_13)
-head(data_Nilsson)
-head(data_Mosmann)
+is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
 
-dim(data_Levine_32)
-dim(data_Levine_13)
-dim(data_Nilsson)
-dim(data_Mosmann)
+
+# load data files
+
+data <- vector("list", length(files))
+names(data) <- names(files)
+
+for (i in 1:length(data)) {
+  f <- files[[i]]
+  
+  if (!is_FlowCAP[i]) {
+    data[[i]] <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+    
+  } else {
+    smp <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+    smp <- smp[, "sample"]
+    d <- flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE)
+    d <- flowCore::split(d, smp)
+    data[[i]] <- lapply(d, function(s) flowCore::exprs(s))
+  }
+}
+
+head(data[[1]])
+head(data[[8]][[1]])
+
+sapply(data, length)
+
+sapply(data[!is_FlowCAP], dim)
+sapply(data[is_FlowCAP], function(d) {
+  sapply(d, function(d2) {
+    dim(d2)
+  })
+})
 
 
 # indices of protein marker columns
 
-marker_cols_Levine_32 <- 5:36
-marker_cols_Levine_13 <- 1:13
-marker_cols_Nilsson <- c(5:7, 9:18)
-marker_cols_Mosmann <- c(7:9, 11:21)
+marker_cols <- list(
+  Levine_32dim = 5:36, 
+  Levine_13dim = 1:13, 
+  Samusik_01   = 9:47, 
+  Samusik_all  = 9:47, 
+  Nilsson_rare = c(5:7, 9:18), 
+  Mosmann_rare = c(7:9, 11:21), 
+  FlowCAP_ND   = 3:12, 
+  FlowCAP_WNV  = 3:8
+)
+sapply(marker_cols, length)
 
-length(marker_cols_Levine_32)
-length(marker_cols_Levine_13)
-length(marker_cols_Nilsson)
-length(marker_cols_Mosmann)
 
+# subset data: protein marker columns only
 
-# subset data
+for (i in 1:length(data)) {
+  if (!is_FlowCAP[i]) {
+    data[[i]] <- data[[i]][, marker_cols[[i]]]
+  } else {
+    for (j in 1:length(data[[i]])) {
+      data[[i]][[j]] <- data[[i]][[j]][, marker_cols[[i]]]
+    }
+  }
+}
 
-data_Levine_32 <- data_Levine_32[, marker_cols_Levine_32]
-data_Levine_13 <- data_Levine_13[, marker_cols_Levine_13]
-data_Nilsson <- data_Nilsson[, marker_cols_Nilsson]
-data_Mosmann <- data_Mosmann[, marker_cols_Mosmann]
-
-dim(data_Levine_32)
-dim(data_Levine_13)
-dim(data_Nilsson)
-dim(data_Mosmann)
+sapply(data[!is_FlowCAP], dim)
+sapply(data[is_FlowCAP], function(d) {
+  sapply(d, function(d2) {
+    dim(d2)
+  })
+})
 
 
 
@@ -72,102 +113,92 @@ dim(data_Mosmann)
 # run SamSPECTRAL with selection of number of clusters via arguments normal.sigma and separation.factor
 # (values from Levine et al. 2015)
 
-set.seed(123)
-runtime_Levine_32_auto <- system.time({
-  out_SamSPECTRAL_Levine_32_auto <- SamSPECTRAL(data_Levine_32, normal.sigma = 100, separation.factor = 1)
-})
+seed <- 123
+out <- runtimes <- vector("list", length(data))
+names(out) <- names(runtimes) <- names(data)
 
-
-set.seed(123)
-runtime_Levine_13_auto <- system.time({
-  out_SamSPECTRAL_Levine_13_auto <- SamSPECTRAL(data_Levine_13, normal.sigma = 100, separation.factor = 1)
-})
-
-
-set.seed(123)
-runtime_Nilsson_auto <- system.time({
-  out_SamSPECTRAL_Nilsson_auto <- SamSPECTRAL(data_Nilsson, normal.sigma = 100, separation.factor = 1)
-})
-
-
-set.seed(123)
-runtime_Mosmann_auto <- system.time({
-  out_SamSPECTRAL_Mosmann_auto <- SamSPECTRAL(data_Mosmann, normal.sigma = 100, separation.factor = 1)
-})
-
+for (i in 1:length(data)) {
+  
+  if (!is_FlowCAP[i]) {
+    set.seed(seed)
+    runtimes[[i]] <- system.time({
+      out[[i]] <- SamSPECTRAL(data[[i]], normal.sigma = 100, separation.factor = 1)
+    })
+    cat("data set", names(data[i]), ": run complete\n")
+    
+  } else {
+    # FlowCAP data sets: run clustering algorithm separately for each sample
+    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
+    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
+    
+    for (j in 1:length(data[[i]])) {
+      set.seed(seed)
+      runtimes[[i]][[j]] <- system.time({
+        out[[i]][[j]] <- SamSPECTRAL(data[[i]][[j]], normal.sigma = 100, separation.factor = 1)
+      })
+    }
+    cat("data set", names(data[i]), ": run complete\n")
+    
+    # FlowCAP data sets: sum runtimes over samples
+    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
+    runtimes_i <- colSums(runtimes_i)
+    names(runtimes_i) <- c("user", "system", "elapsed")
+    runtimes[[i]] <- runtimes_i
+  }
+}
 
 # extract cluster labels
+clus <- vector("list", length(data))
+names(clus) <- names(data)
 
-clus_SamSPECTRAL_Levine_32_auto <- out_SamSPECTRAL_Levine_32_auto
-clus_SamSPECTRAL_Levine_13_auto <- out_SamSPECTRAL_Levine_13_auto
-clus_SamSPECTRAL_Nilsson_auto <- out_SamSPECTRAL_Nilsson_auto
-clus_SamSPECTRAL_Mosmann_auto <- out_SamSPECTRAL_Mosmann_auto
+for (i in 1:length(clus)) {
+  if (!is_FlowCAP[i]) {
+    clus[[i]] <- out[[i]]
+    
+  } else {
+    # FlowCAP data sets
+    clus_list_i <- vector("list", length(data[[i]]))
+    for (j in 1:length(data[[i]])) {
+      clus_list_i[[j]] <- out[[i]][[j]]
+    }
+    
+    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
+    # e.g. sample 1, cluster 3 -> cluster label 1_3
+    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
+    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
+    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
+  }
+}
 
-length(clus_SamSPECTRAL_Levine_32_auto)
-length(clus_SamSPECTRAL_Levine_13_auto)
-length(clus_SamSPECTRAL_Nilsson_auto)
-length(clus_SamSPECTRAL_Mosmann_auto)
-
+sapply(clus, length)
 
 # cluster sizes and number of clusters
-
-table(clus_SamSPECTRAL_Levine_32_auto)
-table(clus_SamSPECTRAL_Levine_13_auto)
-table(clus_SamSPECTRAL_Nilsson_auto)
-table(clus_SamSPECTRAL_Mosmann_auto)
-
-length(table(clus_SamSPECTRAL_Levine_32_auto))
-length(table(clus_SamSPECTRAL_Levine_13_auto))
-length(table(clus_SamSPECTRAL_Nilsson_auto))
-length(table(clus_SamSPECTRAL_Mosmann_auto))
-
+# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
+table(clus[[1]])
+sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
+files_labels <- paste0("../results_auto/SamSPECTRAL/SamSPECTRAL_labels_", 
+                       names(clus), ".txt")
 
-res_SamSPECTRAL_Levine_32_auto <- data.frame(label = clus_SamSPECTRAL_Levine_32_auto)
-res_SamSPECTRAL_Levine_13_auto <- data.frame(label = clus_SamSPECTRAL_Levine_13_auto)
-res_SamSPECTRAL_Nilsson_auto <- data.frame(label = clus_SamSPECTRAL_Nilsson_auto)
-res_SamSPECTRAL_Mosmann_auto <- data.frame(label = clus_SamSPECTRAL_Mosmann_auto)
+for (i in 1:length(files_labels)) {
+  res_i <- data.frame(label = clus[[i]])
+  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
 
+# save runtimes
+runtimes <- lapply(runtimes, function(r) r["elapsed"])
+runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(res_SamSPECTRAL_Levine_32_auto, 
-            file = "../results_auto/SamSPECTRAL/SamSPECTRAL_labels_Levine_2015_marrow_32.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_SamSPECTRAL_Levine_13_auto, 
-            file = "../results_auto/SamSPECTRAL/SamSPECTRAL_labels_Levine_2015_marrow_13.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_SamSPECTRAL_Nilsson_auto, 
-            file = "../results_auto/SamSPECTRAL/SamSPECTRAL_labels_Nilsson_2013_HSC.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_SamSPECTRAL_Mosmann_auto, 
-            file = "../results_auto/SamSPECTRAL/SamSPECTRAL_labels_Mosmann_2014_activ.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-
-
-# save runtime
-
-runtime_SamSPECTRAL_auto <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_Levine_32_auto["elapsed"], 
-  Levine_2015_marrow_13 = runtime_Levine_13_auto["elapsed"], 
-  Nilsson_2013_HSC = runtime_Nilsson_auto["elapsed"], 
-  Mosmann_2014_activ = runtime_Mosmann_auto["elapsed"], 
-  row.names = "runtime"))
-
-write.table(runtime_SamSPECTRAL_auto, 
-            file = "../results_auto/runtime/runtime_SamSPECTRAL.txt", 
+write.table(runtimes, file = "../results_auto/runtimes/runtime_SamSPECTRAL.txt", 
             quote = FALSE, sep = "\t")
 
-
 # save session information
-
 sink(file = "../results_auto/session_info/session_info_SamSPECTRAL.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
-
-# save R objects
-
-save.image(file = "../results_auto/RData_files/results_SamSPECTRAL.RData")
+cat("SamSPECTRAL automatic : all runs complete\n")
 
 
 
@@ -178,113 +209,106 @@ save.image(file = "../results_auto/RData_files/results_SamSPECTRAL.RData")
 
 # run SamSPECTRAL with manual selection of number of clusters
 
+# number of clusters k
+k <- list(
+  Levine_32dim = 40, 
+  Levine_13dim = 40, 
+  Samusik_01   = 40, 
+  Samusik_all  = 40, 
+  Nilsson_rare = 40, 
+  Mosmann_rare = 40, 
+  FlowCAP_ND   = 7, 
+  FlowCAP_WNV  = 4
+)
 
-# number of clusters
-k_Levine_32 <- 40
-k_Levine_13 <- 40
-k_Nilsson <- 40
-k_Mosmann <- 40
+seed <- 123
+out <- runtimes <- vector("list", length(data))
+names(out) <- names(runtimes) <- names(data)
 
-
-set.seed(123)
-runtime_Levine_32_manual <- system.time({
-  out_SamSPECTRAL_Levine_32_manual <- SamSPECTRAL(data_Levine_32, normal.sigma = 100, separation.factor = 1, 
-                                                  number.of.clusters = k_Levine_32)
-})
-
-
-set.seed(123)
-runtime_Levine_13_manual <- system.time({
-  out_SamSPECTRAL_Levine_13_manual <- SamSPECTRAL(data_Levine_13, normal.sigma = 100, separation.factor = 1, 
-                                                  number.of.clusters = k_Levine_13)
-})
-
-
-set.seed(123)
-runtime_Nilsson_manual <- system.time({
-  out_SamSPECTRAL_Nilsson_manual <- SamSPECTRAL(data_Nilsson, normal.sigma = 100, separation.factor = 1, 
-                                                number.of.clusters = k_Nilsson)
-})
-
-
-set.seed(123)
-runtime_Mosmann_manual <- system.time({
-  out_SamSPECTRAL_Mosmann_manual <- SamSPECTRAL(data_Mosmann, normal.sigma = 100, separation.factor = 1, 
-                                                number.of.clusters = k_Mosmann)
-})
-
+for (i in 1:length(data)) {
+  
+  if (!is_FlowCAP[i]) {
+    set.seed(seed)
+    runtimes[[i]] <- system.time({
+      out[[i]] <- SamSPECTRAL(data[[i]], normal.sigma = 100, separation.factor = 1, 
+                              number.of.clusters = k[[i]])
+    })
+    cat("data set", names(data[i]), ": run complete\n")
+    
+  } else {
+    # FlowCAP data sets: run clustering algorithm separately for each sample
+    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
+    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
+    
+    for (j in 1:length(data[[i]])) {
+      set.seed(seed)
+      runtimes[[i]][[j]] <- system.time({
+        out[[i]][[j]] <- SamSPECTRAL(data[[i]][[j]], normal.sigma = 100, separation.factor = 1, 
+                                     number.of.clusters = k[[i]])
+      })
+    }
+    cat("data set", names(data[i]), ": run complete\n")
+    
+    # FlowCAP data sets: sum runtimes over samples
+    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
+    runtimes_i <- colSums(runtimes_i)
+    names(runtimes_i) <- c("user", "system", "elapsed")
+    runtimes[[i]] <- runtimes_i
+  }
+}
 
 # extract cluster labels
+clus <- vector("list", length(data))
+names(clus) <- names(data)
 
-clus_SamSPECTRAL_Levine_32_manual <- out_SamSPECTRAL_Levine_32_manual
-clus_SamSPECTRAL_Levine_13_manual <- out_SamSPECTRAL_Levine_13_manual
-clus_SamSPECTRAL_Nilsson_manual <- out_SamSPECTRAL_Nilsson_manual
-clus_SamSPECTRAL_Mosmann_manual <- out_SamSPECTRAL_Mosmann_manual
+for (i in 1:length(clus)) {
+  if (!is_FlowCAP[i]) {
+    clus[[i]] <- out[[i]]
+    
+  } else {
+    # FlowCAP data sets
+    clus_list_i <- vector("list", length(data[[i]]))
+    for (j in 1:length(data[[i]])) {
+      clus_list_i[[j]] <- out[[i]][[j]]
+    }
+    
+    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
+    # e.g. sample 1, cluster 3 -> cluster label 1_3
+    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
+    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
+    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
+  }
+}
 
-length(clus_SamSPECTRAL_Levine_32_manual)
-length(clus_SamSPECTRAL_Levine_13_manual)
-length(clus_SamSPECTRAL_Nilsson_manual)
-length(clus_SamSPECTRAL_Mosmann_manual)
-
+sapply(clus, length)
 
 # cluster sizes and number of clusters
-
-table(clus_SamSPECTRAL_Levine_32_manual)
-table(clus_SamSPECTRAL_Levine_13_manual)
-table(clus_SamSPECTRAL_Nilsson_manual)
-table(clus_SamSPECTRAL_Mosmann_manual)
-
-length(table(clus_SamSPECTRAL_Levine_32_manual))
-length(table(clus_SamSPECTRAL_Levine_13_manual))
-length(table(clus_SamSPECTRAL_Nilsson_manual))
-length(table(clus_SamSPECTRAL_Mosmann_manual))
-
+# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
+table(clus[[1]])
+sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
+files_labels <- paste0("../results_manual/SamSPECTRAL/SamSPECTRAL_labels_", 
+                       names(clus), ".txt")
 
-res_SamSPECTRAL_Levine_32_manual <- data.frame(label = clus_SamSPECTRAL_Levine_32_manual)
-res_SamSPECTRAL_Levine_13_manual <- data.frame(label = clus_SamSPECTRAL_Levine_13_manual)
-res_SamSPECTRAL_Nilsson_manual <- data.frame(label = clus_SamSPECTRAL_Nilsson_manual)
-res_SamSPECTRAL_Mosmann_manual <- data.frame(label = clus_SamSPECTRAL_Mosmann_manual)
+for (i in 1:length(files_labels)) {
+  res_i <- data.frame(label = clus[[i]])
+  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
 
+# save runtimes
+runtimes <- lapply(runtimes, function(r) r["elapsed"])
+runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(res_SamSPECTRAL_Levine_32_manual, 
-            file = "../results_manual/SamSPECTRAL/SamSPECTRAL_labels_Levine_2015_marrow_32.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_SamSPECTRAL_Levine_13_manual, 
-            file = "../results_manual/SamSPECTRAL/SamSPECTRAL_labels_Levine_2015_marrow_13.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_SamSPECTRAL_Nilsson_manual, 
-            file = "../results_manual/SamSPECTRAL/SamSPECTRAL_labels_Nilsson_2013_HSC.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_SamSPECTRAL_Mosmann_manual, 
-            file = "../results_manual/SamSPECTRAL/SamSPECTRAL_labels_Mosmann_2014_activ.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-
-
-# save runtime
-
-runtime_SamSPECTRAL_manual <- t(data.frame(
-  Levine_2015_marrow_32 = runtime_Levine_32_manual["elapsed"], 
-  Levine_2015_marrow_13 = runtime_Levine_13_manual["elapsed"], 
-  Nilsson_2013_HSC = runtime_Nilsson_manual["elapsed"], 
-  Mosmann_2014_activ = runtime_Mosmann_manual["elapsed"], 
-  row.names = "runtime"))
-
-write.table(runtime_SamSPECTRAL_manual, 
-            file = "../results_manual/runtime/runtime_SamSPECTRAL.txt", 
+write.table(runtimes, file = "../results_manual/runtimes/runtime_SamSPECTRAL.txt", 
             quote = FALSE, sep = "\t")
 
-
 # save session information
-
 sink(file = "../results_manual/session_info/session_info_SamSPECTRAL.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
+cat("SamSPECTRAL manual : all runs complete\n")
 
-# save R objects
-
-save.image(file = "../results_manual/RData_files/results_SamSPECTRAL.RData")
 
 
