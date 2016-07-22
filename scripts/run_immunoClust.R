@@ -39,10 +39,6 @@ files <- list(
 
 is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
 
-# exclude methods with excessive runtime (> 1 day on server)
-
-is_excessive_runtime <- c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
-
 
 # load data files: immunoClust requires flowFrame objects
 
@@ -74,6 +70,16 @@ sapply(data[is_FlowCAP], function(d) {
     dim(d2)
   })
 })
+
+
+# subsampling for data sets with excessive runtime (> 1 day on server)
+
+ix_subsample <- 4
+n_sub <- 100000
+for (i in ix_subsample) {
+  set.seed(123)
+  data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+}
 
 
 # indices of protein marker columns
@@ -119,7 +125,7 @@ names(out) <- names(runtimes) <- names(data)
 
 for (i in 1:length(data)) {
   
-  if (!is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
       out[[i]] <- immunoClust::cell.process(data[[i]], 
@@ -127,7 +133,7 @@ for (i in 1:length(data)) {
     })
     cat("data set", names(data[i]), ": run complete\n")
     
-  } else if (is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
     out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
@@ -157,10 +163,10 @@ clus <- vector("list", length(data))
 names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
-  if (!is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  if (!is_FlowCAP[i]) {
     clus[[i]] <- out[[i]]@label
     
-  } else if (is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
@@ -228,7 +234,7 @@ names(out) <- names(runtimes) <- names(data)
 
 for (i in 1:length(data)) {
   
-  if (!is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
       out[[i]] <- immunoClust::cell.process(data[[i]], 
@@ -237,7 +243,7 @@ for (i in 1:length(data)) {
     })
     cat("data set", names(data[i]), ": run complete\n")
     
-  } else if (is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
     out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
@@ -268,10 +274,10 @@ clus <- vector("list", length(data))
 names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
-  if (!is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  if (!is_FlowCAP[i]) {
     clus[[i]] <- out[[i]]@label
     
-  } else if (is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
@@ -349,7 +355,7 @@ names(out) <- names(runtimes) <- names(data)
 
 for (i in 1:length(data)) {
   
-  if (!is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
       out[[i]] <- immunoClust::cell.process(data[[i]], 
@@ -358,7 +364,7 @@ for (i in 1:length(data)) {
     })
     cat("data set", names(data[i]), ": run complete\n")
     
-  } else if (is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
     out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
@@ -389,10 +395,10 @@ clus <- vector("list", length(data))
 names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
-  if (!is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  if (!is_FlowCAP[i]) {
     clus[[i]] <- out[[i]]@label
     
-  } else if (is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
@@ -470,7 +476,7 @@ names(out) <- names(runtimes) <- names(data)
 
 for (i in 1:length(data)) {
   
-  if (!is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
       out[[i]] <- immunoClust::cell.process(data[[i]], 
@@ -480,7 +486,7 @@ for (i in 1:length(data)) {
     })
     cat("data set", names(data[i]), ": run complete\n")
     
-  } else if (is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  } else {
     # FlowCAP data sets: run clustering algorithm separately for each sample
     out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
@@ -512,10 +518,10 @@ clus <- vector("list", length(data))
 names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
-  if (!is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  if (!is_FlowCAP[i]) {
     clus[[i]] <- out[[i]]@label
     
-  } else if (is_FlowCAP[i] & !is_excessive_runtime[i]) {
+  } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
