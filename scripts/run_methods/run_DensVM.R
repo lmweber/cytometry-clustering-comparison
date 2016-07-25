@@ -1,11 +1,12 @@
 #########################################################################################
-# R script to run k-means
+# R script to run DensVM (cytofkit R/Bioconductor package)
 #
 # Lukas Weber, July 2016
 #########################################################################################
 
 
 library(flowCore)
+library(cytofkit)
 
 
 
@@ -16,7 +17,7 @@ library(flowCore)
 
 # filenames
 
-DATA_DIR <- "../../benchmark_data_sets"
+DATA_DIR <- "../../../benchmark_data_sets"
 
 files <- list(
   Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
@@ -68,6 +69,40 @@ sapply(data[is_FlowCAP], function(d) {
 })
 
 
+# subsampling (recommended in documentation for this method)
+
+ix_subsample <- 1:8
+n_sub <- 20000
+
+for (i in ix_subsample) {
+  if (!is_FlowCAP[i]) {
+    set.seed(123)
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    # save subsampled population IDs
+    true_labels_i <- data[[i]][, "label", drop = FALSE]
+    files_true_labels_i <- paste0("../../results_auto/DensVM/true_labels_DensVM_", 
+                                  names(data)[i], ".txt")
+    for (f in files_true_labels_i) {
+      write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
+    }
+    
+  } else {
+    # FlowCAP data sets
+    for (j in 1:length(data[[i]])) {
+      set.seed(123)
+      data[[i]][[j]] <- data[[i]][[j]][sample(1:nrow(data[[i]][[j]]), n_sub), ]
+      # save subsampled population IDs
+      true_labels_ij <- data[[i]][[j]][, "label", drop = FALSE]
+      files_true_labels_ij <- paste0("../../results_auto/DensVM/true_labels_DensVM_", 
+                                     names(data)[i], "_", j, ".txt")
+      for (f in files_true_labels_ij) {
+        write.table(true_labels_ij, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
+      }
+    }
+  }
+}
+
+
 # indices of protein marker columns
 
 marker_cols <- list(
@@ -105,47 +140,27 @@ sapply(data[is_FlowCAP], function(d) {
 
 
 
-#########################################################
-### Run k-means: manually selected number of clusters ###
-#########################################################
+################################################
+### Run DensVM: automatic number of clusters ###
+################################################
 
-# number of clusters k
-k <- list(
-  Levine_32dim = 40, 
-  Levine_13dim = 40, 
-  Samusik_01   = 40, 
-  Samusik_all  = 40, 
-  Nilsson_rare = 40, 
-  Mosmann_rare = 40, 
-  FlowCAP_ND   = 7, 
-  FlowCAP_WNV  = 4
-)
+# run DensVM with automatic selection of number of clusters (manual selection is not available)
 
-iter.max <- 50
+# use main functions: cytof_dimReduction(), cytof_cluster()
 
-seed <- list(
-  Levine_32dim = 123, 
-  Levine_13dim = 123, 
-  Samusik_01   = 1234, 
-  Samusik_all  = 123, 
-  Nilsson_rare = 123, 
-  Mosmann_rare = 123, 
-  FlowCAP_ND   = 12345, 
-  FlowCAP_WNV  = 123
-)
-
-# run k-means
-# note: additional iterations required; and returns errors for some random seeds
-
+seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
 
 for (i in 1:length(data)) {
   
   if (!is_FlowCAP[i]) {
-    set.seed(seed[[i]])
+    set.seed(seed)
     runtimes[[i]] <- system.time({
-      out[[i]] <- kmeans(data[[i]], k[[i]])
+      # note: could also use function cytof_exprsMerge() for subsampling
+      x <- data[[i]]
+      y <- cytof_dimReduction(x, method = "tsne")
+      out[[i]] <- cytof_cluster(y, x, method = "DensVM")
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -155,9 +170,12 @@ for (i in 1:length(data)) {
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
     
     for (j in 1:length(data[[i]])) {
-      set.seed(seed[[i]])
+      set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- kmeans(data[[i]][[j]], k[[i]])
+        # note: could also use function cytof_exprsMerge() for subsampling
+        x <- data[[i]][[j]]
+        y <- cytof_dimReduction(x, method = "tsne")
+        out[[i]][[j]] <- cytof_cluster(y, x, method = "DensVM")
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
@@ -176,13 +194,13 @@ names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
   if (!is_FlowCAP[i]) {
-    clus[[i]] <- out[[i]]$cluster
+    clus[[i]] <- as.numeric(out[[i]])
     
   } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
-      clus_list_i[[j]] <- out[[i]][[j]]$cluster
+      clus_list_i[[j]] <- as.numeric(out[[i]][[j]])
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
@@ -201,7 +219,7 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../results_manual/kmeans/kmeans_labels_", 
+files_labels <- paste0("../../results_auto/DensVM/DensVM_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -213,15 +231,15 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_manual/runtimes/runtime_kmeans.txt", 
+write.table(runtimes, file = "../../results_auto/runtimes/runtime_DensVM.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../results_manual/session_info/session_info_kmeans.txt")
+sink(file = "../../results_auto/session_info/session_info_DensVM.txt")
 print(sessionInfo())
 sink()
 
-cat("kmeans manual : all runs complete\n")
+cat("DensVM automatic : all runs complete\n")
 
 
 

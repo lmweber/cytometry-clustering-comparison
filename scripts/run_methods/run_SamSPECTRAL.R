@@ -1,12 +1,12 @@
 #########################################################################################
-# R script to run flowMeans
+# R script to run SamSPECTRAL
 #
 # Lukas Weber, July 2016
 #########################################################################################
 
 
 library(flowCore)
-library(flowMeans)
+library(SamSPECTRAL)
 
 
 
@@ -17,7 +17,7 @@ library(flowMeans)
 
 # filenames
 
-DATA_DIR <- "../../benchmark_data_sets"
+DATA_DIR <- "../../../benchmark_data_sets"
 
 files <- list(
   Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
@@ -69,6 +69,27 @@ sapply(data[is_FlowCAP], function(d) {
 })
 
 
+# subsampling for data sets with excessive runtime (> 1 day on server)
+
+ix_subsample <- 4
+n_sub <- 100000
+
+for (i in ix_subsample) {
+  if (!is_FlowCAP[i]) {
+    set.seed(123)
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    # save subsampled population IDs
+    true_labels_i <- data[[i]][, "label", drop = FALSE]
+    files_true_labels_i <- paste0(c("../../results_auto/SamSPECTRAL/true_labels_SamSPECTRAL_", 
+                                    "../../results_manual/SamSPECTRAL/true_labels_SamSPECTRAL_"), 
+                                  names(data)[i], ".txt")
+    for (f in files_true_labels_i) {
+      write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
+    }
+  }
+}
+
+
 # indices of protein marker columns
 
 marker_cols <- list(
@@ -106,13 +127,12 @@ sapply(data[is_FlowCAP], function(d) {
 
 
 
-###################################################
-### Run flowMeans: automatic number of clusters ###
-###################################################
+#####################################################
+### Run SamSPECTRAL: automatic number of clusters ###
+#####################################################
 
-# run flowMeans with automatic selection of number of clusters
-
-# note some of the FlowCAP_ND data sets give errors; skip these
+# run SamSPECTRAL with selection of number of clusters via arguments normal.sigma and separation.factor
+# (values from Levine et al. 2015)
 
 seed <- 123
 out <- runtimes <- vector("list", length(data))
@@ -123,7 +143,7 @@ for (i in 1:length(data)) {
   if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
-      out[[i]] <- flowMeans(data[[i]], Standardize = FALSE)
+      out[[i]] <- SamSPECTRAL(data[[i]], normal.sigma = 100, separation.factor = 1)
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -133,12 +153,9 @@ for (i in 1:length(data)) {
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
     
     for (j in 1:length(data[[i]])) {
-      # some of the FlowCAP_ND data sets give errors; skip these
-      if ((i == 7) & (j %in% c(7, 9, 25))) next
-      
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- flowMeans(data[[i]][[j]], Standardize = FALSE)
+        out[[i]][[j]] <- SamSPECTRAL(data[[i]][[j]], normal.sigma = 100, separation.factor = 1)
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
@@ -157,13 +174,13 @@ names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
   if (!is_FlowCAP[i]) {
-    clus[[i]] <- out[[i]]@Label
+    clus[[i]] <- out[[i]]
     
   } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
-      clus_list_i[[j]] <- out[[i]][[j]]@Label
+      clus_list_i[[j]] <- out[[i]][[j]]
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
@@ -182,7 +199,7 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../results_auto/flowMeans/flowMeans_labels_", 
+files_labels <- paste0("../../results_auto/SamSPECTRAL/SamSPECTRAL_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -194,26 +211,24 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_auto/runtimes/runtime_flowMeans.txt", 
+write.table(runtimes, file = "../../results_auto/runtimes/runtime_SamSPECTRAL.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../results_auto/session_info/session_info_flowMeans.txt")
+sink(file = "../../results_auto/session_info/session_info_SamSPECTRAL.txt")
 print(sessionInfo())
 sink()
 
-cat("flowMeans automatic : all runs complete\n")
+cat("SamSPECTRAL automatic : all runs complete\n")
 
 
 
 
-###########################################################
-### Run flowMeans: manually selected number of clusters ###
-###########################################################
+#############################################################
+### Run SamSPECTRAL: manually selected number of clusters ###
+#############################################################
 
-# run flowMeans with manual selection of number of clusters
-
-# note some of the FlowCAP_ND data sets give errors; skip these
+# run SamSPECTRAL with manual selection of number of clusters
 
 # number of clusters k
 k <- list(
@@ -236,7 +251,8 @@ for (i in 1:length(data)) {
   if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
-      out[[i]] <- flowMeans(data[[i]], Standardize = FALSE, NumC = k[[i]])
+      out[[i]] <- SamSPECTRAL(data[[i]], normal.sigma = 100, separation.factor = 1, 
+                              number.of.clusters = k[[i]])
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -246,12 +262,10 @@ for (i in 1:length(data)) {
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
     
     for (j in 1:length(data[[i]])) {
-      # some of the FlowCAP_ND data sets give errors; skip these
-      if ((i == 7) & (j %in% c(8, 9, 25))) next
-      
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- flowMeans(data[[i]][[j]], Standardize = FALSE, NumC = k[[i]])
+        out[[i]][[j]] <- SamSPECTRAL(data[[i]][[j]], normal.sigma = 100, separation.factor = 1, 
+                                     number.of.clusters = k[[i]])
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
@@ -270,13 +284,13 @@ names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
   if (!is_FlowCAP[i]) {
-    clus[[i]] <- out[[i]]@Label
+    clus[[i]] <- out[[i]]
     
   } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
-      clus[[i]][[j]] <- out[[i]][[j]]@Label
+      clus_list_i[[j]] <- out[[i]][[j]]
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
@@ -295,7 +309,7 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../results_manual/flowMeans/flowMeans_labels_", 
+files_labels <- paste0("../../results_manual/SamSPECTRAL/SamSPECTRAL_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -307,15 +321,15 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_manual/runtimes/runtime_flowMeans.txt", 
+write.table(runtimes, file = "../../results_manual/runtimes/runtime_SamSPECTRAL.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../results_manual/session_info/session_info_flowMeans.txt")
+sink(file = "../../results_manual/session_info/session_info_SamSPECTRAL.txt")
 print(sessionInfo())
 sink()
 
-cat("flowMeans manual : all runs complete\n")
+cat("SamSPECTRAL manual : all runs complete\n")
 
 
 

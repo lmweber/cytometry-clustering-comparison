@@ -1,12 +1,12 @@
 #########################################################################################
-# R script to run DensVM (cytofkit R/Bioconductor package)
+# R script to run Rclusterpp
 #
 # Lukas Weber, July 2016
 #########################################################################################
 
 
 library(flowCore)
-library(cytofkit)
+library(Rclusterpp)
 
 
 
@@ -17,7 +17,7 @@ library(cytofkit)
 
 # filenames
 
-DATA_DIR <- "../../benchmark_data_sets"
+DATA_DIR <- "../../../benchmark_data_sets"
 
 files <- list(
   Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
@@ -69,6 +69,26 @@ sapply(data[is_FlowCAP], function(d) {
 })
 
 
+# subsampling for data sets with excessive runtime (> 1 day on server)
+
+ix_subsample <- c(1, 2, 4, 6)
+n_sub <- 100000
+
+for (i in ix_subsample) {
+  if (!is_FlowCAP[i]) {
+    set.seed(123)
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    # save subsampled population IDs
+    true_labels_i <- data[[i]][, "label", drop = FALSE]
+    files_true_labels_i <- paste0("../../results_manual/Rclusterpp/true_labels_Rclusterpp_", 
+                                  names(data)[i], ".txt")
+    for (f in files_true_labels_i) {
+      write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
+    }
+  }
+}
+
+
 # indices of protein marker columns
 
 marker_cols <- list(
@@ -106,18 +126,26 @@ sapply(data[is_FlowCAP], function(d) {
 
 
 
-################################################
-### Run DensVM: automatic number of clusters ###
-################################################
+############################################################
+### Run Rclusterpp: manually selected number of clusters ###
+############################################################
 
-# number of points to subsample
+# run Rclusterpp
+# note: uses maximum number of cores if setThreads is left as default
 
-n_sub <- 20000
+n_cores <- 16
 
-
-# run DensVM with automatic selection of number of clusters (manual selection is not available)
-
-# use main functions: cytof_dimReduction(), cytof_cluster()
+# number of clusters k
+k <- list(
+  Levine_32dim = 40, 
+  Levine_13dim = 40, 
+  Samusik_01   = 40, 
+  Samusik_all  = 40, 
+  Nilsson_rare = 40, 
+  Mosmann_rare = 40, 
+  FlowCAP_ND   = 7, 
+  FlowCAP_WNV  = 4
+)
 
 seed <- 123
 out <- runtimes <- vector("list", length(data))
@@ -128,11 +156,9 @@ for (i in 1:length(data)) {
   if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
-      # subsampling (could also use function cytof_exprsMerge())
-      x <- data[[i]][sample(1:n_sub, n_sub), ]
-      
-      y <- cytof_dimReduction(x, method = "tsne")
-      out[[i]] <- cytof_cluster(y, x, method = "DensVM")
+      # set number of cores
+      Rclusterpp.setThreads(n_cores)
+      out[[i]] <- Rclusterpp.hclust(data[[i]], method = "average", distance = "euclidean")
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -144,11 +170,9 @@ for (i in 1:length(data)) {
     for (j in 1:length(data[[i]])) {
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        # subsampling (could also use function cytof_exprsMerge())
-        x <- data[[i]][[j]][sample(1:n_sub, n_sub), ]
-        
-        y <- cytof_dimReduction(x, method = "tsne")
-        out[[i]][[j]] <- cytof_cluster(y, x, method = "DensVM")
+        # set number of cores
+        Rclusterpp.setThreads(n_cores)
+        out[[i]][[j]] <- Rclusterpp.hclust(data[[i]][[j]], method = "average", distance = "euclidean")
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
@@ -167,13 +191,15 @@ names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
   if (!is_FlowCAP[i]) {
-    clus[[i]] <- as.numeric(out[[i]])
-    
+    # cut dendrogram at k and extract cluster labels
+    clus[[i]] <- cutree(out[[i]], k = k[[i]])
+
   } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
-      clus_list_i[[j]] <- as.numeric(out[[i]][[j]])
+      # cut dendrogram at k and extract cluster labels
+      clus[[i]][[j]] <- cutree(out[[i]][[j]], k = k[[i]])
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
@@ -192,7 +218,7 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../results_auto/DensVM/DensVM_labels_", 
+files_labels <- paste0("../../results_manual/Rclusterpp/Rclusterpp_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -204,15 +230,15 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_auto/runtimes/runtime_DensVM.txt", 
+write.table(runtimes, file = "../../results_manual/runtimes/runtime_Rclusterpp.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../results_auto/session_info/session_info_DensVM.txt")
+sink(file = "../../results_manual/session_info/session_info_Rclusterpp.txt")
 print(sessionInfo())
 sink()
 
-cat("DensVM automatic : all runs complete\n")
+cat("Rclusterpp manual : all runs complete\n")
 
 
 

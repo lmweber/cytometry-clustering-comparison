@@ -1,12 +1,21 @@
 #########################################################################################
-# R script to run Rclusterpp
+# R script to run FLOCK
+#
+# Note that FLOCK is not available in R. This script runs system commands to run FLOCK 
+# from the command line.
+#
+# Install FLOCK by downloading and compiling C source code from: 
+# http://sourceforge.net/projects/immportflock/files/FLOCK_flowCAP-I_code/. Be careful to
+# download version 2.0, not 1.0. Compilation instructions are in the README file. FLOCK 
+# can also be run through the ImmPort online analysis platform.
+#
+# Requires data file in program directory. The data file must be in .txt format, and 
+# contain only columns of transformed protein expression values. Run from command line 
+# with: "./flock2 ./filename.txt"; results (population IDs for each cell) are saved in
+# the file "flock_results.txt".
 #
 # Lukas Weber, July 2016
 #########################################################################################
-
-
-library(flowCore)
-library(Rclusterpp)
 
 
 
@@ -17,7 +26,7 @@ library(Rclusterpp)
 
 # filenames
 
-DATA_DIR <- "../../benchmark_data_sets"
+DATA_DIR <- "../../../benchmark_data_sets"
 
 files <- list(
   Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
@@ -69,22 +78,6 @@ sapply(data[is_FlowCAP], function(d) {
 })
 
 
-# subsampling for data sets with excessive runtime (> 1 day on server)
-
-ix_subsample <- c(1, 2, 4, 6)
-n_sub <- 100000
-
-for (i in ix_subsample) {
-  set.seed(123)
-  data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
-  
-  # save subsampled population IDs
-  true_labels_i <- data[[i]][, "label", drop = FALSE]
-  file_true_labels_i <- paste0("../results_manual/Rclusterpp/true_labels_", names(data)[i], ".txt")
-  write.table(true_labels_i, file = file_true_labels_i, row.names = FALSE, quote = FALSE, sep = "\t")
-}
-
-
 # indices of protein marker columns
 
 marker_cols <- list(
@@ -122,40 +115,32 @@ sapply(data[is_FlowCAP], function(d) {
 
 
 
-############################################################
-### Run Rclusterpp: manually selected number of clusters ###
-############################################################
+###############################################
+### Run FLOCK: automatic number of clusters ###
+###############################################
 
-# run Rclusterpp
-# note: uses maximum number of cores if setThreads is left as default
+# run from FLOCK program directory
 
-n_cores <- 16
+setwd("../../../algorithms/FLOCK")
 
-# number of clusters k
-k <- list(
-  Levine_32dim = 40, 
-  Levine_13dim = 40, 
-  Samusik_01   = 40, 
-  Samusik_all  = 40, 
-  Nilsson_rare = 40, 
-  Mosmann_rare = 40, 
-  FlowCAP_ND   = 7, 
-  FlowCAP_WNV  = 4
-)
+# run FLOCK with automatic selection of number of clusters (manual selection is not available)
 
-seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
 
 for (i in 1:length(data)) {
   
   if (!is_FlowCAP[i]) {
-    set.seed(seed)
+    # save external data file
+    write.table(data[[i]], file = "FLOCK_data_file.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+    
     runtimes[[i]] <- system.time({
-      # set number of cores
-      Rclusterpp.setThreads(n_cores)
-      out[[i]] <- Rclusterpp.hclust(data[[i]], method = "average", distance = "euclidean")
+      cmd <- "./flock2 ./FLOCK_data_file.txt"
+      system(cmd)
     })
+    
+    # read results from external results file
+    out[[i]] <- read.table("flock_results.txt", header = TRUE, sep = "\t")
     cat("data set", names(data[i]), ": run complete\n")
     
   } else {
@@ -164,12 +149,16 @@ for (i in 1:length(data)) {
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
     
     for (j in 1:length(data[[i]])) {
-      set.seed(seed)
+      # save external data file
+      write.table(data[[i]][[j]], file = "FLOCK_data_file.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+      
       runtimes[[i]][[j]] <- system.time({
-        # set number of cores
-        Rclusterpp.setThreads(n_cores)
-        out[[i]][[j]] <- Rclusterpp.hclust(data[[i]][[j]], method = "average", distance = "euclidean")
+        cmd <- "./flock2 ./FLOCK_data_file.txt"
+        system(cmd)
       })
+      
+      # read results from external results file
+      out[[i]][[j]] <- read.table("flock_results.txt", header = TRUE, sep = "\t")
     }
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -187,15 +176,13 @@ names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
   if (!is_FlowCAP[i]) {
-    # cut dendrogram at k and extract cluster labels
-    clus[[i]] <- cutree(out[[i]], k = k[[i]])
-
+    clus[[i]] <- out[[i]][, "Population"]
+    
   } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
-      # cut dendrogram at k and extract cluster labels
-      clus[[i]][[j]] <- cutree(out[[i]][[j]], k = k[[i]])
+      clus_list_i[[j]] <- out[[i]][[j]][, "Population"]
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
@@ -213,8 +200,11 @@ sapply(clus, length)
 table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
+# return to scripts directory
+setwd("../../clustering_comparison_paper/scripts/run_methods")
+
 # save cluster labels
-files_labels <- paste0("../results_manual/Rclusterpp/Rclusterpp_labels_", 
+files_labels <- paste0("../../results_auto/FLOCK/FLOCK_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -226,15 +216,15 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_manual/runtimes/runtime_Rclusterpp.txt", 
+write.table(runtimes, file = "../../results_auto/runtimes/runtime_FLOCK.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../results_manual/session_info/session_info_Rclusterpp.txt")
+sink(file = "../../results_auto/session_info/session_info_FLOCK.txt")
 print(sessionInfo())
 sink()
 
-cat("Rclusterpp manual : all runs complete\n")
+cat("FLOCK automatic : all runs complete\n")
 
 
 

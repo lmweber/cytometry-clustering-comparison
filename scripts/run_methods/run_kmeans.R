@@ -1,21 +1,11 @@
 #########################################################################################
-# R script to run FLOCK
-#
-# Note that FLOCK is not available in R. This script runs system commands to run FLOCK 
-# from the command line.
-#
-# Install FLOCK by downloading and compiling C source code from: 
-# http://sourceforge.net/projects/immportflock/files/FLOCK_flowCAP-I_code/. Be careful to
-# download version 2.0, not 1.0. Compilation instructions are in the README file. FLOCK 
-# can also be run through the ImmPort online analysis platform.
-#
-# Requires data file in program directory. The data file must be in .txt format, and 
-# contain only columns of transformed protein expression values. Run from command line 
-# with: "./flock2 ./filename.txt"; results (population IDs for each cell) are saved in
-# the file "flock_results.txt".
+# R script to run k-means
 #
 # Lukas Weber, July 2016
 #########################################################################################
+
+
+library(flowCore)
 
 
 
@@ -26,7 +16,7 @@
 
 # filenames
 
-DATA_DIR <- "../../benchmark_data_sets"
+DATA_DIR <- "../../../benchmark_data_sets"
 
 files <- list(
   Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
@@ -115,15 +105,37 @@ sapply(data[is_FlowCAP], function(d) {
 
 
 
-###############################################
-### Run FLOCK: automatic number of clusters ###
-###############################################
+#########################################################
+### Run k-means: manually selected number of clusters ###
+#########################################################
 
-# run from FLOCK program directory
+# number of clusters k
+k <- list(
+  Levine_32dim = 40, 
+  Levine_13dim = 40, 
+  Samusik_01   = 40, 
+  Samusik_all  = 40, 
+  Nilsson_rare = 40, 
+  Mosmann_rare = 40, 
+  FlowCAP_ND   = 7, 
+  FlowCAP_WNV  = 4
+)
 
-setwd("../../algorithms/FLOCK")
+iter.max <- 50
 
-# run FLOCK with automatic selection of number of clusters (manual selection is not available)
+seed <- list(
+  Levine_32dim = 123, 
+  Levine_13dim = 123, 
+  Samusik_01   = 1234, 
+  Samusik_all  = 123, 
+  Nilsson_rare = 123, 
+  Mosmann_rare = 123, 
+  FlowCAP_ND   = 12345, 
+  FlowCAP_WNV  = 123
+)
+
+# run k-means
+# note: additional iterations required; and returns errors for some random seeds
 
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
@@ -131,16 +143,10 @@ names(out) <- names(runtimes) <- names(data)
 for (i in 1:length(data)) {
   
   if (!is_FlowCAP[i]) {
-    # save external data file
-    write.table(data[[i]], file = "FLOCK_data_file.txt", quote = FALSE, sep = "\t", row.names = FALSE)
-    
+    set.seed(seed[[i]])
     runtimes[[i]] <- system.time({
-      cmd <- "./flock2 ./FLOCK_data_file.txt"
-      system(cmd)
+      out[[i]] <- kmeans(data[[i]], k[[i]])
     })
-    
-    # read results from external results file
-    out[[i]] <- read.table("flock_results.txt", header = TRUE, sep = "\t")
     cat("data set", names(data[i]), ": run complete\n")
     
   } else {
@@ -149,16 +155,10 @@ for (i in 1:length(data)) {
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
     
     for (j in 1:length(data[[i]])) {
-      # save external data file
-      write.table(data[[i]][[j]], file = "FLOCK_data_file.txt", quote = FALSE, sep = "\t", row.names = FALSE)
-      
+      set.seed(seed[[i]])
       runtimes[[i]][[j]] <- system.time({
-        cmd <- "./flock2 ./FLOCK_data_file.txt"
-        system(cmd)
+        out[[i]][[j]] <- kmeans(data[[i]][[j]], k[[i]])
       })
-      
-      # read results from external results file
-      out[[i]][[j]] <- read.table("flock_results.txt", header = TRUE, sep = "\t")
     }
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -176,13 +176,13 @@ names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
   if (!is_FlowCAP[i]) {
-    clus[[i]] <- out[[i]][, "Population"]
+    clus[[i]] <- out[[i]]$cluster
     
   } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
     for (j in 1:length(data[[i]])) {
-      clus_list_i[[j]] <- out[[i]][[j]][, "Population"]
+      clus_list_i[[j]] <- out[[i]][[j]]$cluster
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
@@ -200,11 +200,8 @@ sapply(clus, length)
 table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
-# return to scripts directory
-setwd("../../clustering_comparison_paper/scripts")
-
 # save cluster labels
-files_labels <- paste0("../results_auto/FLOCK/FLOCK_labels_", 
+files_labels <- paste0("../../results_manual/kmeans/kmeans_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -216,15 +213,15 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../results_auto/runtimes/runtime_FLOCK.txt", 
+write.table(runtimes, file = "../../results_manual/runtimes/runtime_kmeans.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../results_auto/session_info/session_info_FLOCK.txt")
+sink(file = "../../results_manual/session_info/session_info_kmeans.txt")
 print(sessionInfo())
 sink()
 
-cat("FLOCK automatic : all runs complete\n")
+cat("kmeans manual : all runs complete\n")
 
 
 
