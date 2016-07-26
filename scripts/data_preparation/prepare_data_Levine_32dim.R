@@ -67,7 +67,7 @@ df_pop_names
 
 # column names (protein markers and others)
 
-read.FCS(files_assigned[1], transformation = FALSE) %>% 
+read.FCS(files_assigned[1], transformation = FALSE, truncate_max_range = FALSE) %>% 
   exprs %>% 
   colnames %>% 
   unname %>% 
@@ -94,7 +94,9 @@ indiv_unassigned
 data <- matrix(nrow = 0, ncol = length(col_names) + 2)
 
 for (i in 1:length(files_assigned)) {
-  data_i <- flowCore::exprs(flowCore::read.FCS(files_assigned[i], transformation = FALSE))
+  data_i <- flowCore::exprs(flowCore::read.FCS(files_assigned[i], 
+                                               transformation = FALSE, 
+                                               truncate_max_range = FALSE))
   colnames(data_i) <- col_names
   
   # cluster labels
@@ -118,7 +120,9 @@ table(data[, "individual"])  # 2 individuals (72,463 and 31,721 assigned cells e
 data_unassigned <- matrix(nrow = 0, ncol = length(col_names) + 2)
 
 for (i in 1:length(files_unassigned)) {
-  data_i <- flowCore::exprs(flowCore::read.FCS(files_unassigned[i], transformation = FALSE))
+  data_i <- flowCore::exprs(flowCore::read.FCS(files_unassigned[i], 
+                                               transformation = FALSE, 
+                                               truncate_max_range = FALSE))
   colnames(data_i) <- col_names
   
   # cluster labels (NA since unassigned)

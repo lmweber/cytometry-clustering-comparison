@@ -124,7 +124,7 @@ data <- list()
 
 for (i in 1:length(files)) {
   
-  data_i <- flowCore::exprs(flowCore::read.FCS(files[i], transformation = FALSE))
+  data_i <- flowCore::exprs(flowCore::read.FCS(files[i], transformation = FALSE, truncate_max_range = FALSE))
   names_i <- gsub("^.*/|\\.fcs$", "", files[i])
   
   colnames(data_i) <- marker_names

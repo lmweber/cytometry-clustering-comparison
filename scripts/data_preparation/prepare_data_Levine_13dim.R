@@ -66,7 +66,7 @@ df_pop_names
 
 # column names (protein markers)
 
-read.FCS(files_assigned[1], transformation = FALSE) %>% 
+read.FCS(files_assigned[1], transformation = FALSE, truncate_max_range = FALSE) %>% 
   exprs %>% 
   colnames %>% 
   unname -> 
@@ -80,7 +80,9 @@ col_names
 data <- matrix(nrow = 0, ncol = length(col_names) + 1)
 
 for (i in 1:length(files_assigned)) {
-  data_i <- flowCore::exprs(flowCore::read.FCS(files_assigned[i], transformation = FALSE))
+  data_i <- flowCore::exprs(flowCore::read.FCS(files_assigned[i], 
+                                               transformation = FALSE, 
+                                               truncate_max_range = FALSE))
   
   # cluster labels
   data_i <- cbind(data_i, label = i)
@@ -95,7 +97,9 @@ table(data[, "label"])  # 24 manually gated clusters
 
 # load FCS file for unassigned cells
 
-data_unassigned <- flowCore::exprs(flowCore::read.FCS(files_unassigned, transformation = FALSE))
+data_unassigned <- flowCore::exprs(flowCore::read.FCS(files_unassigned, 
+                                                      transformation = FALSE, 
+                                                      truncate_max_range = FALSE))
 
 data_unassigned <- cbind(data_unassigned, label = NA)
 

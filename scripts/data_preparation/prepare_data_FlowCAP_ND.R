@@ -53,7 +53,7 @@ data <- data.frame()
 
 for (i in 1:length(files_data)) {
   
-  data_i <- flowCore::exprs(flowCore::read.FCS(files_data[i], transformation = FALSE))
+  data_i <- flowCore::exprs(flowCore::read.FCS(files_data[i], transformation = FALSE, truncate_max_range = FALSE))
   
   # population labels (0 = outliers, i.e. unassigned cells)
   labels_i <- read.csv(files_labels[i], header = TRUE)

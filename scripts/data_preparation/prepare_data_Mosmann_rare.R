@@ -43,7 +43,7 @@ library(magrittr)  # from CRAN
 
 file_raw <- list.files("raw_data", pattern = "\\.fcs$", full.names = TRUE)
 
-data_raw <- flowCore::read.FCS(file_raw, transformation = FALSE)
+data_raw <- flowCore::read.FCS(file_raw, transformation = FALSE, truncate_max_range = FALSE)
 
 head(data_raw)
 dim(data_raw)  # 1,600,017 events, 15 protein parameters and 6 scatter parameters
@@ -64,7 +64,9 @@ dim(data_raw)  # 1,600,017 events, 15 protein parameters and 6 scatter parameter
 
 file_single_live <- list.files("gated_data_from_Cytobank", pattern = "Live_cells\\.fcs$", full.names = TRUE)
 
-data_single_live <- flowCore::exprs(flowCore::read.FCS(file_single_live, transformation = FALSE))
+data_single_live <- flowCore::exprs(flowCore::read.FCS(file_single_live, 
+                                                       transformation = FALSE, 
+                                                       truncate_max_range = FALSE))
 
 head(data_single_live)
 dim(data_single_live)  # 396,460 cells
@@ -94,7 +96,7 @@ colnames(data_single_live)[7:21] <- cols_markers
 
 file_activ <- list.files("gated_data_from_Cytobank", pattern = "IFNg_vs_TNFa\\.fcs$", full.names = TRUE)
 
-data_activ <- flowCore::exprs(flowCore::read.FCS(file_activ, transformation = FALSE))
+data_activ <- flowCore::exprs(flowCore::read.FCS(file_activ, transformation = FALSE, truncate_max_range = FALSE))
 
 head(data_activ)
 dim(data_activ)  # 109 cells

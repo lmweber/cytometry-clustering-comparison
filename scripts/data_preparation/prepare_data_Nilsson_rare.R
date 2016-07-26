@@ -39,7 +39,7 @@ library(magrittr)  # from CRAN
 
 file_raw <- list.files("raw_data", pattern = "\\.fcs$", full.names = TRUE)
 
-data_raw <- flowCore::read.FCS(file_raw, transformation = FALSE)
+data_raw <- flowCore::read.FCS(file_raw, transformation = FALSE, truncate_max_range = FALSE)
 
 head(data_raw)
 dim(data_raw)  # 119,959 events, 13 protein parameters (plus scatter, live/dead, time)
@@ -63,7 +63,9 @@ parameters(data_raw)@data  # CD protein names (note PI is for dead cells)
 
 file_single_nondeb_live <- list.files("gated_data_from_Cytobank", pattern = "Live\ cells\\.fcs$", full.names = TRUE)
 
-data_single_nondeb_live <- flowCore::exprs(flowCore::read.FCS(file_single_nondeb_live, transformation = FALSE))
+data_single_nondeb_live <- flowCore::exprs(flowCore::read.FCS(file_single_nondeb_live, 
+                                                              transformation = FALSE, 
+                                                              truncate_max_range = FALSE))
 
 head(data_single_nondeb_live)
 dim(data_single_nondeb_live)  # 44,140 cells
@@ -99,7 +101,7 @@ colnames(data_single_nondeb_live)[ix_markers] <- cols_markers
 
 file_HSC <- list.files("gated_data_from_Cytobank", pattern = "HSCs\\.fcs$", full.names = TRUE)
 
-data_HSC <- flowCore::exprs(flowCore::read.FCS(file_HSC, transformation = FALSE))
+data_HSC <- flowCore::exprs(flowCore::read.FCS(file_HSC, transformation = FALSE, truncate_max_range = FALSE))
 
 head(data_HSC)
 dim(data_HSC)  # 358 cells
