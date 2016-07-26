@@ -197,6 +197,7 @@ for (i in 1:length(clus)) {
   } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
+    names(clus_list_i) <- names(data[[i]])
     for (j in 1:length(data[[i]])) {
       # cut dendrogram at k and extract cluster labels
       clus[[i]][[j]] <- cutree(out[[i]][[j]], k = k[[i]])

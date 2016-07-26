@@ -156,6 +156,7 @@ for (i in 1:length(clus)) {
   } else {
     # FlowCAP data sets
     clus_list_i <- lapply(out[[i]], function(o) o$map$mapping[, 1])
+    names(clus_list_i) <- names(out[[i]])
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
     # e.g. sample 1, cluster 3 -> cluster label 1_3
@@ -284,6 +285,7 @@ for (i in 1:length(clus)) {
   } else {
     # FlowCAP data sets
     clus_list_i <- lapply(out[[i]], function(o) o$map$mapping[, 1])
+    names(clus_list_i) <- names(out[[i]])
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
     # e.g. sample 1, cluster 3 -> cluster label 1.3

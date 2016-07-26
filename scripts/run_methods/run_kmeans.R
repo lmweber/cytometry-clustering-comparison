@@ -181,6 +181,7 @@ for (i in 1:length(clus)) {
   } else {
     # FlowCAP data sets
     clus_list_i <- vector("list", length(data[[i]]))
+    names(clus_list_i) <- names(data[[i]])
     for (j in 1:length(data[[i]])) {
       clus_list_i[[j]] <- out[[i]][[j]]$cluster
     }
