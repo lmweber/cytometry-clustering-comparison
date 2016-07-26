@@ -204,3 +204,103 @@ cat("flowPeaks automatic : all runs complete\n")
 
 
 
+
+################################################
+### Run flowPeaks: manual number of clusters ###
+################################################
+
+# run flowPeaks with manual selection of number of clusters
+# (note: smaller "tol" argument increases number of clusters)
+
+seed <- 123
+out <- runtimes <- vector("list", length(data))
+names(out) <- names(runtimes) <- names(data)
+
+for (i in 1:length(data)) {
+  
+  if (!is_FlowCAP[i]) {
+    set.seed(seed)
+    runtimes[[i]] <- system.time({
+      out[[i]] <- flowPeaks(data[[i]], tol = 0.0001)
+    })
+    cat("data set", names(data[i]), ": run complete\n")
+    
+  } else {
+    # FlowCAP data sets: run clustering algorithm separately for each sample
+    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
+    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
+    
+    for (j in 1:length(data[[i]])) {
+      set.seed(seed)
+      runtimes[[i]][[j]] <- system.time({
+        out[[i]][[j]] <- flowPeaks(data[[i]][[j]], tol = 0.0001)
+      })
+    }
+    cat("data set", names(data[i]), ": run complete\n")
+    
+    # FlowCAP data sets: sum runtimes over samples
+    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
+    runtimes_i <- colSums(runtimes_i)
+    names(runtimes_i) <- c("user", "system", "elapsed")
+    runtimes[[i]] <- runtimes_i
+  }
+}
+
+# extract cluster labels
+clus <- vector("list", length(data))
+names(clus) <- names(data)
+
+for (i in 1:length(clus)) {
+  if (!is_FlowCAP[i]) {
+    clus[[i]] <- out[[i]][["peaks.cluster"]]
+    
+  } else {
+    # FlowCAP data sets
+    clus_list_i <- vector("list", length(data[[i]]))
+    names(clus_list_i) <- names(data[[i]])
+    for (j in 1:length(data[[i]])) {
+      if (!is.null(out[[i]][[j]])) {
+        clus_list_i[[j]] <- out[[i]][[j]][["peaks.cluster"]]
+      }
+    }
+    
+    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
+    # e.g. sample 1, cluster 3 -> cluster label 1_3
+    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
+    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
+    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
+  }
+}
+
+sapply(clus, length)
+
+# cluster sizes and number of clusters
+# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
+table(clus[[1]])
+sapply(clus, function(cl) length(table(cl)))
+
+# save cluster labels
+files_labels <- paste0("../../results_manual/flowPeaks/flowPeaks_labels_", 
+                       names(clus), ".txt")
+
+for (i in 1:length(files_labels)) {
+  res_i <- data.frame(label = clus[[i]])
+  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
+
+# save runtimes
+runtimes <- lapply(runtimes, function(r) r["elapsed"])
+runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
+
+write.table(runtimes, file = "../../results_manual/runtimes/runtime_flowPeaks.txt", 
+            quote = FALSE, sep = "\t")
+
+# save session information
+sink(file = "../../results_manual/session_info/session_info_flowPeaks.txt")
+print(sessionInfo())
+sink()
+
+cat("flowPeaks manual : all runs complete\n")
+
+
+
