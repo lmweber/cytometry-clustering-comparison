@@ -117,7 +117,9 @@ helper_match_evaluate_FlowCAP_alternate <- function(clus_algorithm, clus_truth) 
   return(list(mean_pr_by_sample = mean_pr_by_sample, 
               mean_re_by_sample = mean_re_by_sample, 
               mean_F1_by_sample = mean_F1_by_sample, 
-              mean_pr = mean_pr, mean_re = mean_re, mean_F1 = mean_F1))
+              mean_pr = mean_pr, 
+              mean_re = mean_re, 
+              mean_F1 = mean_F1))
 }
 
 

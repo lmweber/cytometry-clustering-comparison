@@ -97,8 +97,19 @@ helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
     n_cells_matched[i] <- sum(clus_algorithm == labels_matched[i], na.rm = TRUE)
   }
   
-  return(list(pr = pr, re = re, F1 = F1, 
-              labels_matched = labels_matched, n_cells_matched = n_cells_matched))
+  # means across populations
+  mean_pr <- mean(pr)
+  mean_re <- mean(re)
+  mean_F1 <- mean(F1)
+  
+  return(list(pr = pr, 
+              re = re, 
+              F1 = F1, 
+              labels_matched = labels_matched, 
+              n_cells_matched = n_cells_matched, 
+              mean_pr = mean_pr, 
+              mean_re = mean_re, 
+              mean_F1 = mean_F1))
 }
 
 

@@ -59,8 +59,11 @@ helper_match_evaluate_single <- function(clus_algorithm, clus_truth) {
   
   n_cells_matched <- sum(clus_algorithm == labels_matched, na.rm = TRUE)
   
-  return(list(pr = pr, re = re, F1 = F1, 
-              labels_matched = labels_matched, n_cells_matched = n_cells_matched))
+  return(list(pr = pr, 
+              re = re, 
+              F1 = F1, 
+              labels_matched = labels_matched, 
+              n_cells_matched = n_cells_matched))
 }
 
 
