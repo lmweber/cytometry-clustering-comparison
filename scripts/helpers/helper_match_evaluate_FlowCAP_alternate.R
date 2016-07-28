@@ -6,8 +6,9 @@
 # Averages across populations: weighted by number of cells in true population
 #
 # Alternative function for FlowCAP-I data sets. Using same methodology as in FlowCAP 
-# paper (Aghaeepour et al. 2013), i.e. max F1 score and weighting. Results are averaged 
-# across populations for each sample, and then averaged across samples.
+# paper (Aghaeepour et al. 2013), i.e. max F1 score and weighting by population size.
+# Results are averaged across populations for each sample, and then averaged across
+# samples.
 #
 # Lukas Weber, July 2016
 #########################################################################################
