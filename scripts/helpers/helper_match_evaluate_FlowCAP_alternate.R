@@ -7,7 +7,7 @@
 #
 # Alternative function for FlowCAP-I data sets. Using same methodology as in FlowCAP 
 # paper (Aghaeepour et al. 2013), i.e. max F1 score and weighting. Results are averaged 
-# across populations for each sample, and returned individually by sample.
+# across populations for each sample, and then averaged across samples.
 #
 # Lukas Weber, July 2016
 #########################################################################################
@@ -17,21 +17,24 @@
 # - clus_algorithm: cluster labels from algorithm
 # - clus_truth: true cluster labels
 # (for both arguments: length = number of cells; names = cluster labels (integers))
-helper_match_evaluate_FlowCAP_alt <- function(clus_algorithm, clus_truth) {
+helper_match_evaluate_FlowCAP_alternate <- function(clus_algorithm, clus_truth) {
   
   # split cluster labels by sample
-  
   spl <- strsplit(clus_algorithm, split = "_")
   samples  <- as.numeric(sapply(spl, function(s) s[[1]]))
   clusters <- as.numeric(sapply(spl, function(s) s[[2]]))
   clusters_true <- clus_truth
   
-  # evaluate individually for each sample
-  
+  # evaluate individually for each sample (note some sample IDs may be missing)
   n_samples <- length(table(samples))
+  sample_ids <- names(table(samples))
   res <- vector("list", n_samples)
   
   for (z in 1:n_samples) {
+    
+    # use sample ID instead of index z
+    original_z <- z
+    z <- as.numeric(sample_ids[z])
     
     # select sample z
     sel <- samples == z
@@ -47,6 +50,7 @@ helper_match_evaluate_FlowCAP_alt <- function(clus_algorithm, clus_truth) {
     tbl_algorithm <- table(clus_algorithm)
     tbl_truth <- table(clus_truth)
     
+    # detected clusters in rows, true populations in columns
     pr_mat <- re_mat <- F1_mat <- matrix(NA, nrow = length(tbl_algorithm), ncol = length(tbl_truth))
     
     for (i in 1:length(tbl_algorithm)) {
@@ -59,7 +63,6 @@ helper_match_evaluate_FlowCAP_alt <- function(clus_algorithm, clus_truth) {
         truth <- sum(clus_truth == j_int, na.rm = TRUE)
         
         # calculate precision, recall, and F1 score
-        
         precision_ij <- true_positives / detected
         recall_ij <- true_positives / truth
         F1_ij <- 2 * (precision_ij * recall_ij) / (precision_ij + recall_ij)
@@ -72,43 +75,48 @@ helper_match_evaluate_FlowCAP_alt <- function(clus_algorithm, clus_truth) {
       }
     }
     
-    # put back cluster labels
-    
+    # put back cluster labels (note some row names may be missing due to removal of unassigned cells)
     rownames(pr_mat) <- rownames(re_mat) <- rownames(F1_mat) <- names(tbl_algorithm)
     colnames(pr_mat) <- colnames(re_mat) <- colnames(F1_mat) <- names(tbl_truth)
     
     # match labels using highest F1 score (note duplicates are allowed)
-    
-    labels_matched <- apply(F1_mat, 2, which.max)
+    # use row names since some labels may have been removed due to unassigned cells
+    labels_matched <- as.numeric(rownames(F1_mat)[apply(F1_mat, 2, which.max)])
+    names(labels_matched) <- 1:length(labels_matched)
     
     # precision, recall, F1 score, and number of cells for each matched cluster
-    
     pr <- re <- F1 <- n_cells_matched <- rep(NA, ncol(F1_mat))
     names(pr) <- names(re) <- names(F1) <- names(n_cells_matched) <- names(labels_matched)
     
     for (i in 1:ncol(F1_mat)) {
-      # use character names for column indices in case subsampling completely removes some true clusters
-      pr[i] <- pr_mat[labels_matched[i], names(labels_matched[i])]
-      re[i] <- re_mat[labels_matched[i], names(labels_matched[i])]
-      F1[i] <- F1_mat[labels_matched[i], names(labels_matched[i])]
+      # use character names for row and column indices in case subsampling completely removes some clusters
+      pr[i] <- pr_mat[as.character(labels_matched[i]), names(labels_matched)[i]]
+      re[i] <- re_mat[as.character(labels_matched[i]), names(labels_matched)[i]]
+      F1[i] <- F1_mat[as.character(labels_matched[i]), names(labels_matched)[i]]
       
       n_cells_matched[i] <- sum(clus_algorithm == labels_matched[i], na.rm = TRUE)
     }
     
-    # keep tbl_truth for calculating weighted means
-    res[[z]] <- list(pr = pr, re = re, F1 = F1, 
-                     labels_matched = labels_matched, n_cells_matched = n_cells_matched, 
-                     tbl_truth = tbl_truth)
+    # use index z instead of sample ID (some sample IDs may be missing)
+    res[[original_z]] <- list(pr = pr, re = re, F1 = F1, 
+                              labels_matched = labels_matched, n_cells_matched = n_cells_matched, 
+                              tbl_truth = tbl_truth)
   }
   
-  # calculate mean precision, recall, F1 (across populations; return for each sample)
+  # calculate mean precision, recall, F1 across true populations (with weighting by true population size)
+  mean_pr_by_sample <- sapply(res, function(s) sum(s$pr * as.numeric(s$tbl_truth)) / sum(as.numeric(s$tbl_truth)))
+  mean_re_by_sample <- sapply(res, function(s) sum(s$re * as.numeric(s$tbl_truth)) / sum(as.numeric(s$tbl_truth)))
+  mean_F1_by_sample <- sapply(res, function(s) sum(s$F1 * as.numeric(s$tbl_truth)) / sum(as.numeric(s$tbl_truth)))
   
-  # with weighting by true population size
+  # calculate means across samples
+  mean_pr <- mean(mean_pr_by_sample)
+  mean_re <- mean(mean_re_by_sample)
+  mean_F1 <- mean(mean_F1_by_sample)
   
-  mean_pr <- sapply(res, function(s) sum(s$pr * as.numeric(s$tbl_truth)) / sum(as.numeric(s$tbl_truth)))
-  mean_re <- sapply(res, function(s) sum(s$re * as.numeric(s$tbl_truth)) / sum(as.numeric(s$tbl_truth)))
-  mean_F1 <- sapply(res, function(s) sum(s$F1 * as.numeric(s$tbl_truth)) / sum(as.numeric(s$tbl_truth)))
-  
-  return(list(mean_pr = mean_pr, mean_re = mean_re, mean_F1 = mean_F1))
+  return(list(mean_pr_by_sample = mean_pr_by_sample, 
+              mean_re_by_sample = mean_re_by_sample, 
+              mean_F1_by_sample = mean_F1_by_sample, 
+              mean_pr = mean_pr, mean_re = mean_re, mean_F1 = mean_F1))
 }
+
 

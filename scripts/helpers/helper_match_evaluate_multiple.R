@@ -2,7 +2,7 @@
 # Function to match cluster labels with manual gating (reference standard) population 
 # labels and calculate precision, recall, and F1 score
 #
-# Matching criterion: Hungarian algorithm (see Samusik et al. 2016)
+# Matching criterion: Hungarian algorithm
 #
 # Use this function for data sets with multiple populations of interest
 #
@@ -10,7 +10,7 @@
 #########################################################################################
 
 
-library(clue)  # contains implementation of Hungarian algorithm
+library(clue)
 
 
 # arguments:
@@ -28,6 +28,7 @@ helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
   tbl_algorithm <- table(clus_algorithm)
   tbl_truth <- table(clus_truth)
   
+  # detected clusters in rows, true populations in columns
   pr_mat <- re_mat <- F1_mat <- matrix(NA, nrow = length(tbl_algorithm), ncol = length(tbl_truth))
   
   for (i in 1:length(tbl_algorithm)) {
@@ -40,7 +41,6 @@ helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
       truth <- sum(clus_truth == j_int, na.rm = TRUE)
       
       # calculate precision, recall, and F1 score
-      
       precision_ij <- true_positives / detected
       recall_ij <- true_positives / truth
       F1_ij <- 2 * (precision_ij * recall_ij) / (precision_ij + recall_ij)
@@ -53,31 +53,46 @@ helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
     }
   }
   
-  # put back cluster labels
-  
+  # put back cluster labels (note some row names may be missing due to removal of unassigned cells)
   rownames(pr_mat) <- rownames(re_mat) <- rownames(F1_mat) <- names(tbl_algorithm)
   colnames(pr_mat) <- colnames(re_mat) <- colnames(F1_mat) <- names(tbl_truth)
   
   # match labels using Hungarian algorithm applied to matrix of F1 scores (Hungarian
   # algorithm calculates an optimal one-to-one assignment)
   
-  # note Hungarian algorithm assumes n_rows <= n_cols (transpose matrix)
+  # use transpose matrix (Hungarian algorithm assumes n_rows <= n_cols)
+  F1_mat_trans <- t(F1_mat)
   
-  labels_matched <- clue::solve_LSAP(t(F1_mat), maximum = TRUE)
-  
-  labels_matched <- as.numeric(labels_matched)
-  names(labels_matched) <- 1:length(labels_matched)
+  if (nrow(F1_mat_trans) <= ncol(F1_mat_trans)) {
+    # if fewer (or equal no.) true populations than detected clusters, can match all true populations
+    labels_matched <- clue::solve_LSAP(F1_mat_trans, maximum = TRUE)
+    # use column names since some labels may have been removed due to unassigned cells
+    labels_matched <- as.numeric(colnames(F1_mat_trans)[as.numeric(labels_matched)])
+    names(labels_matched) <- 1:length(labels_matched)
+    
+  } else {
+    # if fewer detected clusters than true populations, use transpose matrix and assign
+    # NAs for true populations without any matching clusters
+    labels_matched_flipped <- clue::solve_LSAP(F1_mat, maximum = TRUE)
+    # use row names since some labels may have been removed due to unassigned cells
+    labels_matched_flipped <- as.numeric(rownames(F1_mat_trans)[as.numeric(labels_matched_flipped)])
+    names(labels_matched_flipped) <- 1:length(labels_matched_flipped)
+    
+    labels_matched <- rep(NA, ncol(F1_mat))
+    labels_matched[labels_matched_flipped] <- as.numeric(names(labels_matched_flipped))
+    names(labels_matched) <- 1:length(labels_matched)
+  }
   
   # precision, recall, F1 score, and number of cells for each matched cluster
-  
   pr <- re <- F1 <- n_cells_matched <- rep(NA, ncol(F1_mat))
   names(pr) <- names(re) <- names(F1) <- names(n_cells_matched) <- names(labels_matched)
   
   for (i in 1:ncol(F1_mat)) {
-    # use character names for column indices in case subsampling completely removes some true clusters
-    pr[i] <- pr_mat[labels_matched[i], names(labels_matched[i])]
-    re[i] <- re_mat[labels_matched[i], names(labels_matched[i])]
-    F1[i] <- F1_mat[labels_matched[i], names(labels_matched[i])]
+    # set to 0 if no matching cluster (too few detected clusters); use character names 
+    # for row and column indices in case subsampling completely removes some clusters
+    pr[i] <- ifelse(is.na(labels_matched[i]), 0, pr_mat[as.character(labels_matched[i]), names(labels_matched)[i]])
+    re[i] <- ifelse(is.na(labels_matched[i]), 0, re_mat[as.character(labels_matched[i]), names(labels_matched)[i]])
+    F1[i] <- ifelse(is.na(labels_matched[i]), 0, F1_mat[as.character(labels_matched[i]), names(labels_matched)[i]])
     
     n_cells_matched[i] <- sum(clus_algorithm == labels_matched[i], na.rm = TRUE)
   }
@@ -85,4 +100,5 @@ helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
   return(list(pr = pr, re = re, F1 = F1, 
               labels_matched = labels_matched, n_cells_matched = n_cells_matched))
 }
+
 
