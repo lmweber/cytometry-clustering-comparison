@@ -1,5 +1,5 @@
 #########################################################################################
-# R script to load and evaluate results for flowMeans
+# R script to load and evaluate results for FlowSOM
 #
 # Lukas Weber, July 2016
 #########################################################################################
@@ -15,12 +15,12 @@ source("../helpers/helper_match_evaluate_FlowCAP.R")
 source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
 # which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
-RES_DIR_FLOWMEANS <- "../../results_manual/flowMeans"
+RES_DIR_FLOWSOM <- "../../results_manual/FlowSOM"
 
 DATA_DIR <- "../../../benchmark_data_sets"
 
 # which data sets required subsampling for this method (see parameters spreadsheet)
-is_subsampled <- c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
+is_subsampled <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
 
 is_rare    <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
 is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
@@ -39,7 +39,7 @@ files_truth <- list(
   Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
   Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
   Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
-  Samusik_all  = file.path(RES_DIR_FLOWMEANS, "true_labels_flowMeans_Samusik_all.txt"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
   Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
   Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
   FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
@@ -73,21 +73,21 @@ sapply(tbl_truth, length)
 
 
 
-##############################
-### load flowMeans results ###
-##############################
+############################
+### load FlowSOM results ###
+############################
 
 # load cluster labels
 
 files_out <- list(
-  Levine_32dim = file.path(RES_DIR_FLOWMEANS, "flowMeans_labels_Levine_32dim.txt"), 
-  Levine_13dim = file.path(RES_DIR_FLOWMEANS, "flowMeans_labels_Levine_13dim.txt"), 
-  Samusik_01   = file.path(RES_DIR_FLOWMEANS, "flowMeans_labels_Samusik_01.txt"), 
-  Samusik_all  = file.path(RES_DIR_FLOWMEANS, "flowMeans_labels_Samusik_all.txt"), 
-  Nilsson_rare = file.path(RES_DIR_FLOWMEANS, "flowMeans_labels_Nilsson_rare.txt"), 
-  Mosmann_rare = file.path(RES_DIR_FLOWMEANS, "flowMeans_labels_Mosmann_rare.txt"), 
-  FlowCAP_ND   = file.path(RES_DIR_FLOWMEANS, "flowMeans_labels_FlowCAP_ND.txt"), 
-  FlowCAP_WNV  = file.path(RES_DIR_FLOWMEANS, "flowMeans_labels_FlowCAP_WNV.txt")
+  Levine_32dim = file.path(RES_DIR_FLOWSOM, "FlowSOM_labels_Levine_32dim.txt"), 
+  Levine_13dim = file.path(RES_DIR_FLOWSOM, "FlowSOM_labels_Levine_13dim.txt"), 
+  Samusik_01   = file.path(RES_DIR_FLOWSOM, "FlowSOM_labels_Samusik_01.txt"), 
+  Samusik_all  = file.path(RES_DIR_FLOWSOM, "FlowSOM_labels_Samusik_all.txt"), 
+  Nilsson_rare = file.path(RES_DIR_FLOWSOM, "FlowSOM_labels_Nilsson_rare.txt"), 
+  Mosmann_rare = file.path(RES_DIR_FLOWSOM, "FlowSOM_labels_Mosmann_rare.txt"), 
+  FlowCAP_ND   = file.path(RES_DIR_FLOWSOM, "FlowSOM_labels_FlowCAP_ND.txt"), 
+  FlowCAP_WNV  = file.path(RES_DIR_FLOWSOM, "FlowSOM_labels_FlowCAP_WNV.txt")
 )
 
 clus <- lapply(files_out, function(f) {
@@ -139,7 +139,7 @@ for (i in 1:length(res)) {
 
 # return named object when evaluating several clustering methods
 
-res_flowMeans <- res
+res_FlowSOM <- res
 
 
 
