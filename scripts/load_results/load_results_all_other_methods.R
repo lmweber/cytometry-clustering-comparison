@@ -1,15 +1,15 @@
 #########################################################################################
-# R script to load and calculate results for all other methods
+# R script to load and evaluate results for all methods without subsampling
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, July 2016
 #########################################################################################
 
 
 library(flowCore)
 
 # helper functions
-source("helper_match_clusters_and_evaluate.R")
-source("helper_match_one_rare_cluster_and_evaluate.R")
+source("helper_match_multiple_clusters_and_evaluate.R")
+source("helper_match_single_cluster_and_evaluate.R")
 
 # true (manually gated) cluster labels
 source("load_results_truth.R")

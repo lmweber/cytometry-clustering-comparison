@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load results directories
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, July 2016
 #########################################################################################
 
 # This script chooses the results directories for each method, depending on whether 
