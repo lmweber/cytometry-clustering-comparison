@@ -302,7 +302,7 @@ for (i in 1:length(clus)) {
     names(clus_list_i) <- names(data[[i]])
     for (j in 1:length(data[[i]])) {
       if (!is.null(out[[i]][[j]])) {
-        clus[[i]][[j]] <- out[[i]][[j]]@Label
+        clus_list_i[[j]] <- out[[i]][[j]]@Label
       }
     }
     
