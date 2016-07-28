@@ -22,8 +22,10 @@ DATA_DIR <- "../../../benchmark_data_sets"
 # which data sets required subsampling for this method (see parameters spreadsheet)
 is_subsampled <- c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
 
-is_rare    <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
-is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
+# alternate FlowCAP results at the end
+is_rare    <- c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE)
+is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE)
+n_FlowCAP <- 2
 
 
 
@@ -122,10 +124,11 @@ for (i in 1:length(clus)) {
 
 # see helper function scripts for details on matching strategy and evaluation
 
-res <- vector("list", length(clus))
-names(res) <- names(clus)
+res <- vector("list", length(clus) + n_FlowCAP)
+names(res)[1:length(clus)] <- names(clus)
+names(res)[-(1:length(clus))] <- paste0(names(clus)[is_FlowCAP], "_alternate")
 
-for (i in 1:length(res)) {
+for (i in 1:length(clus)) {
   if (!is_rare[i] & !is_FlowCAP[i]) {
     res[[i]] <- helper_match_evaluate_multiple(clus[[i]], clus_truth[[i]])
     
@@ -133,11 +136,12 @@ for (i in 1:length(res)) {
     res[[i]] <- helper_match_evaluate_single(clus[[i]], clus_truth[[i]])
     
   } else if (is_FlowCAP[i]) {
-    res[[i]] <- helper_match_evaluate_FlowCAP(clus[[i]], clus_truth[[i]])
+    res[[i]]             <- helper_match_evaluate_FlowCAP(clus[[i]], clus_truth[[i]])
+    res[[i + n_FlowCAP]] <- helper_match_evaluate_FlowCAP_alternate(clus[[i]], clus_truth[[i]])
   }
 }
 
-# return named object when evaluating several clustering methods
+# return named object (used in plotting scripts)
 
 res_flowMeans <- res
 
