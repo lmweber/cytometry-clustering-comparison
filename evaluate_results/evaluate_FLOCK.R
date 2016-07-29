@@ -1,21 +1,77 @@
 #########################################################################################
-# R script to load and calculate results for FLOCK
+# R script to load and evaluate results for FLOCK
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, July 2016
 #########################################################################################
 
 
 library(flowCore)
+library(clue)
 
-# helper functions
-source("helper_match_clusters_and_evaluate.R")
-source("helper_match_one_rare_cluster_and_evaluate.R")
+# helper functions to match clusters and evaluate
+source("../helpers/helper_match_evaluate_multiple.R")
+source("../helpers/helper_match_evaluate_single.R")
+source("../helpers/helper_match_evaluate_FlowCAP.R")
+source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
-# true (manually gated) cluster labels
-source("load_results_truth.R")
+# which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
+RES_DIR_FLOCK <- "../../results_auto/FLOCK"
 
-# results directories
-source("load_results_directories.R")
+DATA_DIR <- "../../../benchmark_data_sets"
+
+# which data sets required subsampling for this method (see parameters spreadsheet)
+is_subsampled <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+
+# alternate FlowCAP results at the end
+is_rare    <- c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE)
+is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE)
+n_FlowCAP <- 2
+
+
+
+
+###################################################
+### load truth (manual gating population labels) ##
+###################################################
+
+# files with true population labels (subsampled labels if subsampling was required for
+# this method; see parameters spreadsheet)
+
+files_truth <- list(
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
+  FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
+  FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
+)
+
+# extract true population labels
+
+clus_truth <- vector("list", length(files_truth))
+names(clus_truth) <- names(files_truth)
+
+for (i in 1:length(clus_truth)) {
+  if (!is_subsampled[i]) {
+    data_truth_i <- flowCore::exprs(flowCore::read.FCS(files_truth[[i]], transformation = FALSE, truncate_max_range = FALSE))
+  } else {
+    data_truth_i <- read.table(files_truth[[i]], header = TRUE, stringsAsFactors = FALSE)
+  }
+  clus_truth[[i]] <- data_truth_i[, "label"]
+}
+
+sapply(clus_truth, length)
+
+# cluster sizes and number of clusters
+# (for data sets with single rare population: 1 = rare population of interest, 0 = all others)
+
+tbl_truth <- lapply(clus_truth, table)
+
+tbl_truth
+sapply(tbl_truth, length)
+
 
 
 
@@ -23,79 +79,71 @@ source("load_results_directories.R")
 ### load FLOCK results ###
 ##########################
 
-# load FLOCK output files
+# load cluster labels
 
-file_FLOCK_Levine_32 <- file.path(RES_DIR_FLOCK, "FLOCK/flock_results_Levine_2015_marrow_32.txt")
-file_FLOCK_Levine_13 <- file.path(RES_DIR_FLOCK, "FLOCK/flock_results_Levine_2015_marrow_13.txt")
-file_FLOCK_Nilsson <- file.path(RES_DIR_FLOCK, "FLOCK/flock_results_Nilsson_2013_HSC.txt")
-file_FLOCK_Mosmann <- file.path(RES_DIR_FLOCK, "FLOCK/flock_results_Mosmann_2014_activ.txt")
+files_out <- list(
+  Levine_32dim = file.path(RES_DIR_FLOCK, "FLOCK_labels_Levine_32dim.txt"), 
+  Levine_13dim = file.path(RES_DIR_FLOCK, "FLOCK_labels_Levine_13dim.txt"), 
+  Samusik_01   = file.path(RES_DIR_FLOCK, "FLOCK_labels_Samusik_01.txt"), 
+  Samusik_all  = file.path(RES_DIR_FLOCK, "FLOCK_labels_Samusik_all.txt"), 
+  Nilsson_rare = file.path(RES_DIR_FLOCK, "FLOCK_labels_Nilsson_rare.txt"), 
+  Mosmann_rare = file.path(RES_DIR_FLOCK, "FLOCK_labels_Mosmann_rare.txt"), 
+  FlowCAP_ND   = file.path(RES_DIR_FLOCK, "FLOCK_labels_FlowCAP_ND.txt"), 
+  FlowCAP_WNV  = file.path(RES_DIR_FLOCK, "FLOCK_labels_FlowCAP_WNV.txt")
+)
 
-data_FLOCK_Levine_32 <- read.table(file_FLOCK_Levine_32, header = TRUE, sep = "\t")
-data_FLOCK_Levine_13 <- read.table(file_FLOCK_Levine_13, header = TRUE, sep = "\t")
-data_FLOCK_Nilsson <- read.table(file_FLOCK_Nilsson, header = TRUE, sep = "\t")
-data_FLOCK_Mosmann <- read.table(file_FLOCK_Mosmann, header = TRUE, sep = "\t")
+clus <- lapply(files_out, function(f) {
+  read.table(f, header = TRUE, stringsAsFactors = FALSE)[, "label"]
+})
 
-head(data_FLOCK_Levine_32)
-head(data_FLOCK_Levine_13)
-head(data_FLOCK_Nilsson)
-head(data_FLOCK_Mosmann)
-
-dim(data_FLOCK_Levine_32)
-dim(data_FLOCK_Levine_13)
-dim(data_FLOCK_Nilsson)
-dim(data_FLOCK_Mosmann)
-
-
-# extract cluster labels
-
-clus_FLOCK_Levine_32 <- data_FLOCK_Levine_32[, "Population"]
-clus_FLOCK_Levine_13 <- data_FLOCK_Levine_13[, "Population"]
-clus_FLOCK_Nilsson <- data_FLOCK_Nilsson[, "Population"]
-clus_FLOCK_Mosmann <- data_FLOCK_Mosmann[, "Population"]
-
-length(clus_FLOCK_Levine_32)
-length(clus_FLOCK_Levine_13)
-length(clus_FLOCK_Nilsson)
-length(clus_FLOCK_Mosmann)
-
-
-# contingency tables
-
-table(clus_FLOCK_Levine_32, clus_truth_Levine_32)
-table(clus_FLOCK_Levine_13, clus_truth_Levine_13)
-table(clus_FLOCK_Nilsson, clus_truth_Nilsson)
-table(clus_FLOCK_Mosmann, clus_truth_Mosmann)
-
+sapply(clus, length)
 
 # cluster sizes and number of clusters
+# (for data sets with single rare population: 1 = rare population of interest, 0 = all others)
 
-tbl_FLOCK_Levine_32 <- table(clus_FLOCK_Levine_32)
-tbl_FLOCK_Levine_13 <- table(clus_FLOCK_Levine_13)
-tbl_FLOCK_Nilsson <- table(clus_FLOCK_Nilsson)
-tbl_FLOCK_Mosmann <- table(clus_FLOCK_Mosmann)
+tbl <- lapply(clus, table)
 
-tbl_FLOCK_Levine_32
-tbl_FLOCK_Levine_13
-tbl_FLOCK_Nilsson
-tbl_FLOCK_Mosmann
+tbl
+sapply(tbl, length)
 
-length(tbl_FLOCK_Levine_32)
-length(tbl_FLOCK_Levine_13)
-length(tbl_FLOCK_Nilsson)
-length(tbl_FLOCK_Mosmann)
+# contingency tables
+# (excluding FlowCAP data sets since population IDs are not consistent across samples)
+
+for (i in 1:length(clus)) {
+  if (!is_FlowCAP[i]) {
+    print(table(clus[[i]], clus_truth[[i]]))
+  }
+}
 
 
-# match cluster labels by highest F1 score and calculate results
-# precision, recall, F1 score, matched cluster labels, number of cells per matched cluster
 
-res_FLOCK_Levine_32 <- helper_match_clusters_and_evaluate(clus_FLOCK_Levine_32, clus_truth_Levine_32)
-res_FLOCK_Levine_13 <- helper_match_clusters_and_evaluate(clus_FLOCK_Levine_13, clus_truth_Levine_13)
-res_FLOCK_Nilsson <- helper_match_one_rare_cluster_and_evaluate(clus_FLOCK_Nilsson, clus_truth_Nilsson)
-res_FLOCK_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_FLOCK_Mosmann, clus_truth_Mosmann)
 
-res_FLOCK_Levine_32
-res_FLOCK_Levine_13
-res_FLOCK_Nilsson
-res_FLOCK_Mosmann
+###################################
+### match clusters and evaluate ###
+###################################
+
+# see helper function scripts for details on matching strategy and evaluation
+
+res <- vector("list", length(clus) + n_FlowCAP)
+names(res)[1:length(clus)] <- names(clus)
+names(res)[-(1:length(clus))] <- paste0(names(clus)[is_FlowCAP], "_alternate")
+
+for (i in 1:length(clus)) {
+  if (!is_rare[i] & !is_FlowCAP[i]) {
+    res[[i]] <- helper_match_evaluate_multiple(clus[[i]], clus_truth[[i]])
+    
+  } else if (is_rare[i]) {
+    res[[i]] <- helper_match_evaluate_single(clus[[i]], clus_truth[[i]])
+    
+  } else if (is_FlowCAP[i]) {
+    res[[i]]             <- helper_match_evaluate_FlowCAP(clus[[i]], clus_truth[[i]])
+    res[[i + n_FlowCAP]] <- helper_match_evaluate_FlowCAP_alternate(clus[[i]], clus_truth[[i]])
+  }
+}
+
+# return named object (used in plotting scripts)
+
+res_FLOCK <- res
+
 
 

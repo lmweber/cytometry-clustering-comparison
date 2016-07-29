@@ -12,14 +12,12 @@
 RES_DIR_ACCENSE         <- "../results_manual_n_clus"
 
 RES_DIR_DENSVM          <- "../results_auto_n_clus"
-RES_DIR_FLOCK           <- "../results_auto_n_clus"
 
 RES_DIR_IMMUNOCLUST     <- "../results_manual_n_clus"
 RES_DIR_IMMUNOCLUST_ALL <- "../results_manual_n_clus"
 
 RES_DIR_PHENOGRAPH      <- "../results_auto_n_clus"
 
-RES_DIR_RCLUSTERPP      <- "../results_manual_n_clus"
 RES_DIR_SAMSPECTRAL     <- "../results_manual_n_clus"
 
 RES_DIR_SWIFT           <- "../results_auto_n_clus"
