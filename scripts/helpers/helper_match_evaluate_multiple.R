@@ -66,21 +66,21 @@ helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
   if (nrow(F1_mat_trans) <= ncol(F1_mat_trans)) {
     # if fewer (or equal no.) true populations than detected clusters, can match all true populations
     labels_matched <- clue::solve_LSAP(F1_mat_trans, maximum = TRUE)
-    # use column names since some labels may have been removed due to unassigned cells
+    # use row and column names since some labels may have been removed due to unassigned cells
     labels_matched <- as.numeric(colnames(F1_mat_trans)[as.numeric(labels_matched)])
-    names(labels_matched) <- 1:length(labels_matched)
+    names(labels_matched) <- rownames(F1_mat_trans)
     
   } else {
     # if fewer detected clusters than true populations, use transpose matrix and assign
     # NAs for true populations without any matching clusters
     labels_matched_flipped <- clue::solve_LSAP(F1_mat, maximum = TRUE)
-    # use row names since some labels may have been removed due to unassigned cells
+    # use row and column names since some labels may have been removed due to unassigned cells
     labels_matched_flipped <- as.numeric(rownames(F1_mat_trans)[as.numeric(labels_matched_flipped)])
-    names(labels_matched_flipped) <- 1:length(labels_matched_flipped)
+    names(labels_matched_flipped) <- rownames(F1_mat)
     
     labels_matched <- rep(NA, ncol(F1_mat))
     labels_matched[labels_matched_flipped] <- as.numeric(names(labels_matched_flipped))
-    names(labels_matched) <- 1:length(labels_matched)
+    names(labels_matched) <- rownames(F1_mat_trans)
   }
   
   # precision, recall, F1 score, and number of cells for each matched cluster

@@ -81,9 +81,9 @@ helper_match_evaluate_FlowCAP_alternate <- function(clus_algorithm, clus_truth) 
     colnames(pr_mat) <- colnames(re_mat) <- colnames(F1_mat) <- names(tbl_truth)
     
     # match labels using highest F1 score (note duplicates are allowed)
-    # use row names since some labels may have been removed due to unassigned cells
+    # use row and column names since some labels may have been removed due to unassigned cells
     labels_matched <- as.numeric(rownames(F1_mat)[apply(F1_mat, 2, which.max)])
-    names(labels_matched) <- 1:length(labels_matched)
+    names(labels_matched) <- colnames(F1_mat)
     
     # precision, recall, F1 score, and number of cells for each matched cluster
     pr <- re <- F1 <- n_cells_matched <- rep(NA, ncol(F1_mat))
