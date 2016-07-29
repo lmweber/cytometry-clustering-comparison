@@ -200,7 +200,7 @@ for (i in 1:length(clus)) {
     names(clus_list_i) <- names(data[[i]])
     for (j in 1:length(data[[i]])) {
       # cut dendrogram at k and extract cluster labels
-      clus[[i]][[j]] <- cutree(out[[i]][[j]], k = k[[i]])
+      clus_list_i[[j]] <- cutree(out[[i]][[j]], k = k[[i]])
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
