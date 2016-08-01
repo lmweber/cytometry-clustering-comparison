@@ -79,8 +79,8 @@ helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
     names(labels_matched_flipped) <- rownames(F1_mat)
     
     labels_matched <- rep(NA, ncol(F1_mat))
-    labels_matched[labels_matched_flipped] <- as.numeric(names(labels_matched_flipped))
     names(labels_matched) <- rownames(F1_mat_trans)
+    labels_matched[as.character(labels_matched_flipped)] <- as.numeric(names(labels_matched_flipped))
   }
   
   # precision, recall, F1 score, and number of cells for each matched cluster
