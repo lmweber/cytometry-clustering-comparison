@@ -1,5 +1,5 @@
 #########################################################################################
-# R script to load and evaluate results for DensVM
+# R script to load and evaluate results for ClusterX
 #
 # Lukas Weber, July 2016
 #########################################################################################
@@ -15,7 +15,7 @@ source("../helpers/helper_match_evaluate_FlowCAP.R")
 source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
 # which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
-RES_DIR_DENSVM <- "../../results_auto/DensVM"
+RES_DIR_CLUSTERX <- "../../results_auto/ClusterX"
 
 DATA_DIR <- "../../../benchmark_data_sets"
 
@@ -38,14 +38,14 @@ n_FlowCAP <- 2
 # this method; see parameters spreadsheet)
 
 files_truth <- list(
-  Levine_32dim = file.path(RES_DIR_DENSVM, "true_labels_DensVM_Levine_32dim.txt"), 
-  Levine_13dim = file.path(RES_DIR_DENSVM, "true_labels_DensVM_Levine_13dim.txt"), 
-  Samusik_01   = file.path(RES_DIR_DENSVM, "true_labels_DensVM_Samusik_01.txt"), 
-  Samusik_all  = file.path(RES_DIR_DENSVM, "true_labels_DensVM_Samusik_all.txt"), 
-  Nilsson_rare = file.path(RES_DIR_DENSVM, "true_labels_DensVM_Nilsson_rare.txt"), 
-  Mosmann_rare = file.path(RES_DIR_DENSVM, "true_labels_DensVM_Mosmann_rare.txt"), 
-  FlowCAP_ND   = paste0(RES_DIR_DENSVM, "/true_labels_DensVM_FlowCAP_ND_", 1:30, ".txt"), 
-  FlowCAP_WNV  = paste0(RES_DIR_DENSVM, "/true_labels_DensVM_FlowCAP_WNV_", 1:13, ".txt")
+  Levine_32dim = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Levine_32dim.txt"), 
+  Levine_13dim = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Levine_13dim.txt"), 
+  Samusik_01   = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Samusik_01.txt"), 
+  Samusik_all  = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Samusik_all.txt"), 
+  Nilsson_rare = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Nilsson_rare.txt"), 
+  Mosmann_rare = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Mosmann_rare.txt"), 
+  FlowCAP_ND   = paste0(RES_DIR_CLUSTERX, "/true_labels_ClusterX_FlowCAP_ND_", 1:30, ".txt"), 
+  FlowCAP_WNV  = paste0(RES_DIR_CLUSTERX, "/true_labels_ClusterX_FlowCAP_WNV_", 1:13, ".txt")
 )
 
 # extract true population labels
@@ -81,21 +81,21 @@ sapply(tbl_truth, length)
 
 
 
-###########################
-### load DensVM results ###
-###########################
+#############################
+### load ClusterX results ###
+#############################
 
 # load cluster labels
 
 files_out <- list(
-  Levine_32dim = file.path(RES_DIR_DENSVM, "DensVM_labels_Levine_32dim.txt"), 
-  Levine_13dim = file.path(RES_DIR_DENSVM, "DensVM_labels_Levine_13dim.txt"), 
-  Samusik_01   = file.path(RES_DIR_DENSVM, "DensVM_labels_Samusik_01.txt"), 
-  Samusik_all  = file.path(RES_DIR_DENSVM, "DensVM_labels_Samusik_all.txt"), 
-  Nilsson_rare = file.path(RES_DIR_DENSVM, "DensVM_labels_Nilsson_rare.txt"), 
-  Mosmann_rare = file.path(RES_DIR_DENSVM, "DensVM_labels_Mosmann_rare.txt"), 
-  FlowCAP_ND   = file.path(RES_DIR_DENSVM, "DensVM_labels_FlowCAP_ND.txt"), 
-  FlowCAP_WNV  = file.path(RES_DIR_DENSVM, "DensVM_labels_FlowCAP_WNV.txt")
+  Levine_32dim = file.path(RES_DIR_CLUSTERX, "ClusterX_labels_Levine_32dim.txt"), 
+  Levine_13dim = file.path(RES_DIR_CLUSTERX, "ClusterX_labels_Levine_13dim.txt"), 
+  Samusik_01   = file.path(RES_DIR_CLUSTERX, "ClusterX_labels_Samusik_01.txt"), 
+  Samusik_all  = file.path(RES_DIR_CLUSTERX, "ClusterX_labels_Samusik_all.txt"), 
+  Nilsson_rare = file.path(RES_DIR_CLUSTERX, "ClusterX_labels_Nilsson_rare.txt"), 
+  Mosmann_rare = file.path(RES_DIR_CLUSTERX, "ClusterX_labels_Mosmann_rare.txt"), 
+  FlowCAP_ND   = file.path(RES_DIR_CLUSTERX, "ClusterX_labels_FlowCAP_ND.txt"), 
+  FlowCAP_WNV  = file.path(RES_DIR_CLUSTERX, "ClusterX_labels_FlowCAP_WNV.txt")
 )
 
 clus <- lapply(files_out, function(f) {
@@ -149,7 +149,7 @@ for (i in 1:length(clus)) {
 
 # return named object (used in plotting scripts)
 
-res_DensVM <- res
+res_ClusterX <- res
 
 
 

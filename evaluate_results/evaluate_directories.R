@@ -11,8 +11,6 @@
 
 RES_DIR_ACCENSE         <- "../results_manual_n_clus"
 
-RES_DIR_DENSVM          <- "../results_auto_n_clus"
-
 RES_DIR_IMMUNOCLUST     <- "../results_manual_n_clus"
 RES_DIR_IMMUNOCLUST_ALL <- "../results_manual_n_clus"
 
