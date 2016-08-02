@@ -12,6 +12,6 @@ source("evaluate_flowMeans.R")
 source("evaluate_flowPeaks.R")
 source("evaluate_FlowSOM.R")
 source("evaluate_FlowSOM_pre_meta.R")  # takes 1-2 min
+source("evaluate_immunoClust.R")
 source("evaluate_kmeans.R")
 source("evaluate_Rclusterpp.R")
-

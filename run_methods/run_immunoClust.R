@@ -1,7 +1,7 @@
 #########################################################################################
-# R script to run immunoClust and immunoClust_all
+# R script to run immunoClust
 #
-# Lukas Weber, July 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
@@ -84,9 +84,7 @@ for (i in ix_subsample) {
     # save subsampled population IDs
     true_labels_i <- flowCore::exprs(data[[i]])[, "label", drop = FALSE]
     files_true_labels_i <- paste0(c("../../results_auto/immunoClust/true_labels_immunoClust_", 
-                                    "../../results_auto/immunoClust_all/true_labels_immunoClust_all_", 
-                                    "../../results_manual/immunoClust/true_labels_immunoClust_", 
-                                    "../../results_manual/immunoClust_all/true_labels_immunoClust_all_"), 
+                                    "../../results_manual/immunoClust/true_labels_immunoClust_"), 
                                   names(data)[i], ".txt")
     for (f in files_true_labels_i) {
       write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
@@ -233,14 +231,14 @@ cat("immunoClust automatic : all runs complete\n")
 
 
 
-#########################################################
-### Run immunoClust_all: automatic number of clusters ###
-#########################################################
+#############################################################
+### Run immunoClust: manually selected number of clusters ###
+#############################################################
 
-# immunoClust_all includes additional step to classify all cells ("classify.all = TRUE")
+# run immunoClust with manual selection of number of clusters
+# (note: "classify.all = TRUE" classifies all cells including outliers; decreasing the
+# bias argument increases the number of clusters)
 
-# run immunoClust_all with automatic selection of number of clusters
-# (note: decreasing the bias argument increases the number of clusters)
 
 seed <- 123
 out <- runtimes <- vector("list", length(data))
@@ -315,128 +313,6 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # plots
-#png("../../results_auto/immunoClust_all/plot_immunoClust_all_Levine_32dim.png", width = 1000, height = 1000)
-#immunoClust::splom(out[[1]], immunoClust::trans.ApplyToData(out[[1]], data[[1]]), N = 1000)
-#dev.off()
-
-# save cluster labels
-files_labels <- paste0("../../results_auto/immunoClust_all/immunoClust_all_labels_", 
-                       names(clus), ".txt")
-
-for (i in 1:length(files_labels)) {
-  res_i <- data.frame(label = clus[[i]])
-  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
-}
-
-# save runtimes
-runtimes <- lapply(runtimes, function(r) r["elapsed"])
-runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
-
-write.table(runtimes, file = "../../results_auto/runtimes/runtime_immunoClust_all.txt", 
-            quote = FALSE, sep = "\t")
-
-# save session information
-sink(file = "../../results_auto/session_info/session_info_immunoClust_all.txt")
-print(sessionInfo())
-sink()
-
-cat("immunoClust_all automatic : all runs complete\n")
-
-
-
-
-#############################################################
-### Run immunoClust: manually selected number of clusters ###
-#############################################################
-
-# run immunoClust with manual selection of number of clusters
-# (note: decreasing the bias argument increases the number of clusters)
-
-# bias (default = 0.3)
-bias <- list(
-  Levine_32dim = 0.3, 
-  Levine_13dim = 0.3, 
-  Samusik_01   = 0.3, 
-  Samusik_all  = 0.3, 
-  Nilsson_rare = 0.1, 
-  Mosmann_rare = 0.1, 
-  FlowCAP_ND   = 0.3, 
-  FlowCAP_WNV  = 0.3
-)
-
-seed <- 123
-out <- runtimes <- vector("list", length(data))
-names(out) <- names(runtimes) <- names(data)
-
-for (i in 1:length(data)) {
-  
-  if (!is_FlowCAP[i]) {
-    set.seed(seed)
-    runtimes[[i]] <- system.time({
-      out[[i]] <- immunoClust::cell.process(data[[i]], 
-                                            parameters = pars[[i]], 
-                                            bias = bias[[i]])
-    })
-    cat("data set", names(data[i]), ": run complete\n")
-    
-  } else {
-    # FlowCAP data sets: run clustering algorithm separately for each sample
-    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
-    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
-    
-    for (j in 1:length(data[[i]])) {
-      set.seed(seed)
-      runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- immunoClust::cell.process(data[[i]][[j]], 
-                                                   parameters = pars[[i]], 
-                                                   bias = bias[[i]])
-      })
-    }
-    cat("data set", names(data[i]), ": run complete\n")
-    
-    # FlowCAP data sets: sum runtimes over samples
-    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
-    runtimes_i <- colSums(runtimes_i)
-    names(runtimes_i) <- c("user", "system", "elapsed")
-    runtimes[[i]] <- runtimes_i
-  }
-}
-
-# number of clusters
-summary(out[[1]])
-
-# extract cluster labels
-clus <- vector("list", length(data))
-names(clus) <- names(data)
-
-for (i in 1:length(clus)) {
-  if (!is_FlowCAP[i]) {
-    clus[[i]] <- out[[i]]@label
-    
-  } else {
-    # FlowCAP data sets
-    clus_list_i <- vector("list", length(data[[i]]))
-    names(clus_list_i) <- names(data[[i]])
-    for (j in 1:length(data[[i]])) {
-      clus_list_i[[j]] <- out[[i]][[j]]@label
-    }
-    
-    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
-    # e.g. sample 1, cluster 3 -> cluster label 1_3
-    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
-    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
-    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
-  }
-}
-
-sapply(clus, length)
-
-# cluster sizes and number of clusters
-# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
-table(clus[[1]])
-sapply(clus, function(cl) length(table(cl)))
-
-# plots
 #png("../../results_manual/immunoClust/plot_immunoClust_Levine_32dim.png", width = 1000, height = 1000)
 #immunoClust::splom(out[[1]], immunoClust::trans.ApplyToData(out[[1]], data[[1]]), N = 1000)
 #dev.off()
@@ -463,130 +339,6 @@ print(sessionInfo())
 sink()
 
 cat("immunoClust manual : all runs complete\n")
-
-
-
-
-#################################################################
-### Run immunoClust_all: manually selected number of clusters ###
-#################################################################
-
-# run immunoClust_all with manual selection of number of clusters
-# (note: decreasing the bias argument increases the number of clusters)
-
-# bias (default = 0.3)
-bias <- list(
-  Levine_32dim = 0.3, 
-  Levine_13dim = 0.3, 
-  Samusik_01   = 0.3, 
-  Samusik_all  = 0.3, 
-  Nilsson_rare = 0.1, 
-  Mosmann_rare = 0.1, 
-  FlowCAP_ND   = 0.3, 
-  FlowCAP_WNV  = 0.3
-)
-
-seed <- 123
-out <- runtimes <- vector("list", length(data))
-names(out) <- names(runtimes) <- names(data)
-
-for (i in 1:length(data)) {
-  
-  if (!is_FlowCAP[i]) {
-    set.seed(seed)
-    runtimes[[i]] <- system.time({
-      out[[i]] <- immunoClust::cell.process(data[[i]], 
-                                            parameters = pars[[i]], 
-                                            classify.all = TRUE, 
-                                            bias = bias[[i]])
-    })
-    cat("data set", names(data[i]), ": run complete\n")
-    
-  } else {
-    # FlowCAP data sets: run clustering algorithm separately for each sample
-    out[[i]] <- runtimes[[i]] <- vector("list", length(data[[i]]))
-    names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
-    
-    for (j in 1:length(data[[i]])) {
-      set.seed(seed)
-      runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- immunoClust::cell.process(data[[i]][[j]], 
-                                                   parameters = pars[[i]], 
-                                                   classify.all = TRUE, 
-                                                   bias = bias[[i]])
-      })
-    }
-    cat("data set", names(data[i]), ": run complete\n")
-    
-    # FlowCAP data sets: sum runtimes over samples
-    runtimes_i <- do.call(rbind, runtimes[[i]])[, 1:3]
-    runtimes_i <- colSums(runtimes_i)
-    names(runtimes_i) <- c("user", "system", "elapsed")
-    runtimes[[i]] <- runtimes_i
-  }
-}
-
-# number of clusters
-summary(out[[1]])
-
-# extract cluster labels
-clus <- vector("list", length(data))
-names(clus) <- names(data)
-
-for (i in 1:length(clus)) {
-  if (!is_FlowCAP[i]) {
-    clus[[i]] <- out[[i]]@label
-    
-  } else {
-    # FlowCAP data sets
-    clus_list_i <- vector("list", length(data[[i]]))
-    names(clus_list_i) <- names(data[[i]])
-    for (j in 1:length(data[[i]])) {
-      clus_list_i[[j]] <- out[[i]][[j]]@label
-    }
-    
-    # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
-    # e.g. sample 1, cluster 3 -> cluster label 1_3
-    names_i <- rep(names(clus_list_i), times = sapply(clus_list_i, length))
-    clus_collapse_i <- unlist(clus_list_i, use.names = FALSE)
-    clus[[i]] <- paste(names_i, clus_collapse_i, sep = "_")
-  }
-}
-
-sapply(clus, length)
-
-# cluster sizes and number of clusters
-# (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
-table(clus[[1]])
-sapply(clus, function(cl) length(table(cl)))
-
-# plots
-#png("../../results_manual/immunoClust_all/plot_immunoClust_all_Levine_32dim.png", width = 1000, height = 1000)
-#immunoClust::splom(out[[1]], immunoClust::trans.ApplyToData(out[[1]], data[[1]]), N = 1000)
-#dev.off()
-
-# save cluster labels
-files_labels <- paste0("../../results_manual/immunoClust_all/immunoClust_all_labels_", 
-                       names(clus), ".txt")
-
-for (i in 1:length(files_labels)) {
-  res_i <- data.frame(label = clus[[i]])
-  write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
-}
-
-# save runtimes
-runtimes <- lapply(runtimes, function(r) r["elapsed"])
-runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
-
-write.table(runtimes, file = "../../results_manual/runtimes/runtime_immunoClust_all.txt", 
-            quote = FALSE, sep = "\t")
-
-# save session information
-sink(file = "../../results_manual/session_info/session_info_immunoClust_all.txt")
-print(sessionInfo())
-sink()
-
-cat("immunoClust_all manual : all runs complete\n")
 
 
 
