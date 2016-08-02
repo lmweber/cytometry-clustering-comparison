@@ -1,94 +1,103 @@
 #########################################################################################
-# R script to load runtime results
+# R script to load runtimes
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
+# Methods that were run using R scripts were timed with the "system.time()" function, 
+# with results saved as .txt files in folders "results_auto/runtime/" or 
+# "results_manual/runtime/".
 
-# Methods that were not available as R packages were timed manually with a stopwatch app, 
-# with results saved in the spreadsheet "clustering_methods_details.xlsx".
-
-# All other methods were timed with system.time() in R, with results saved as text files
-# in the folder "results_auto_n_clus/runtime/" or "results_manual_n_clus/runtime/".
-
-
-
-# ===================
-# Prepare data frames
-# ===================
-
-runtime_Levine_32 <- list()
-runtime_Levine_13 <- list()
-runtime_Nilsson <- list()
-runtime_Mosmann <- list()
+# Methods not accessible via R were timed manually using a stopwatch app or the Matlab
+# "clock" command, with results saved in the spreadsheet 
+# "Supp_Table_S1_clustering_methods_parameters.xlsx".
 
 
 
-# ===================================================================================
-# Manually enter runtime results for methods not available as R packages (copied from
-# spreadsheet "clustering_methods_details.xlsx")
-# ===================================================================================
+# ===============
+# Prepare objects
+# ===============
 
-runtime_Levine_32[["ACCENSE"]] <- (4 * 60) + 49
-runtime_Levine_13[["ACCENSE"]] <- (4 * 60) + 41
-runtime_Nilsson[["ACCENSE"]] <- (5 * 60) + 40
-runtime_Mosmann[["ACCENSE"]] <- (4 * 60) + 7
-
-runtime_Levine_32[["FLOCK"]] <- (2 * 60) + 51
-runtime_Levine_13[["FLOCK"]] <- 24
-runtime_Nilsson[["FLOCK"]] <- 6
-runtime_Mosmann[["FLOCK"]] <- (1 * 60) + 1
-
-runtime_Levine_32[["PhenoGraph"]] <- (37 * 60) + 42
-runtime_Levine_13[["PhenoGraph"]] <- (13 * 60) + 11
-runtime_Nilsson[["PhenoGraph"]] <- (2 * 60) + 2
-runtime_Mosmann[["PhenoGraph"]] <- (49 * 60) + 59
-
-runtime_Levine_32[["SWIFT"]] <- (2 * 3600) + (35 * 60) + 48
-runtime_Levine_13[["SWIFT"]] <- (56 * 60) + 13
-runtime_Nilsson[["SWIFT"]] <- (11 * 60) + 26
-runtime_Mosmann[["SWIFT"]] <- (34 * 60) + 34
+res_runtime <- list(
+  Levine_32dim = list(), 
+  Levine_13dim = list(), 
+  Samusik_01   = list(), 
+  Samusik_all  = list(), 
+  Nilsson_rare = list(), 
+  Mosmann_rare = list(), 
+  FlowCAP_ND   = list(), 
+  FlowCAP_WNV  = list()
+)
 
 
 
-# ==========================================
-# Load runtime results for all other methods
-# ==========================================
+# =================================================================================
+# Manually enter runtimes for methods not accessible via R (copied from spreadsheet
+# "clustering_methods_details.xlsx")
+# =================================================================================
 
-# load results directories (depending on whether automatic or manually selected number of clusters)
+res_runtime[["Levine_32dim"]][["ACCENSE"]] <- (4 * 60) + 49
+res_runtime[["Levine_13dim"]][["ACCENSE"]] <- (4 * 60) + 41
+res_runtime[["Nilsson_rare"]][["ACCENSE"]] <- (5 * 60) + 40
+res_runtime[["Mosmann_rare"]][["ACCENSE"]] <- (4 * 60) + 7
 
-source("load_results_directories.R")
+res_runtime[["Levine_32dim"]][["PhenoGraph"]] <- (37 * 60) + 42
+res_runtime[["Levine_13dim"]][["PhenoGraph"]] <- (13 * 60) + 11
+res_runtime[["Nilsson_rare"]][["PhenoGraph"]] <- (2 * 60) + 2
+res_runtime[["Mosmann_rare"]][["PhenoGraph"]] <- (49 * 60) + 59
 
-RES_DIRS <- c(RES_DIR_DENSVM, 
+res_runtime[["Levine_32dim"]][["SWIFT"]] <- (2 * 3600) + (35 * 60) + 48
+res_runtime[["Levine_13dim"]][["SWIFT"]] <- (56 * 60) + 13
+res_runtime[["Nilsson_rare"]][["SWIFT"]] <- (11 * 60) + 26
+res_runtime[["Mosmann_rare"]][["SWIFT"]] <- (34 * 60) + 34
+
+
+
+# ===================================
+# Load runtimes for all other methods
+# ===================================
+
+# run script "evaluate_all_methods.R" to load results directories (automatic or manual
+# number of clusters)
+
+#source("evaluate_all_methods.R")  ## takes 10-15 min
+
+RES_DIRS <- c(RES_DIR_CLUSTERX, 
+              RES_DIR_DENSVM, 
+              RES_DIR_FLOCK, 
               RES_DIR_FLOWMEANS, 
+              RES_DIR_FLOWPEAKS, 
               RES_DIR_FLOWSOM, 
-              RES_DIR_FLOWSOM_META, 
+              RES_DIR_FLOWSOM_PRE_META, 
               RES_DIR_IMMUNOCLUST, 
-              RES_DIR_IMMUNOCLUST_ALL, 
               RES_DIR_KMEANS, 
-              RES_DIR_RCLUSTERPP, 
-              RES_DIR_SAMSPECTRAL)
+              RES_DIR_RCLUSTERPP)
 
-method_names <- c("DensVM", 
+method_names <- c("ClusterX", 
+                  "DensVM", 
+                  "FLOCK", 
                   "flowMeans", 
+                  "flowPeaks", 
                   "FlowSOM", 
-                  "FlowSOM_meta", 
+                  "FlowSOM_pre_meta", 
                   "immunoClust", 
-                  "immunoClust_all", 
                   "kmeans", 
-                  "Rclusterpp", 
-                  "SamSPECTRAL")
+                  "Rclusterpp")
 
 
 # load runtime results files
 
 for (i in 1:length(RES_DIRS)) {
-  file_i <- paste0(RES_DIRS[i], "/runtime/runtime_", method_names[i], ".txt")
+  file_i <- paste0(RES_DIRS[i], "/../runtimes/runtime_", method_names[i], ".txt")
   data_i <- read.table(file_i, header = TRUE, sep = "\t")
-  runtime_Levine_32[[method_names[i]]] <- data_i["Levine_2015_marrow_32", "runtime"]
-  runtime_Levine_13[[method_names[i]]] <- data_i["Levine_2015_marrow_13", "runtime"]
-  runtime_Nilsson[[method_names[i]]] <- data_i["Nilsson_2013_HSC", "runtime"]
-  runtime_Mosmann[[method_names[i]]] <- data_i["Mosmann_2014_activ", "runtime"]
+  res_runtime[["Levine_32dim"]][[method_names[i]]] <- data_i["Levine_32dim", "runtime"]
+  res_runtime[["Levine_13dim"]][[method_names[i]]] <- data_i["Levine_13dim", "runtime"]
+  res_runtime[["Samusik_01"]][[method_names[i]]]   <- data_i["Samusik_01", "runtime"]
+  res_runtime[["Samusik_all"]][[method_names[i]]]  <- data_i["Samusik_all", "runtime"]
+  res_runtime[["Nilsson_rare"]][[method_names[i]]] <- data_i["Nilsson_rare", "runtime"]
+  res_runtime[["Mosmann_rare"]][[method_names[i]]] <- data_i["Mosmann_rare", "runtime"]
+  res_runtime[["FlowCAP_ND"]][[method_names[i]]]   <- data_i["FlowCAP_ND", "runtime"]
+  res_runtime[["FlowCAP_WNV"]][[method_names[i]]]  <- data_i["FlowCAP_WNV", "runtime"]
 }
 
 
@@ -97,14 +106,9 @@ for (i in 1:length(RES_DIRS)) {
 # Arrange in ascending order
 # ==========================
 
-runtime_Levine_32_ord <- unlist(runtime_Levine_32)
-runtime_Levine_13_ord <- unlist(runtime_Levine_13)
-runtime_Nilsson_ord <- unlist(runtime_Nilsson)
-runtime_Mosmann_ord <- unlist(runtime_Mosmann)
-
-runtime_Levine_32_ord <- runtime_Levine_32_ord[order(runtime_Levine_32_ord)]
-runtime_Levine_13_ord <- runtime_Levine_13_ord[order(runtime_Levine_13_ord)]
-runtime_Nilsson_ord <- runtime_Nilsson_ord[order(runtime_Nilsson_ord)]
-runtime_Mosmann_ord <- runtime_Mosmann_ord[order(runtime_Mosmann_ord)]
+res_runtime_ord <- lapply(res_runtime, function(r) {
+  r_ord <- unlist(r)
+  r_ord[order(r_ord)]
+})
 
 
