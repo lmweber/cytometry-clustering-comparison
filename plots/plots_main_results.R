@@ -1,33 +1,21 @@
 #########################################################################################
 # R script to generate main plots of results
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
 library(ggplot2)
 library(reshape2)
-library(cowplot)  # note masks ggplot2::ggsave
+library(cowplot)  # note masks ggplot2::ggsave()
 library(ggrepel)
 
-# helper function
-source("helper_collapse_data_frame.R")
+# helper function for plots
+source("../helpers/helper_collapse_data_frame.R")
 
-# load results directories (depending on whether automatic or manually selected number of clusters)
-source("load_results_directories.R")
-
-# load results from previous steps
-source("load_results_ACCENSE.R")
-source("load_results_DensVM.R")
-source("load_results_FLOCK.R")
-source("load_results_PhenoGraph.R")
-source("load_results_Rclusterpp.R")
-source("load_results_SWIFT.R")
-source("load_results_truth.R")
-source("load_results_all_other_methods.R")
-
-# load runtime results
-source("load_results_runtime.R")
+# load and evaluate results
+source("../evaluate_results/evaluate_all_methods.R")
+source("../evaluate_results/evaluate_runtime.R")
 
 # color-blind friendly palettes (http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/)
 cb_pal_black <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -43,91 +31,94 @@ gg_pal <- c("#F8766D", "#00BA38", "#619CFF")
 ### PREPARE DATA FRAMES ###
 ###########################
 
-# combine results into lists
+# results for all methods
 
-res_Levine_32 <- list(ACCENSE = res_ACCENSE_Levine_32, 
-                      DensVM = res_DensVM_Levine_32, 
-                      FLOCK = res_FLOCK_Levine_32, 
-                      flowMeans = res_flowMeans_Levine_32, 
-                      FlowSOM = res_FlowSOM_Levine_32, 
-                      FlowSOM_meta = res_FlowSOM_meta_Levine_32, 
-                      immunoClust = res_immunoClust_Levine_32, 
-                      immunoClust_all = res_immunoClust_all_Levine_32, 
-                      kmeans = res_kmeans_Levine_32, 
-                      PhenoGraph = res_PhenoGraph_Levine_32, 
-                      Rclusterpp = res_Rclusterpp_Levine_32, 
-                      SamSPECTRAL = res_SamSPECTRAL_Levine_32, 
-                      SWIFT = res_SWIFT_Levine_32)
-
-res_Levine_13 <- list(ACCENSE = res_ACCENSE_Levine_13, 
-                      DensVM = res_DensVM_Levine_13, 
-                      FLOCK = res_FLOCK_Levine_13, 
-                      flowMeans = res_flowMeans_Levine_13, 
-                      FlowSOM = res_FlowSOM_Levine_13, 
-                      FlowSOM_meta = res_FlowSOM_meta_Levine_13, 
-                      immunoClust = res_immunoClust_Levine_13, 
-                      immunoClust_all = res_immunoClust_all_Levine_13, 
-                      kmeans = res_kmeans_Levine_13, 
-                      PhenoGraph = res_PhenoGraph_Levine_13, 
-                      Rclusterpp = res_Rclusterpp_Levine_13, 
-                      SamSPECTRAL = res_SamSPECTRAL_Levine_13, 
-                      SWIFT = res_SWIFT_Levine_13)
-
-res_Nilsson <- list(ACCENSE = res_ACCENSE_Nilsson, 
-                    DensVM = res_DensVM_Nilsson, 
-                    FLOCK = res_FLOCK_Nilsson, 
-                    flowMeans = res_flowMeans_Nilsson, 
-                    FlowSOM = res_FlowSOM_Nilsson, 
-                    FlowSOM_meta = res_FlowSOM_meta_Nilsson, 
-                    immunoClust = res_immunoClust_Nilsson, 
-                    immunoClust_all = res_immunoClust_all_Nilsson, 
-                    kmeans = res_kmeans_Nilsson, 
-                    PhenoGraph = res_PhenoGraph_Nilsson, 
-                    Rclusterpp = res_Rclusterpp_Nilsson, 
-                    SamSPECTRAL = res_SamSPECTRAL_Nilsson, 
-                    SWIFT = res_SWIFT_Nilsson)
-
-res_Mosmann <- list(ACCENSE = res_ACCENSE_Mosmann, 
-                    DensVM = res_DensVM_Mosmann, 
-                    FLOCK = res_FLOCK_Mosmann, 
-                    flowMeans = res_flowMeans_Mosmann, 
-                    FlowSOM = res_FlowSOM_Mosmann, 
-                    FlowSOM_meta = res_FlowSOM_meta_Mosmann, 
-                    immunoClust = res_immunoClust_Mosmann, 
-                    immunoClust_all = res_immunoClust_all_Mosmann, 
-                    kmeans = res_kmeans_Mosmann, 
-                    PhenoGraph = res_PhenoGraph_Mosmann, 
-                    Rclusterpp = res_Rclusterpp_Mosmann, 
-                    SamSPECTRAL = res_SamSPECTRAL_Mosmann, 
-                    SWIFT = res_SWIFT_Mosmann)
+res_all <- list(
+  #ACCENSE = res_ACCENSE, 
+  ClusterX = res_ClusterX, 
+  DensVM = res_DensVM, 
+  FLOCK = res_FLOCK, 
+  flowMeans = res_flowMeans, 
+  flowPeaks = res_flowPeaks, 
+  FlowSOM = res_FlowSOM, 
+  FlowSOM_pre = res_FlowSOM_pre_meta, 
+  immunoClust = res_immunoClust, 
+  kmeans = res_kmeans, 
+  #PhenoGraph = res_PhenoGraph, 
+  Rclusterpp = res_Rclusterpp#, 
+  #SamSPECTRAL = res_SamSPECTRAL, 
+  #SWIFT = res_SWIFT)
+)
 
 
-# collapse into data frames (using helper functions to pad missing values with zeros or NAs)
+# collapse into data frames (use helper functions to pad with zeros or NAs for clusters removed by subsampling)
 
-precision_df_Levine_32 <- as.data.frame(sapply(res_Levine_32, function(res) res$pr))
-precision_df_Levine_13 <- collapse_data_frame_zeros(sapply(res_Levine_13, function(res) res$pr))
-precision_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$pr))
-precision_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$pr))
+precision_df <- list(
+  Levine_32dim = as.data.frame(sapply(res_all, function(res) res[["Levine_32dim"]][["pr"]])), 
+  Levine_13dim = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Levine_13dim"]][["pr"]])), 
+  Samusik_01   = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_01"]][["pr"]])), 
+  Samusik_all  = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_all"]][["pr"]])), 
+  Nilsson_rare = as.data.frame(lapply(res_all, function(res) res[["Nilsson_rare"]][["pr"]])), 
+  Mosmann_rare = as.data.frame(lapply(res_all, function(res) res[["Mosmann_rare"]][["pr"]]))
+)
 
-recall_df_Levine_32 <- as.data.frame(sapply(res_Levine_32, function(res) res$re))
-recall_df_Levine_13 <- collapse_data_frame_zeros(sapply(res_Levine_13, function(res) res$re))
-recall_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$re))
-recall_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$re))
+precision_df_FlowCAP <- list(
+  FlowCAP_ND   = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND"]][["pr"]])), 
+  FlowCAP_WNV  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV"]][["pr"]])), 
+  FlowCAP_ND_alternate  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["pr"]])), 
+  FlowCAP_WNV_alternate = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["pr"]]))
+)
 
-F1_df_Levine_32 <- as.data.frame(sapply(res_Levine_32, function(res) res$F1))
-F1_df_Levine_13 <- collapse_data_frame_zeros(sapply(res_Levine_13, function(res) res$F1))
-F1_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$F1))
-F1_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$F1))
 
-labels_matched_df_Levine_32 <- as.data.frame(sapply(res_Levine_32, function(res) res$labels_matched))
-labels_matched_df_Levine_13 <- collapse_data_frame_NAs(sapply(res_Levine_13, function(res) res$labels_matched))  # NA = no match
-labels_matched_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$labels_matched))
-labels_matched_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$labels_matched))
+recall_df <- list(
+  Levine_32dim = as.data.frame(sapply(res_all, function(res) res[["Levine_32dim"]][["re"]])), 
+  Levine_13dim = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Levine_13dim"]][["re"]])), 
+  Samusik_01   = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_01"]][["re"]])), 
+  Samusik_all  = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_all"]][["re"]])), 
+  Nilsson_rare = as.data.frame(lapply(res_all, function(res) res[["Nilsson_rare"]][["re"]])), 
+  Mosmann_rare = as.data.frame(lapply(res_all, function(res) res[["Mosmann_rare"]][["re"]]))
+)
 
-n_cells_df_Levine_32 <- as.data.frame(sapply(res_Levine_32, function(res) res$n_cells))
-n_cells_df_Levine_13 <- collapse_data_frame_zeros(sapply(res_Levine_13, function(res) res$n_cells))
-n_cells_df_Nilsson <- as.data.frame(lapply(res_Nilsson, function(res) res$n_cells))
-n_cells_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$n_cells))
+recall_df_FlowCAP <- list(
+  FlowCAP_ND   = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND"]][["re"]])), 
+  FlowCAP_WNV  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV"]][["re"]])), 
+  FlowCAP_ND_alternate  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["re"]])), 
+  FlowCAP_WNV_alternate = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["re"]]))
+)
+
+
+F1_df <- list(
+  Levine_32dim = as.data.frame(sapply(res_all, function(res) res[["Levine_32dim"]][["F1"]])), 
+  Levine_13dim = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Levine_13dim"]][["F1"]])), 
+  Samusik_01   = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_01"]][["F1"]])), 
+  Samusik_all  = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_all"]][["F1"]])), 
+  Nilsson_rare = as.data.frame(lapply(res_all, function(res) res[["Nilsson_rare"]][["F1"]])), 
+  Mosmann_rare = as.data.frame(lapply(res_all, function(res) res[["Mosmann_rare"]][["F1"]]))
+)
+
+F1_df_FlowCAP <- list(
+  FlowCAP_ND   = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND"]][["F1"]])), 
+  FlowCAP_WNV  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV"]][["F1"]])), 
+  FlowCAP_ND_alternate  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["F1"]])), 
+  FlowCAP_WNV_alternate = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["F1"]]))
+)
+
+
+labels_matched_df <- list(
+  Levine_32dim = as.data.frame(sapply(res_all, function(res) res[["Levine_32dim"]][["labels_matched"]])), 
+  Levine_13dim = collapse_data_frame_NAs(sapply(res_all, function(res) res[["Levine_13dim"]][["labels_matched"]])), 
+  Samusik_01   = collapse_data_frame_NAs(sapply(res_all, function(res) res[["Samusik_01"]][["labels_matched"]])), 
+  Samusik_all  = collapse_data_frame_NAs(sapply(res_all, function(res) res[["Samusik_all"]][["labels_matched"]])), 
+  Nilsson_rare = as.data.frame(lapply(res_all, function(res) res[["Nilsson_rare"]][["labels_matched"]])), 
+  Mosmann_rare = as.data.frame(lapply(res_all, function(res) res[["Mosmann_rare"]][["labels_matched"]]))
+)
+
+labels_matched_df_FlowCAP <- list(
+  FlowCAP_ND   = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND"]][["labels_matched"]])), 
+  FlowCAP_WNV  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV"]][["labels_matched"]])), 
+  FlowCAP_ND_alternate  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["labels_matched"]])), 
+  FlowCAP_WNV_alternate = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["labels_matched"]]))
+)
 
 
 
@@ -136,78 +127,49 @@ n_cells_df_Mosmann <- as.data.frame(lapply(res_Mosmann, function(res) res$n_cell
 ### MEAN F1 SCORE ###
 #####################
 
-# for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
+# for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
 
-# number of methods
-
-n_methods_Levine_32 <- ncol(n_cells_df_Levine_32)
-n_methods_Levine_13 <- ncol(n_cells_df_Levine_13)
-
-# mean F1 score across all true clusters (unweighted)
-
-mean_F1_Levine_32 <- colMeans(F1_df_Levine_32)
-mean_F1_Levine_13 <- colMeans(F1_df_Levine_13)
+# mean F1 score across true populations (unweighted)
+mean_F1 <- lapply(F1_df, colMeans)[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
 
 # arrange in descending order
-
-ord_Levine_32 <- rev(order(mean_F1_Levine_32))
-ord_Levine_13 <- rev(order(mean_F1_Levine_13))
-
-mean_F1_Levine_32_ord <- mean_F1_Levine_32[ord_Levine_32]
-mean_F1_Levine_13_ord <- mean_F1_Levine_13[ord_Levine_13]
-
-mean_F1_Levine_32_ord
-mean_F1_Levine_13_ord
-
+mean_F1_ord <- lapply(mean_F1, function(m) {
+  ord <- rev(order(m))
+  m[ord]
+})
 
 # tidy data format (for ggplot)
-
-mean_F1_Levine_32_tidy <- data.frame(value = mean_F1_Levine_32_ord)
-mean_F1_Levine_32_tidy["method"] <- factor(rownames(mean_F1_Levine_32_tidy), 
-                                           levels = rownames(mean_F1_Levine_32_tidy))
-mean_F1_Levine_32_tidy
-
-mean_F1_Levine_13_tidy <- data.frame(value = mean_F1_Levine_13_ord)
-mean_F1_Levine_13_tidy["method"] <- factor(rownames(mean_F1_Levine_13_tidy), 
-                                           levels = rownames(mean_F1_Levine_13_tidy))
-mean_F1_Levine_13_tidy
+mean_F1_tidy <- lapply(mean_F1_ord, function(m) {
+  d <- data.frame(value = m)
+  d["method"] <- factor(rownames(d), levels = rownames(d))
+  d
+})
 
 
 # bar plots
 
-barplot_mean_F1_Levine_32 <- 
-  ggplot(mean_F1_Levine_32_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", fill = "royalblue3") + 
-  geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
-  ylim(0, 1) + 
-  ylab("mean F1 score") + 
-  ggtitle("Mean F1 score: Levine_2015_marrow_32") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
-barplot_mean_F1_Levine_32
-ggplot2::ggsave("../plots/Levine_2015_marrow_32/results_barplot_mean_F1_Levine2015marrow32.pdf", 
-                width = 5, height = 5)
-
-
-barplot_mean_F1_Levine_13 <- 
-  ggplot(mean_F1_Levine_13_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", fill = "royalblue3") + 
-  geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
-  ylim(0, 1) + 
-  ylab("mean F1 score") + 
-  ggtitle("Mean F1 score: Levine_2015_marrow_13") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
-barplot_mean_F1_Levine_13
-ggplot2::ggsave("../plots/Levine_2015_marrow_13/results_barplot_mean_F1_Levine2015marrow13.pdf", 
-                width = 5, height = 5)
+for (i in 1:4) {
+  nm <- names(mean_F1_tidy)[i]
+  title <- paste0("Mean F1 score: ", nm)
+  filename <- paste0("../../plots/", nm, "/results_barplot_mean_F1_", nm, ".pdf")
+  
+  pl <- 
+    ggplot(mean_F1_tidy[[i]], aes(x = method, y = value)) + 
+    geom_bar(stat = "identity", fill = "royalblue3") + 
+    geom_text(aes(label = sprintf("%.3f", round(value, 3)), y = value + 0.08, angle = 90), size = 3.5) + 
+    ylim(0, 1) + 
+    ylab("mean F1 score") + 
+    ggtitle(title) + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          axis.title.x = element_blank(), 
+          axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+  
+  print(pl)
+  
+  ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
+}
 
 
 
