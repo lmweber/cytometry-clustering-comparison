@@ -1,5 +1,5 @@
 #########################################################################################
-# R script to load and evaluate results for FlowSOM_pre_meta
+# R script to load and evaluate results for FlowSOM_pre
 #
 # Lukas Weber, July 2016
 #########################################################################################
@@ -15,7 +15,7 @@ source("../helpers/helper_match_evaluate_FlowCAP.R")
 source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
 # which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
-RES_DIR_FLOWSOM_PRE_META <- "../../results_manual/FlowSOM_pre_meta"
+RES_DIR_FLOWSOM_PRE <- "../../results_manual/FlowSOM_pre"
 
 DATA_DIR <- "../../../benchmark_data_sets"
 
@@ -75,21 +75,21 @@ sapply(tbl_truth, length)
 
 
 
-#####################################
-### load FlowSOM_pre_meta results ###
-#####################################
+################################
+### load FlowSOM_pre results ###
+################################
 
 # load cluster labels
 
 files_out <- list(
-  Levine_32dim = file.path(RES_DIR_FLOWSOM_PRE_META, "FlowSOM_pre_meta_labels_Levine_32dim.txt"), 
-  Levine_13dim = file.path(RES_DIR_FLOWSOM_PRE_META, "FlowSOM_pre_meta_labels_Levine_13dim.txt"), 
-  Samusik_01   = file.path(RES_DIR_FLOWSOM_PRE_META, "FlowSOM_pre_meta_labels_Samusik_01.txt"), 
-  Samusik_all  = file.path(RES_DIR_FLOWSOM_PRE_META, "FlowSOM_pre_meta_labels_Samusik_all.txt"), 
-  Nilsson_rare = file.path(RES_DIR_FLOWSOM_PRE_META, "FlowSOM_pre_meta_labels_Nilsson_rare.txt"), 
-  Mosmann_rare = file.path(RES_DIR_FLOWSOM_PRE_META, "FlowSOM_pre_meta_labels_Mosmann_rare.txt"), 
-  FlowCAP_ND   = file.path(RES_DIR_FLOWSOM_PRE_META, "FlowSOM_pre_meta_labels_FlowCAP_ND.txt"), 
-  FlowCAP_WNV  = file.path(RES_DIR_FLOWSOM_PRE_META, "FlowSOM_pre_meta_labels_FlowCAP_WNV.txt")
+  Levine_32dim = file.path(RES_DIR_FLOWSOM_PRE, "FlowSOM_pre_labels_Levine_32dim.txt"), 
+  Levine_13dim = file.path(RES_DIR_FLOWSOM_PRE, "FlowSOM_pre_labels_Levine_13dim.txt"), 
+  Samusik_01   = file.path(RES_DIR_FLOWSOM_PRE, "FlowSOM_pre_labels_Samusik_01.txt"), 
+  Samusik_all  = file.path(RES_DIR_FLOWSOM_PRE, "FlowSOM_pre_labels_Samusik_all.txt"), 
+  Nilsson_rare = file.path(RES_DIR_FLOWSOM_PRE, "FlowSOM_pre_labels_Nilsson_rare.txt"), 
+  Mosmann_rare = file.path(RES_DIR_FLOWSOM_PRE, "FlowSOM_pre_labels_Mosmann_rare.txt"), 
+  FlowCAP_ND   = file.path(RES_DIR_FLOWSOM_PRE, "FlowSOM_pre_labels_FlowCAP_ND.txt"), 
+  FlowCAP_WNV  = file.path(RES_DIR_FLOWSOM_PRE, "FlowSOM_pre_labels_FlowCAP_WNV.txt")
 )
 
 clus <- lapply(files_out, function(f) {
@@ -143,7 +143,7 @@ for (i in 1:length(clus)) {
 
 # return named object (used in plotting scripts)
 
-res_FlowSOM_pre_meta <- res
+res_FlowSOM_pre <- res
 
 
 

@@ -1,7 +1,7 @@
 #########################################################################################
-# R script to run FlowSOM_pre_meta and FlowSOM
+# R script to run FlowSOM_pre and FlowSOM
 #
-# Lukas Weber, July 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
@@ -85,11 +85,11 @@ sapply(marker_cols, length)
 
 
 
-##########################################################
-### Run FlowSOM_pre_meta: automatic number of clusters ###
-##########################################################
+#####################################################
+### Run FlowSOM_pre: automatic number of clusters ###
+#####################################################
 
-# run FlowSOM_pre_meta with default number of clusters for all data sets
+# run FlowSOM_pre with default number of clusters for all data sets
 
 # default is 10x10 grid, i.e. 100 clusters
 
@@ -134,8 +134,8 @@ for (i in 1:length(data)) {
 }
 
 # store output and runtimes for meta-clustering step below
-out_pre_meta_auto <- out
-runtimes_pre_meta_auto <- runtimes
+out_pre_auto <- out
+runtimes_pre_auto <- runtimes
 
 # example of FlowSOM plots (one data set only)
 FlowSOM::PlotStars(out[[1]])
@@ -174,7 +174,7 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../../results_auto/FlowSOM_pre_meta/FlowSOM_pre_meta_labels_", 
+files_labels <- paste0("../../results_auto/FlowSOM_pre/FlowSOM_pre_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -186,24 +186,24 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_auto/runtimes/runtime_FlowSOM_pre_meta.txt", 
+write.table(runtimes, file = "../../results_auto/runtimes/runtime_FlowSOM_pre.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_auto/session_info/session_info_FlowSOM_pre_meta.txt")
+sink(file = "../../results_auto/session_info/session_info_FlowSOM_pre.txt")
 print(sessionInfo())
 sink()
 
-cat("FlowSOM_pre_meta automatic : all runs complete\n")
+cat("FlowSOM_pre automatic : all runs complete\n")
 
 
 
 
-##################################################################
-### Run FlowSOM_pre_meta: manually selected number of clusters ###
-##################################################################
+#############################################################
+### Run FlowSOM_pre: manually selected number of clusters ###
+#############################################################
 
-# run FlowSOM_pre_meta with manually selected number of clusters
+# run FlowSOM_pre with manually selected number of clusters
 
 # grid size 20x20 (400 clusters) for Mosmann_rare (data set with very rare population);
 # and grid size 10x10 (100 clusters, i.e. default) for all other data sets
@@ -263,8 +263,8 @@ for (i in 1:length(data)) {
 }
 
 # store output and runtimes for meta-clustering step below
-out_pre_meta_manual <- out
-runtimes_pre_meta_manual <- runtimes
+out_pre_manual <- out
+runtimes_pre_manual <- runtimes
 
 # example of FlowSOM plots (one data set only)
 FlowSOM::PlotStars(out[[1]])
@@ -303,7 +303,7 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../../results_manual/FlowSOM_pre_meta/FlowSOM_pre_meta_labels_", 
+files_labels <- paste0("../../results_manual/FlowSOM_pre/FlowSOM_pre_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -315,15 +315,15 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_manual/runtimes/runtime_FlowSOM_pre_meta.txt", 
+write.table(runtimes, file = "../../results_manual/runtimes/runtime_FlowSOM_pre.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_manual/session_info/session_info_FlowSOM_pre_meta.txt")
+sink(file = "../../results_manual/session_info/session_info_FlowSOM_pre.txt")
 print(sessionInfo())
 sink()
 
-cat("FlowSOM_pre_meta manual : all runs complete\n")
+cat("FlowSOM_pre manual : all runs complete\n")
 
 
 
@@ -334,17 +334,17 @@ cat("FlowSOM_pre_meta manual : all runs complete\n")
 
 # run FlowSOM (additional meta-clustering step) with automatic selection of number of clusters
 
-# using results from above (stored in object "out_pre_meta_auto")
+# using results from above (stored in object "out_pre_auto")
 
 seed <- 1000
-out <- runtimes <- vector("list", length(out_pre_meta_auto))
-names(out) <- names(runtimes) <- names(out_pre_meta_auto)
+out <- runtimes <- vector("list", length(out_pre_auto))
+names(out) <- names(runtimes) <- names(out_pre_auto)
 
-for (i in 1:length(out_pre_meta_auto)) {
+for (i in 1:length(out_pre_auto)) {
   if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
-      meta <- FlowSOM::MetaClustering(out_pre_meta_auto[[i]]$map$codes, method = "metaClustering_consensus")
+      meta <- FlowSOM::MetaClustering(out_pre_auto[[i]]$map$codes, method = "metaClustering_consensus")
     })
     out[[i]] <- meta
     cat("data set", names(data[i]), ": run complete\n")
@@ -357,7 +357,7 @@ for (i in 1:length(out_pre_meta_auto)) {
     for (j in 1:length(data[[i]])) {
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        meta <- FlowSOM::MetaClustering(out_pre_meta_auto[[i]][[j]]$map$codes, method = "metaClustering_consensus")
+        meta <- FlowSOM::MetaClustering(out_pre_auto[[i]][[j]]$map$codes, method = "metaClustering_consensus")
       })
       out[[i]][[j]] <- meta
     }
@@ -373,7 +373,7 @@ for (i in 1:length(out_pre_meta_auto)) {
 
 # combine runtimes
 for (i in 1:length(runtimes)) {
-  runtimes[[i]] <- runtimes_pre_meta_auto[[i]] + runtimes[[i]]
+  runtimes[[i]] <- runtimes_pre_auto[[i]] + runtimes[[i]]
 }
 
 # check cluster labels (one data set only)
@@ -386,14 +386,14 @@ names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
   if (!is_FlowCAP[i]) {
-    clus[[i]] <- out[[i]][out_pre_meta_auto[[i]]$map$mapping[, 1]]
+    clus[[i]] <- out[[i]][out_pre_auto[[i]]$map$mapping[, 1]]
     
   } else {
     # FlowCAP data sets
-    clus_list_i <- vector("list", length(out_pre_meta_auto[[i]]))
-    names(clus_list_i) <- names(out_pre_meta_auto[[i]])
+    clus_list_i <- vector("list", length(out_pre_auto[[i]]))
+    names(clus_list_i) <- names(out_pre_auto[[i]])
     for (j in 1:length(clus_list_i)) {
-      clus_list_i[[j]] <- out[[i]][[j]][out_pre_meta_auto[[i]][[j]]$map$mapping[, 1]]
+      clus_list_i[[j]] <- out[[i]][[j]][out_pre_auto[[i]][[j]]$map$mapping[, 1]]
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
@@ -442,7 +442,7 @@ cat("FlowSOM automatic : all runs complete\n")
 
 # run FlowSOM (additional meta-clustering step) with manually selected number of clusters
 
-# using results from above (stored in object "out_pre_meta_manual")
+# using results from above (stored in object "out_pre_manual")
 
 # number of clusters k
 k <- list(
@@ -457,14 +457,14 @@ k <- list(
 )
 
 seed <- 1000
-out <- runtimes <- vector("list", length(out_pre_meta_manual))
-names(out) <- names(runtimes) <- names(out_pre_meta_manual)
+out <- runtimes <- vector("list", length(out_pre_manual))
+names(out) <- names(runtimes) <- names(out_pre_manual)
 
-for (i in 1:length(out_pre_meta_manual)) {
+for (i in 1:length(out_pre_manual)) {
   if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
-      meta <- FlowSOM::metaClustering_consensus(out_pre_meta_manual[[i]]$map$codes, k = k[[i]])
+      meta <- FlowSOM::metaClustering_consensus(out_pre_manual[[i]]$map$codes, k = k[[i]])
     })
     out[[i]] <- meta
     cat("data set", names(data[i]), ": run complete\n")
@@ -477,7 +477,7 @@ for (i in 1:length(out_pre_meta_manual)) {
     for (j in 1:length(data[[i]])) {
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        meta <- FlowSOM::metaClustering_consensus(out_pre_meta_manual[[i]][[j]]$map$codes, k = k[[i]])
+        meta <- FlowSOM::metaClustering_consensus(out_pre_manual[[i]][[j]]$map$codes, k = k[[i]])
       })
       out[[i]][[j]] <- meta
     }
@@ -493,7 +493,7 @@ for (i in 1:length(out_pre_meta_manual)) {
 
 # combine runtimes
 for (i in 1:length(runtimes)) {
-  runtimes[[i]] <- runtimes_pre_meta_manual[[i]] + runtimes[[i]]
+  runtimes[[i]] <- runtimes_pre_manual[[i]] + runtimes[[i]]
 }
 
 # check cluster labels (one data set only)
@@ -506,14 +506,14 @@ names(clus) <- names(data)
 
 for (i in 1:length(clus)) {
   if (!is_FlowCAP[i]) {
-    clus[[i]] <- out[[i]][out_pre_meta_manual[[i]]$map$mapping[, 1]]
+    clus[[i]] <- out[[i]][out_pre_manual[[i]]$map$mapping[, 1]]
     
   } else {
     # FlowCAP data sets
-    clus_list_i <- vector("list", length(out_pre_meta_manual[[i]]))
-    names(clus_list_i) <- names(out_pre_meta_manual[[i]])
+    clus_list_i <- vector("list", length(out_pre_manual[[i]]))
+    names(clus_list_i) <- names(out_pre_manual[[i]])
     for (j in 1:length(clus_list_i)) {
-      clus_list_i[[j]] <- out[[i]][[j]][out_pre_meta_manual[[i]][[j]]$map$mapping[, 1]]
+      clus_list_i[[j]] <- out[[i]][[j]][out_pre_manual[[i]][[j]]$map$mapping[, 1]]
     }
     
     # convert FlowCAP cluster labels into format "sample_number"_"cluster_number"
