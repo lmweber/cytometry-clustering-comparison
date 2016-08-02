@@ -41,7 +41,7 @@ res_all <- list(
   flowMeans = res_flowMeans, 
   flowPeaks = res_flowPeaks, 
   FlowSOM = res_FlowSOM, 
-  FlowSOM_pre = res_FlowSOM_pre_meta, 
+  FlowSOM_pre = res_FlowSOM_pre, 
   immunoClust = res_immunoClust, 
   kmeans = res_kmeans, 
   #PhenoGraph = res_PhenoGraph, 
@@ -178,69 +178,48 @@ for (i in 1:4) {
 ### F1 SCORE: BOX PLOTS ###
 ###########################
 
-# for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
+# for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
 
-# arrange in same order as previously
-
-F1_df_Levine_32_ord <- F1_df_Levine_32[, ord_Levine_32]
-F1_df_Levine_13_ord <- F1_df_Levine_13[, ord_Levine_13]
-
-F1_df_Levine_32_ord
-F1_df_Levine_13_ord
-
+# arrange in same order as previous plots
+ord <- lapply(mean_F1, function(m) rev(order(m)))
+F1_df_ord <- F1_df[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
+for (i in 1:4) {
+  F1_df_ord[[i]] <- F1_df_ord[[i]][, ord[[i]]]
+}
 
 # tidy data format (for ggplot)
-
-F1_df_Levine_32_tidy <- data.frame(value = as.vector(as.matrix(F1_df_Levine_32_ord)))
-F1_df_Levine_32_tidy["method"] <- rep(factor(colnames(F1_df_Levine_32_ord), 
-                                             levels = colnames(F1_df_Levine_32_ord)), 
-                                      each = nrow(F1_df_Levine_32_ord))
-F1_df_Levine_32_tidy
-
-F1_df_Levine_13_tidy <- data.frame(value = as.vector(as.matrix(F1_df_Levine_13_ord)))
-F1_df_Levine_13_tidy["method"] <- rep(factor(colnames(F1_df_Levine_13_ord), 
-                                             levels = colnames(F1_df_Levine_13_ord)), 
-                                      each = nrow(F1_df_Levine_13_ord))
-F1_df_Levine_13_tidy
+F1_df_tidy <- lapply(F1_df_ord, function(m) {
+  d <- data.frame(value = as.vector(as.matrix(m)))
+  d["method"] <- rep(factor(colnames(m), levels = colnames(m)), each = nrow(m))
+  d
+})
 
 
 # box plots
 
-boxplots_F1_Levine_32 <- 
-  ggplot(F1_df_Levine_32_tidy, aes(x = method, y = value)) + 
-  geom_boxplot(col = "gray50", fill = "aliceblue") + 
-  geom_point(shape = 1, col = "darkblue") + 
-  stat_summary(fun.y = mean, color = "red", geom = "point", shape = 1) + 
-  ylim(0, 1) + 
-  ylab("F1 score") + 
-  ggtitle("F1 score: Levine_2015_marrow_32") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
-boxplots_F1_Levine_32
-ggplot2::ggsave("../plots/Levine_2015_marrow_32/results_boxplots_F1_Levine2015marrow32.pdf", 
-                width = 5, height = 5)
-
-
-boxplots_F1_Levine_13 <- 
-  ggplot(F1_df_Levine_13_tidy, aes(x = method, y = value)) + 
-  geom_boxplot(col = "gray50", fill = "aliceblue") + 
-  geom_point(shape = 1, col = "darkblue") + 
-  stat_summary(fun.y = mean, color = "red", geom = "point", shape = 1) + 
-  ylim(0, 1) + 
-  ylab("F1 score") + 
-  ggtitle("F1 score: Levine_2015_marrow_13") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
-boxplots_F1_Levine_13
-ggplot2::ggsave("../plots/Levine_2015_marrow_13/results_boxplots_F1_Levine2015marrow13.pdf", 
-                width = 5, height = 5)
+for (i in 1:4) {
+  nm <- names(F1_df_tidy)[i]
+  title <- paste0("F1 score: ", nm)
+  filename <- paste0("../../plots/", nm, "/results_boxplots_F1_", nm, ".pdf")
+  
+  pl <- 
+    ggplot(F1_df_tidy[[i]], aes(x = method, y = value)) + 
+    geom_boxplot(col = "gray50", fill = "aliceblue") + 
+    geom_point(shape = 1, col = "darkblue") + 
+    stat_summary(fun.y = mean, color = "red", geom = "point", shape = 1) + 
+    ylim(0, 1) + 
+    ylab("F1 score") + 
+    ggtitle(title) + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          axis.title.x = element_blank(), 
+          axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+  
+  print(pl)
+  
+  ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
+}
 
 
 
