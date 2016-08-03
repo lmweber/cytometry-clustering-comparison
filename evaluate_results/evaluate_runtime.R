@@ -60,7 +60,7 @@ res_runtime[["Mosmann_rare"]][["SWIFT"]] <- (34 * 60) + 34
 # run script "evaluate_all_methods.R" to load results directories (automatic or manual
 # number of clusters)
 
-#source("evaluate_all_methods.R")  ## takes 10-15 min
+#source("evaluate_all_methods.R")  ## takes 15 min
 
 RES_DIRS <- c(RES_DIR_CLUSTERX, 
               RES_DIR_DENSVM, 
@@ -68,7 +68,7 @@ RES_DIRS <- c(RES_DIR_CLUSTERX,
               RES_DIR_FLOWMEANS, 
               RES_DIR_FLOWPEAKS, 
               RES_DIR_FLOWSOM, 
-              RES_DIR_FLOWSOM_PRE_META, 
+              RES_DIR_FLOWSOM_PRE, 
               RES_DIR_IMMUNOCLUST, 
               RES_DIR_KMEANS, 
               RES_DIR_RCLUSTERPP)
@@ -79,7 +79,7 @@ method_names <- c("ClusterX",
                   "flowMeans", 
                   "flowPeaks", 
                   "FlowSOM", 
-                  "FlowSOM_pre_meta", 
+                  "FlowSOM_pre", 
                   "immunoClust", 
                   "kmeans", 
                   "Rclusterpp")

@@ -14,8 +14,11 @@ library(ggrepel)
 source("../helpers/helper_collapse_data_frame.R")
 
 # load and evaluate results
-source("../evaluate_results/evaluate_all_methods.R")
-source("../evaluate_results/evaluate_runtime.R")
+CURRENT_DIR <- getwd()
+setwd("../evaluate_results")
+source("evaluate_all_methods.R")  ## takes 15 min
+source("evaluate_runtime.R")
+setwd(CURRENT_DIR)
 
 # color-blind friendly palettes (http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/)
 cb_pal_black <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -123,6 +126,33 @@ labels_matched_df_FlowCAP <- list(
 
 
 
+#########################
+### TABLES OF RESULTS ###
+#########################
+
+data_sets_multiple <- 1:4
+data_sets_single   <- 5:6
+data_sets_FlowCAP  <- 7:8
+data_sets_FlowCAP_alternate <- 9:10
+
+
+# mean F1 score (multiple populations) or F1 score (single population) for each method and data set
+
+# data sets with multiple populations (mean F1 score)
+sapply(res_all, function(r) sapply(r[data_sets_multiple], function(s) s$mean_F1))
+# data sets with single population of interest (F1 score)
+sapply(res_all, function(r) sapply(r[data_sets_single], function(s) s$F1))
+
+
+# FlowCAP data sets (Hungarian algorithm matching, unweighted averages)
+sapply(res_all, function(r) sapply(r[data_sets_FlowCAP], function(s) s$mean_F1))
+
+# FlowCAP data sets: alternate (max F1 score matching, averages weighted by number of cells)
+sapply(res_all, function(r) sapply(r[data_sets_FlowCAP_alternate], function(s) s$mean_F1))
+
+
+
+
 #####################
 ### MEAN F1 SCORE ###
 #####################
@@ -134,13 +164,13 @@ labels_matched_df_FlowCAP <- list(
 mean_F1 <- lapply(F1_df, colMeans)[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
 
 # arrange in descending order
-mean_F1_ord <- lapply(mean_F1, function(m) {
-  ord <- rev(order(m))
-  m[ord]
-})
+ord <- lapply(mean_F1, function(m) rev(order(m)))
+for (i in 1:length(mean_F1)) {
+  mean_F1[[i]] <- mean_F1[[i]][ord[[i]]]
+}
 
 # tidy data format (for ggplot)
-mean_F1_tidy <- lapply(mean_F1_ord, function(m) {
+mean_F1_tidy <- lapply(mean_F1, function(m) {
   d <- data.frame(value = m)
   d["method"] <- factor(rownames(d), levels = rownames(d))
   d
@@ -182,14 +212,13 @@ for (i in 1:4) {
 
 
 # arrange in same order as previous plots
-ord <- lapply(mean_F1, function(m) rev(order(m)))
-F1_df_ord <- F1_df[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
-for (i in 1:4) {
-  F1_df_ord[[i]] <- F1_df_ord[[i]][, ord[[i]]]
+F1_df_multiple <- F1_df[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
+for (i in 1:length(F1_df_multiple)) {
+  F1_df_multiple[[i]] <- F1_df_multiple[[i]][, ord[[i]]]
 }
 
 # tidy data format (for ggplot)
-F1_df_tidy <- lapply(F1_df_ord, function(m) {
+F1_df_tidy <- lapply(F1_df_multiple, function(m) {
   d <- data.frame(value = as.vector(as.matrix(m)))
   d["method"] <- rep(factor(colnames(m), levels = colnames(m)), each = nrow(m))
   d
@@ -224,103 +253,62 @@ for (i in 1:4) {
 
 
 
-############################################
-### MEAN F1 SCORE, PRECISION, AND RECALL ###
-############################################
+##################################################
+### MEAN F1 SCORE, MEAN PRECISION, MEAN RECALL ###
+##################################################
 
-# for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
+# for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
 
-# mean precision and mean recall across all true clusters (unweighted)
+# mean precision and mean recall across true populations (unweighted)
+mean_precision <- lapply(precision_df, colMeans)[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
+mean_recall <- lapply(recall_df, colMeans)[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
 
-mean_precision_Levine_32 <- colMeans(precision_df_Levine_32)
-mean_precision_Levine_13 <- colMeans(precision_df_Levine_13)
-
-mean_recall_Levine_32 <- colMeans(recall_df_Levine_32)
-mean_recall_Levine_13 <- colMeans(recall_df_Levine_13)
-
-# arrange in descending order of mean F1 score (unweighted)
-
-mean_precision_Levine_32_ord <- mean_precision_Levine_32[ord_Levine_32]
-mean_precision_Levine_13_ord <- mean_precision_Levine_13[ord_Levine_13]
-
-mean_recall_Levine_32_ord <- mean_recall_Levine_32[ord_Levine_32]
-mean_recall_Levine_13_ord <- mean_recall_Levine_13[ord_Levine_13]
-
-mean_precision_Levine_32_ord
-mean_precision_Levine_13_ord
-
-mean_recall_Levine_32_ord
-mean_recall_Levine_13_ord
-
+# arrange in same order as previous plots
+for (i in 1:length(mean_precision)) {
+  mean_precision[[i]] <- mean_precision[[i]][ord[[i]]]
+  mean_recall[[i]] <- mean_recall[[i]][ord[[i]]]
+}
 
 # tidy data format (for ggplot)
-
-plot_data_Levine_32 <- data.frame(F1_score = mean_F1_Levine_32_ord, 
-                                  precision = mean_precision_Levine_32_ord, 
-                                  recall = mean_recall_Levine_32_ord)
-plot_data_Levine_32["method"] <- factor(rownames(plot_data_Levine_32), 
-                                        levels = rownames(plot_data_Levine_32))
-plot_data_Levine_32 <- melt(plot_data_Levine_32, 
-                            id.vars = "method", 
-                            measure.vars = c("F1_score", "precision", "recall"))
-
-plot_data_Levine_13 <- data.frame(F1_score = mean_F1_Levine_13_ord, 
-                                  precision = mean_precision_Levine_13_ord, 
-                                  recall = mean_recall_Levine_13_ord)
-plot_data_Levine_13["method"] <- factor(rownames(plot_data_Levine_13), 
-                                        levels = rownames(plot_data_Levine_13))
-plot_data_Levine_13 <- melt(plot_data_Levine_13, 
-                            id.vars = "method", 
-                            measure.vars = c("F1_score", "precision", "recall"))
+f_plot_data <- function(f, p, r) {
+  d <- data.frame(F1_score = f, precision = p, recall = r)
+  d["method"] <- factor(rownames(d), levels = rownames(d))
+  d <- melt(d, id.vars = "method", measure.vars = c("F1_score", "precision", "recall"))
+  d
+}
+plot_data <- mapply(f_plot_data, mean_F1, mean_precision, mean_recall, SIMPLIFY = FALSE)
 
 
-# bar plots of mean F1 score, mean precision, and mean recall (in same order as previously)
+# bar plots of mean F1 score, mean precision, mean recall (in same order as previously)
 
-barplot_mean_F1_pr_re_Levine_32 <- 
-  ggplot(plot_data_Levine_32, aes(x = method, y = value, group = variable, fill = variable)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
-  ylim(0, 1) + 
-  ylab("") + 
-  ggtitle("Mean F1 score, precision, and recall: Levine_2015_marrow_32") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.73, 0.95), 
-        legend.direction = "horizontal", 
-        legend.key.size = unit(4, "mm"), 
-        legend.key = element_blank(), 
-        legend.title = element_blank(), 
-        legend.background = element_blank())
-
-barplot_mean_F1_pr_re_Levine_32
-ggplot2::ggsave("../plots/Levine_2015_marrow_32/results_barplot_mean_F1_pr_re_Levine2015marrow32.pdf", 
-                width = 5, height = 5)
-
-
-barplot_mean_F1_pr_re_Levine_13 <- 
-  ggplot(plot_data_Levine_13, aes(x = method, y = value, group = variable, fill = variable)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
-  ylim(0, 1) + 
-  ylab("") + 
-  ggtitle("Mean F1 score, precision, and recall: Levine_2015_marrow_13") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.73, 0.95), 
-        legend.direction = "horizontal", 
-        legend.key.size = unit(4, "mm"), 
-        legend.key = element_blank(), 
-        legend.title = element_blank(), 
-        legend.background = element_blank())
-
-barplot_mean_F1_pr_re_Levine_13
-ggplot2::ggsave("../plots/Levine_2015_marrow_13/results_barplot_mean_F1_pr_re_Levine2015marrow13.pdf", 
-                width = 5, height = 5)
+for (i in 1:4) {
+  nm <- names(plot_data)[i]
+  title <- paste0("Mean F1 score, precision, recall: ", nm)
+  filename <- paste0("../../plots/", nm, "/results_barplot_mean_F1_pr_re_", nm, ".pdf")
+  
+  pl <- 
+    ggplot(plot_data[[i]], aes(x = method, y = value, group = variable, fill = variable)) + 
+    geom_bar(stat = "identity", position = "dodge") + 
+    scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
+    ylim(0, 1) + 
+    ylab("") + 
+    ggtitle(title) + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          axis.title.x = element_blank(), 
+          axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+          legend.position = c(0.73, 0.95), 
+          legend.direction = "horizontal", 
+          legend.key.size = unit(4, "mm"), 
+          legend.key = element_blank(), 
+          legend.title = element_blank(), 
+          legend.background = element_blank())
+  
+  print(pl)
+  
+  ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
+}
 
 
 
