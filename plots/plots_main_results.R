@@ -443,7 +443,7 @@ res_runtime_ord <- lapply(res_runtime, function(r) {
 })
 
 # tidy data format (for ggplot)
-runtime_tidy <- lapply(res_runtime_ord, function(r) {
+runtime_tidy <- lapply(res_runtime_ord[c(data_sets_multiple, data_sets_single)], function(r) {
   d <- data.frame(value = r)
   d["method"] <- factor(rownames(d), levels = rownames(d))
   d
@@ -464,7 +464,6 @@ runtime_tidy[["Samusik_01"]]["cores"]   <- c("^", "^", "^", "^", "^", "^", "^", 
 runtime_tidy[["Samusik_all"]]["cores"]  <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
 runtime_tidy[["Nilsson_rare"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
 runtime_tidy[["Mosmann_rare"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
-
 
 # bar plots
 
@@ -508,109 +507,79 @@ for (i in 1:6) {
 
 # for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
-
-# create tidy data frames
-
-runtime_vs_F1_Levine_32_tidy <- runtime_Levine_32_tidy
-colnames(runtime_vs_F1_Levine_32_tidy)[1] <- "runtime"
-runtime_vs_F1_Levine_32_tidy$mean_F1 <- mean_F1_Levine_32[rownames(runtime_vs_F1_Levine_32_tidy)]
-
-runtime_vs_F1_Levine_13_tidy <- runtime_Levine_13_tidy
-colnames(runtime_vs_F1_Levine_13_tidy)[1] <- "runtime"
-runtime_vs_F1_Levine_13_tidy$mean_F1 <- mean_F1_Levine_13[rownames(runtime_vs_F1_Levine_13_tidy)]
-
-# check
-
-runtime_vs_F1_Levine_32_tidy
-runtime_vs_F1_Levine_13_tidy
-
+# tidy data format (for ggplot)
+f_runtime_vs_F1_tidy <- function(r, m) {
+  colnames(r)[1] <- "runtime"
+  r["mean_F1"] <- m[rownames(r)]
+  r
+}
+runtime_vs_F1_tidy <- runtime_tidy[data_sets_multiple]
+runtime_vs_F1_tidy <- mapply(f_runtime_vs_F1_tidy, runtime_vs_F1_tidy, mean_F1, SIMPLIFY = FALSE)
 
 # scatter plots
 
-runtime_scatterplot_Levine_32 <- 
-  ggplot(runtime_vs_F1_Levine_32_tidy, aes(x = mean_F1, y = runtime)) + 
-  geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
-  xlim(0.15, 0.8) + 
-  ylim(-1000, 38000) + 
-  ggtitle("Runtime vs. mean F1: Levine_2015_marrow_32") + 
-  xlab("mean F1 score") + 
-  ylab("runtime (seconds)") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12))
+ymaxs <- list(45000, 10000, 23000, 26000)
 
-runtime_scatterplot_Levine_32
-ggplot2::ggsave("../plots/Levine_2015_marrow_32/runtime_scatterplot_Levine2015marrow32.pdf", 
-                width = 5, height = 5)
-
-
-runtime_scatterplot_Levine_13 <- 
-  ggplot(runtime_vs_F1_Levine_13_tidy, aes(x = mean_F1, y = runtime)) + 
-  geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
-  xlim(0.15, 0.8) + 
-  ylim(-1000, 10500) + 
-  ggtitle("Runtime vs. mean F1: Levine_2015_marrow_13") + 
-  xlab("mean F1 score") + 
-  ylab("runtime (seconds)") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12))
-
-runtime_scatterplot_Levine_13
-ggplot2::ggsave("../plots/Levine_2015_marrow_13/runtime_scatterplot_Levine2015marrow13.pdf", 
-                width = 5, height = 5)
+for (i in 1:4) {
+  nm <- names(runtime_vs_F1_tidy)[i]
+  title <- paste0("Runtime vs. mean F1: ", nm)
+  filename <- paste0("../../plots/", nm, "/runtime_scatterplot_", nm, ".pdf")
+  
+  pl <- 
+    ggplot(runtime_vs_F1_tidy[[i]], aes(x = mean_F1, y = runtime)) + 
+    geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
+    geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
+    xlim(0, 0.8) + 
+    ylim(-1000, ymaxs[[i]]) + 
+    ggtitle(title) + 
+    xlab("mean F1 score") + 
+    ylab("runtime (seconds)") + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12))
+  
+  print(pl)
+  
+  ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
+}
 
 
-# for data sets with a single rare cell population of interest (Nilsson_2013_HSC, Mosmann_2014_activ)
+# for data sets with a single rare population of interest (Nilsson_rare, Mosmann_rare)
 
-runtime_vs_F1_Nilsson_tidy <- runtime_Nilsson_tidy
-colnames(runtime_vs_F1_Nilsson_tidy)[1] <- "runtime"
-runtime_vs_F1_Nilsson_tidy$F1 <- F1_df_Nilsson_ord[rownames(runtime_vs_F1_Nilsson_tidy)]
-
-runtime_vs_F1_Mosmann_tidy <- runtime_Mosmann_tidy
-colnames(runtime_vs_F1_Mosmann_tidy)[1] <- "runtime"
-runtime_vs_F1_Mosmann_tidy$F1 <- F1_df_Mosmann_ord[rownames(runtime_vs_F1_Mosmann_tidy)]
-
-# check
-
-runtime_vs_F1_Nilsson_tidy
-runtime_vs_F1_Mosmann_tidy
-
+# tidy data format (for ggplot)
+f_runtime_vs_F1_tidy_rare <- function(r, m) {
+  colnames(r)[1] <- "runtime"
+  r["F1"] <- m[rownames(r)]
+  r
+}
+runtime_vs_F1_tidy_rare <- runtime_tidy[data_sets_single]
+runtime_vs_F1_tidy_rare <- mapply(f_runtime_vs_F1_tidy_rare, runtime_vs_F1_tidy_rare, F1_rare, SIMPLIFY = FALSE)
 
 # scatter plots
 
-runtime_scatterplot_Nilsson <- 
-  ggplot(runtime_vs_F1_Nilsson_tidy, aes(x = F1, y = runtime)) + 
-  geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines"), force = 3) + 
-  xlim(-0.1, 0.75) + 
-  ylim(-1000, 10000) + 
-  ggtitle("Runtime vs. F1: Nilsson_2013_HSC") + 
-  xlab("F1 score") + 
-  ylab("runtime (seconds)") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12))
+ymaxs <- list(6100, 27000)
+ymins <- list(-500, -2000)
 
-runtime_scatterplot_Nilsson
-ggplot2::ggsave("../plots/Nilsson_2013_HSC/runtime_scatterplot_Nilsson2013HSC.pdf", 
-                width = 5, height = 5)
-
-
-runtime_scatterplot_Mosmann <- 
-  ggplot(runtime_vs_F1_Mosmann_tidy, aes(x = F1, y = runtime)) + 
-  geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
-  geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.45, "lines")) + 
-  xlim(-0.1, 0.75) + 
-  ylim(-1000, 16750) + 
-  ggtitle("Runtime vs. F1: Mosmann_2014_activ") + 
-  xlab("F1 score") + 
-  ylab("runtime (seconds)") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12))
-
-runtime_scatterplot_Mosmann
-ggplot2::ggsave("../plots/Mosmann_2014_activ/runtime_scatterplot_Mosmann2014activ.pdf", 
-                width = 5, height = 5)
+for (i in 1:2) {
+  nm <- names(runtime_vs_F1_tidy_rare)[i]
+  title <- paste0("Runtime vs. F1: ", nm)
+  filename <- paste0("../../plots/", nm, "/runtime_scatterplot_", nm, ".pdf")
+  
+  pl <- 
+    ggplot(runtime_vs_F1_tidy_rare[[i]], aes(x = F1, y = runtime)) + 
+    geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
+    geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
+    xlim(0, 0.8) + 
+    ylim(ymins[[i]], ymaxs[[i]]) + 
+    ggtitle(title) + 
+    xlab("F1 score") + 
+    ylab("runtime (seconds)") + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12))
+  
+  print(pl)
+  
+  ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
+}
 
 
 
