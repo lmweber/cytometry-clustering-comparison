@@ -15,3 +15,5 @@ source("evaluate_FlowSOM_pre.R")  # takes 1-2 min
 source("evaluate_immunoClust.R")
 source("evaluate_kmeans.R")
 source("evaluate_Rclusterpp.R")
+source("evaluate_SamSPECTRAL.R")
+

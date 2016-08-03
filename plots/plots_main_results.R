@@ -48,8 +48,8 @@ res_all <- list(
   immunoClust = res_immunoClust, 
   kmeans = res_kmeans, 
   #PhenoGraph = res_PhenoGraph, 
-  Rclusterpp = res_Rclusterpp#, 
-  #SamSPECTRAL = res_SamSPECTRAL, 
+  Rclusterpp = res_Rclusterpp, 
+  SamSPECTRAL = res_SamSPECTRAL#, 
   #SWIFT = res_SWIFT)
 )
 
