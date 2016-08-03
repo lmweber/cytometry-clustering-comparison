@@ -201,6 +201,9 @@ mean_F1_tidy <- lapply(mean_F1, function(m) {
 
 # bar plots
 
+barplots_mean_F1 <- vector("list", length(mean_F1_tidy))
+names(barplots_mean_F1) <- names(mean_F1_tidy)
+
 for (i in 1:4) {
   nm <- names(mean_F1_tidy)[i]
   title <- paste0("Mean F1 score: ", nm)
@@ -218,6 +221,7 @@ for (i in 1:4) {
           axis.title.x = element_blank(), 
           axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
   
+  barplots_mean_F1[[i]] <- pl
   print(pl)
   
   ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
@@ -247,6 +251,9 @@ F1_df_tidy <- lapply(F1_df_multiple, function(m) {
 
 # box plots
 
+boxplots_F1 <- vector("list", length(F1_df_tidy))
+names(boxplots_F1) <- names(F1_df_tidy)
+
 for (i in 1:4) {
   nm <- names(F1_df_tidy)[i]
   title <- paste0("F1 score: ", nm)
@@ -265,6 +272,7 @@ for (i in 1:4) {
           axis.title.x = element_blank(), 
           axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
   
+  boxplots_F1[[i]] <- pl
   print(pl)
   
   ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
@@ -300,6 +308,9 @@ plot_data <- mapply(f_plot_data, mean_F1, mean_precision, mean_recall, SIMPLIFY 
 
 # bar plots of mean F1 score, mean precision, mean recall (in same order as previously)
 
+barplots_mean_F1_pr_re <- vector("list", length(plot_data))
+names(barplots_mean_F1_pr_re) <- names(plot_data)
+
 for (i in 1:4) {
   nm <- names(plot_data)[i]
   title <- paste0("Mean F1 score, precision, recall: ", nm)
@@ -323,6 +334,7 @@ for (i in 1:4) {
           legend.title = element_blank(), 
           legend.background = element_blank())
   
+  barplots_mean_F1_pr_re[[i]] <- pl
   print(pl)
   
   ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
@@ -347,8 +359,11 @@ n_cells_tidy <- lapply(tbl_truth_multiple, function(d) {
 
 # plots of population sizes: number of assigned cells per true population
 
-ymaxs <- list(30000, 15750, 15500, 132500)
-offsets <- list(600, 300, 300, 2500)
+no_of_cells <- vector("list", length(n_cells_tidy))
+names(no_of_cells) <- names(n_cells_tidy)
+
+ymaxs_ncells <- list(30000, 15750, 15500, 132500)
+offsets_ncells <- list(600, 300, 300, 2500)
 
 for (i in 1:4) {
   nm <- names(n_cells_tidy)[i]
@@ -358,8 +373,8 @@ for (i in 1:4) {
   pl <- 
     ggplot(n_cells_tidy[[i]], aes(x = population, y = value)) + 
     geom_bar(stat = "identity", fill = "darkgray") + 
-    geom_text(aes(label = value, y = value + offsets[[i]], angle = 90), hjust = "left", size = 3.5) + 
-    scale_y_continuous(limits = c(0, ymaxs[[i]]), labels = scales::comma) + 
+    geom_text(aes(label = value, y = value + offsets_ncells[[i]], angle = 90), hjust = "left", size = 3.5) + 
+    scale_y_continuous(limits = c(0, ymaxs_ncells[[i]]), labels = scales::comma) + 
     xlab("manually gated population") + 
     ylab("number of cells") + 
     ggtitle(title) + 
@@ -367,6 +382,7 @@ for (i in 1:4) {
     theme(plot.title = element_text(size = 12), 
           axis.text.x = element_text(size = 9))
   
+  no_of_cells[[i]] <- pl
   print(pl)
   
   ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
@@ -399,6 +415,9 @@ plot_data_rare <- mapply(f_plot_data, F1_rare, precision_rare, recall_rare, SIMP
 
 # bar plots
 
+barplots_F1_pr_re <- vector("list", length(plot_data_rare))
+names(barplots_F1_pr_re) <- names(plot_data_rare)
+
 for (i in 1:2) {
   nm <- names(plot_data_rare)[i]
   title <- paste0("Rare population: ", nm)
@@ -422,6 +441,7 @@ for (i in 1:2) {
           legend.title = element_blank(), 
           legend.background = element_blank())
   
+  barplots_F1_pr_re[[i]] <- pl
   print(pl)
   
   ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
@@ -433,8 +453,6 @@ for (i in 1:2) {
 ##########################
 ### RUNTIME: BAR PLOTS ###
 ##########################
-
-# all data sets
 
 # arrange runtimes in ascending order
 res_runtime_ord <- lapply(res_runtime, function(r) {
@@ -465,12 +483,16 @@ runtime_tidy[["Samusik_all"]]["cores"]  <- c("^", "^", "^", "^", "^", "^", "^", 
 runtime_tidy[["Nilsson_rare"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
 runtime_tidy[["Mosmann_rare"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
 
-# bar plots
 
-offsets <- list(1000, 200, 500, 600, 150, 600)
-ymaxs <- list(50000, 11000, 25000, 29000, 6500, 30000)
+# bar plots: data sets with multiple populations
 
-for (i in 1:6) {
+runtime_barplots <- vector("list", length(runtime_tidy[data_sets_multiple]))
+names(runtime_barplots) <- names(runtime_tidy)[data_sets_multiple]
+
+offsets_runtime <- list(1000, 200, 500, 600)
+ymaxs_runtime <- list(50000, 11000, 25000, 29000)
+
+for (i in 1:4) {
   nm <- names(runtime_tidy)[i]
   title <- paste0("Runtime: ", nm)
   filename <- paste0("../../plots/", nm, "/runtime_barplot_", nm, ".pdf")
@@ -479,9 +501,9 @@ for (i in 1:6) {
     ggplot(runtime_tidy[[i]], aes(x = method, y = value)) + 
     geom_bar(stat = "identity", fill = "mediumpurple") + 
     geom_text(aes(label = paste0(round(value, 0), " ", subsampling, cores), 
-                  y = value + offsets[[i]], angle = 90), hjust = "left", size = 3.5) + 
+                  y = value + offsets_runtime[[i]], angle = 90), hjust = "left", size = 3.5) + 
     ggtitle(title) + 
-    ylim(0, ymaxs[[i]]) + 
+    ylim(0, ymaxs_runtime[[i]]) + 
     ylab("seconds") + 
     theme_bw() + 
     theme(plot.title = element_text(size = 12), 
@@ -493,6 +515,47 @@ for (i in 1:6) {
           legend.title = element_blank(), 
           legend.background = element_blank())
   
+  runtime_barplots[[i]] <- pl
+  print(pl)
+  
+  ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
+}
+
+
+# bar plots: data sets with single rare population
+
+runtime_tidy_rare <- runtime_tidy[data_sets_single]
+
+runtime_barplots_rare <- vector("list", length(runtime_tidy_rare))
+names(runtime_barplots_rare) <- names(runtime_tidy_rare)
+
+offsets_runtime_rare <- list(150, 600)
+ymaxs_runtime_rare <- list(7000, 30000)
+
+for (i in 1:2) {
+  nm <- names(runtime_tidy_rare)[i]
+  title <- paste0("Runtime: ", nm)
+  filename <- paste0("../../plots/", nm, "/runtime_barplot_", nm, ".pdf")
+  
+  pl <- 
+    ggplot(runtime_tidy_rare[[i]], aes(x = method, y = value)) + 
+    geom_bar(stat = "identity", fill = "mediumpurple") + 
+    geom_text(aes(label = paste0(round(value, 0), " ", subsampling, cores), 
+                  y = value + offsets_runtime_rare[[i]], angle = 90), hjust = "left", size = 3.5) + 
+    ggtitle(title) + 
+    ylim(0, ymaxs_runtime_rare[[i]]) + 
+    ylab("seconds") + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          axis.title.x = element_blank(), 
+          axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+          legend.position = c(0.16, 0.91), 
+          legend.key.size = unit(5, "mm"), 
+          legend.key = element_blank(), 
+          legend.title = element_blank(), 
+          legend.background = element_blank())
+  
+  runtime_barplots_rare[[i]] <- pl
   print(pl)
   
   ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
@@ -505,7 +568,7 @@ for (i in 1:6) {
 ### RUNTIME: SCATTER PLOTS (RUNTIME VS. MEAN F1 SCORE) ###
 ##########################################################
 
-# for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
+# data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
 # tidy data format (for ggplot)
 f_runtime_vs_F1_tidy <- function(r, m) {
@@ -518,7 +581,10 @@ runtime_vs_F1_tidy <- mapply(f_runtime_vs_F1_tidy, runtime_vs_F1_tidy, mean_F1, 
 
 # scatter plots
 
-ymaxs <- list(45000, 10000, 23000, 26000)
+runtime_scatterplots <- vector("list", length(runtime_vs_F1_tidy))
+names(runtime_scatterplots) <- names(runtime_vs_F1_tidy)
+
+ymaxs_scatter <- list(45000, 10000, 23000, 26000)
 
 for (i in 1:4) {
   nm <- names(runtime_vs_F1_tidy)[i]
@@ -530,20 +596,21 @@ for (i in 1:4) {
     geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
     geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
     xlim(0, 0.8) + 
-    ylim(-1000, ymaxs[[i]]) + 
+    ylim(-1000, ymaxs_scatter[[i]]) + 
     ggtitle(title) + 
     xlab("mean F1 score") + 
     ylab("runtime (seconds)") + 
     theme_bw() + 
     theme(plot.title = element_text(size = 12))
   
+  runtime_scatterplots[[i]] <- pl
   print(pl)
   
   ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
 }
 
 
-# for data sets with a single rare population of interest (Nilsson_rare, Mosmann_rare)
+# data sets with a single rare population of interest (Nilsson_rare, Mosmann_rare)
 
 # tidy data format (for ggplot)
 f_runtime_vs_F1_tidy_rare <- function(r, m) {
@@ -556,8 +623,11 @@ runtime_vs_F1_tidy_rare <- mapply(f_runtime_vs_F1_tidy_rare, runtime_vs_F1_tidy_
 
 # scatter plots
 
-ymaxs <- list(6100, 27000)
-ymins <- list(-500, -2000)
+runtime_scatterplots_rare <- vector("list", length(runtime_vs_F1_tidy_rare))
+names(runtime_scatterplots_rare) <- names(runtime_vs_F1_tidy_rare)
+
+ymaxs_scatter_rare <- list(6100, 27000)
+ymins_scatter_rare <- list(-500, -2000)
 
 for (i in 1:2) {
   nm <- names(runtime_vs_F1_tidy_rare)[i]
@@ -569,13 +639,14 @@ for (i in 1:2) {
     geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
     geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
     xlim(0, 0.8) + 
-    ylim(ymins[[i]], ymaxs[[i]]) + 
+    ylim(ymins_scatter_rare[[i]], ymaxs_scatter_rare[[i]]) + 
     ggtitle(title) + 
     xlab("F1 score") + 
     ylab("runtime (seconds)") + 
     theme_bw() + 
     theme(plot.title = element_text(size = 12))
   
+  runtime_scatterplots_rare[[i]] <- pl
   print(pl)
   
   ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
@@ -590,69 +661,62 @@ for (i in 1:2) {
 
 # combine into one multi-panel plot for each data set
 
+# data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
-# Levine_2015_marrow_32
-ggdraw() + 
-  draw_plot(barplot_mean_F1_Levine_32, 0.05, 0.66, 0.4, 0.33) + 
-  draw_plot(boxplots_F1_Levine_32, 0.55, 0.66, 0.4, 0.33) + 
-  draw_plot(barplot_mean_F1_pr_re_Levine_32, 0.05, 0.33, 0.4, 0.33) + 
-  draw_plot(plot_n_cells_Levine_32, 0.55, 0.36, 0.4, 0.30) + 
-  draw_plot(runtime_barplot_Levine_32, 0.05, 0, 0.4, 0.33) + 
-  draw_plot(runtime_scatterplot_Levine_32, 0.55, 0.03, 0.4, 0.30) + 
-  draw_plot_label(LETTERS[1:6], 
-                  c(0, 0.5, 0, 0.5, 0, 0.5), c(0.99, 0.99, 0.66, 0.66, 0.33, 0.33), size = 16)
+multi_panel_multiple <- vector("list", length(mean_F1_tidy))
+names(multi_panel_multiple) <- names(mean_F1_tidy)
 
-ggplot2::ggsave("../plots/Levine_2015_marrow_32/plots_multi_panel_Levine2015marrow32.pdf", 
-                width = 13, height = 14.5)
-
-
-# Levine_2015_marrow_13
-ggdraw() + 
-  draw_plot(barplot_mean_F1_Levine_13, 0.05, 0.66, 0.4, 0.33) + 
-  draw_plot(boxplots_F1_Levine_13, 0.55, 0.66, 0.4, 0.33) + 
-  draw_plot(barplot_mean_F1_pr_re_Levine_13, 0.05, 0.33, 0.4, 0.33) + 
-  draw_plot(plot_n_cells_Levine_13, 0.55, 0.36, 0.4, 0.30) + 
-  draw_plot(runtime_barplot_Levine_13, 0.05, 0, 0.4, 0.33) + 
-  draw_plot(runtime_scatterplot_Levine_13, 0.55, 0.03, 0.4, 0.30) + 
-  draw_plot_label(LETTERS[1:6], 
-                  c(0, 0.5, 0, 0.5, 0, 0.5), c(0.99, 0.99, 0.66, 0.66, 0.33, 0.33), size = 16)
-
-ggplot2::ggsave("../plots/Levine_2015_marrow_13/plots_multi_panel_Levine2015marrow13.pdf", 
-                width = 13, height = 14.5)
+for (i in 1:4) {
+  nm <- names(multi_panel_multiple)[i]
+  filename <- paste0("../../plots/", nm, "/plots_multi_panel_", nm, ".pdf")
+  
+  pl <- ggdraw() + 
+    draw_plot(barplots_mean_F1[[i]], 0.05, 0.66, 0.4, 0.33) + 
+    draw_plot(boxplots_F1[[i]], 0.55, 0.66, 0.4, 0.33) + 
+    draw_plot(barplots_mean_F1_pr_re[[i]], 0.05, 0.33, 0.4, 0.33) + 
+    draw_plot(no_of_cells[[i]], 0.55, 0.36, 0.4, 0.30) + 
+    draw_plot(runtime_barplots[[i]], 0.05, 0, 0.4, 0.33) + 
+    draw_plot(runtime_scatterplots[[i]], 0.55, 0.03, 0.4, 0.30) + 
+    draw_plot_label(LETTERS[1:6], 
+                    c(0, 0.5, 0, 0.5, 0, 0.5), c(0.99, 0.99, 0.66, 0.66, 0.33, 0.33), size = 16)
+  
+  multi_panel_multiple[[i]] <- pl
+  print(pl)
+  
+  ggplot2::ggsave(filename, width = 13, height = 14.5)
+}
 
 
-# Nilsson_2013_HSC
-ggdraw() + 
-  draw_plot(barplot_F1_pr_re_Nilsson, 0.025, 0.64, 0.8, 0.35) + 
-  draw_plot(runtime_barplot_Nilsson, 0.025, 0.32, 0.8, 0.32) + 
-  draw_plot(runtime_scatterplot_Nilsson, 0.025, 0.03, 0.8, 0.29) + 
-  draw_plot_label(LETTERS[1:3], c(0, 0, 0), c(0.99, 0.64, 0.32), size = 16)
+# data sets with a single rare population of interest (Nilsson_rare, Mosmann_rare)
 
-ggplot2::ggsave("../plots/Nilsson_2013_HSC/plots_multi_panel_Nilsson2013HSC.pdf", 
-                width = 6.5, height = 14.5)
+multi_panel_single <- vector("list", length(plot_data_rare))
+names(multi_panel_single) <- names(plot_data_rare)
 
-
-# Mosmann_2014_activ
-ggdraw() + 
-  draw_plot(barplot_F1_pr_re_Mosmann, 0.025, 0.64, 0.8, 0.35) + 
-  draw_plot(runtime_barplot_Mosmann, 0.025, 0.32, 0.8, 0.32) + 
-  draw_plot(runtime_scatterplot_Mosmann, 0.025, 0.03, 0.8, 0.29) + 
-  draw_plot_label(LETTERS[1:3], c(0, 0, 0), c(0.99, 0.64, 0.32), size = 16)
-
-ggplot2::ggsave("../plots/Mosmann_2014_activ/plots_multi_panel_Mosmann2014activ.pdf", 
-                width = 6.5, height = 14.5)
+for (i in 1:2) {
+  nm <- names(multi_panel_single)[i]
+  filename <- paste0("../../plots/", nm, "/plots_multi_panel_", nm, ".pdf")
+  
+  pl <- ggdraw() + 
+    draw_plot(barplots_F1_pr_re[[i]], 0.025, 0.64, 0.8, 0.35) + 
+    draw_plot(runtime_barplots_rare[[i]], 0.025, 0.32, 0.8, 0.32) + 
+    draw_plot(runtime_scatterplots_rare[[i]], 0.025, 0.03, 0.8, 0.29) + 
+    draw_plot_label(LETTERS[1:3], c(0, 0, 0), c(0.99, 0.64, 0.32), size = 16)
+  
+  multi_panel_single[[i]] <- pl
+  print(pl)
+  
+  ggplot2::ggsave(filename, pl, width = 6.5, height = 14.5)
+}
 
 
 
 
-####################
-### SESSION INFO ###
-####################
-
-# session information for plots
+###########################
+### SESSION INFORMATION ###
+###########################
 
 sink(file = "../plots/session_info_plots_main_results.txt")
-sessionInfo()
+print(sessionInfo())
 sink()
 
 
