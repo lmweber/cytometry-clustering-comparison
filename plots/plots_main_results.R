@@ -124,6 +124,30 @@ labels_matched_df_FlowCAP <- list(
 )
 
 
+# population sizes: number of assigned cells per true population
+
+files_truth <- list(
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
+  FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
+  FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
+)
+
+clus_truth <- lapply(files_truth, function(f) {
+  d <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+  d[, "label"]
+})
+
+sapply(clus_truth, length)
+tbl_truth <- lapply(clus_truth, table)
+tbl_truth
+sapply(tbl_truth, length)
+
+
 
 
 #########################
@@ -159,9 +183,8 @@ sapply(res_all, function(r) sapply(r[data_sets_FlowCAP_alternate], function(s) s
 
 # for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
-
 # mean F1 score across true populations (unweighted)
-mean_F1 <- lapply(F1_df, colMeans)[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
+mean_F1 <- lapply(F1_df, colMeans)[data_sets_multiple]
 
 # arrange in descending order
 ord <- lapply(mean_F1, function(m) rev(order(m)))
@@ -175,7 +198,6 @@ mean_F1_tidy <- lapply(mean_F1, function(m) {
   d["method"] <- factor(rownames(d), levels = rownames(d))
   d
 })
-
 
 # bar plots
 
@@ -210,9 +232,8 @@ for (i in 1:4) {
 
 # for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
-
 # arrange in same order as previous plots
-F1_df_multiple <- F1_df[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
+F1_df_multiple <- F1_df[data_sets_multiple]
 for (i in 1:length(F1_df_multiple)) {
   F1_df_multiple[[i]] <- F1_df_multiple[[i]][, ord[[i]]]
 }
@@ -223,7 +244,6 @@ F1_df_tidy <- lapply(F1_df_multiple, function(m) {
   d["method"] <- rep(factor(colnames(m), levels = colnames(m)), each = nrow(m))
   d
 })
-
 
 # box plots
 
@@ -259,10 +279,9 @@ for (i in 1:4) {
 
 # for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
-
 # mean precision and mean recall across true populations (unweighted)
-mean_precision <- lapply(precision_df, colMeans)[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
-mean_recall <- lapply(recall_df, colMeans)[c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all")]
+mean_precision <- lapply(precision_df, colMeans)[data_sets_multiple]
+mean_recall <- lapply(recall_df, colMeans)[data_sets_multiple]
 
 # arrange in same order as previous plots
 for (i in 1:length(mean_precision)) {
@@ -278,7 +297,6 @@ f_plot_data <- function(f, p, r) {
   d
 }
 plot_data <- mapply(f_plot_data, mean_F1, mean_precision, mean_recall, SIMPLIFY = FALSE)
-
 
 # bar plots of mean F1 score, mean precision, mean recall (in same order as previously)
 
@@ -317,147 +335,97 @@ for (i in 1:4) {
 ### POPULATION SIZES ###
 ########################
 
-# for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
-
-
-# tidy data format (for ggplot)
-
-n_cells_truth_Levine_32_tidy <- as.data.frame(tbl_truth_Levine_32)
-n_cells_truth_Levine_13_tidy <- as.data.frame(tbl_truth_Levine_13)
-
-colnames(n_cells_truth_Levine_32_tidy) <- c("population", "value")
-colnames(n_cells_truth_Levine_13_tidy) <- c("population", "value")
-
-
-# plot number of cells in each true (manually gated) population
-
-plot_n_cells_Levine_32 <- 
-  ggplot(n_cells_truth_Levine_32_tidy, aes(x = population, y = value)) + 
-  geom_bar(stat = "identity", fill = "darkgray") + 
-  geom_text(aes(label = value, y = value + 600, angle = 90), hjust = "left", size = 3.5) + 
-  ylim(0, 30000) + 
-  xlab("manually gated population") + 
-  ylab("number of cells") + 
-  ggtitle("Manually gated populations: Levine_2015_marrow_32") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12))
-
-plot_n_cells_Levine_32
-ggplot2::ggsave("../plots/Levine_2015_marrow_32/results_no_of_cells_Levine2015marrow32.pdf", 
-                width = 5, height = 5)
-
-
-plot_n_cells_Levine_13 <- 
-  ggplot(n_cells_truth_Levine_13_tidy, aes(x = population, y = value)) + 
-  geom_bar(stat = "identity", fill = "darkgray") + 
-  geom_text(aes(label = value, y = value + 300, angle = 90), hjust = "left", size = 3.5) + 
-  ylim(0, 15750) + 
-  xlab("manually gated population") + 
-  ylab("number of cells") + 
-  ggtitle("Manually gated populations: Levine_2015_marrow_13") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.text.x = element_text(size = 9))
-
-plot_n_cells_Levine_13
-ggplot2::ggsave("../plots/Levine_2015_marrow_13/results_no_of_cells_Levine2015marrow13.pdf", 
-                width = 5, height = 5)
-
-
-
-
-##########################################################################
-### DETECTION OF RARE CELL POPULATION: F1 SCORE, PRECISION, AND RECALL ###
-##########################################################################
-
-# for data sets with a single rare cell population of interest (Nilsson_2013_HSC, Mosmann_2014_activ)
-
-
-# arrange by F1 score
-
-ord_Nilsson <- rev(order(F1_df_Nilsson))
-ord_Mosmann <- rev(order(F1_df_Mosmann))
-
-
-precision_df_Nilsson_ord <- unlist(precision_df_Nilsson[ord_Nilsson])
-precision_df_Mosmann_ord <- unlist(precision_df_Mosmann[ord_Mosmann])
-
-recall_df_Nilsson_ord <- unlist(recall_df_Nilsson[ord_Nilsson])
-recall_df_Mosmann_ord <- unlist(recall_df_Mosmann[ord_Mosmann])
-
-F1_df_Nilsson_ord <- unlist(F1_df_Nilsson[ord_Nilsson])
-F1_df_Mosmann_ord <- unlist(F1_df_Mosmann[ord_Mosmann])
-
-F1_df_Nilsson_ord
-F1_df_Mosmann_ord
-
+# for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
 # tidy data format (for ggplot)
+tbl_truth_multiple <- tbl_truth[data_sets_multiple]
+n_cells_tidy <- lapply(tbl_truth_multiple, function(d) {
+  d <- as.data.frame(d)
+  colnames(d) <- c("population", "value")
+  d
+})
 
-plot_data_Nilsson <- data.frame(precision = precision_df_Nilsson_ord, 
-                                recall = recall_df_Nilsson_ord, 
-                                F1_score = F1_df_Nilsson_ord)
-plot_data_Nilsson["method"] <- factor(rownames(plot_data_Nilsson), 
-                                      levels = rownames(plot_data_Nilsson))
-plot_data_Nilsson <- melt(plot_data_Nilsson, 
-                          id.vars = "method", 
-                          measure.vars = c("F1_score", "precision", "recall"))
+# plots of population sizes: number of assigned cells per true population
 
-plot_data_Mosmann <- data.frame(precision = precision_df_Mosmann_ord, 
-                                recall = recall_df_Mosmann_ord, 
-                                F1_score = F1_df_Mosmann_ord)
-plot_data_Mosmann["method"] <- factor(rownames(plot_data_Mosmann), 
-                                      levels = rownames(plot_data_Mosmann))
-plot_data_Mosmann <- melt(plot_data_Mosmann, 
-                          id.vars = "method", 
-                          measure.vars = c("F1_score", "precision", "recall"))
+ymaxs <- list(30000, 15750, 15500, 132500)
+offsets <- list(600, 300, 300, 2500)
+
+for (i in 1:4) {
+  nm <- names(n_cells_tidy)[i]
+  title <- paste0("Manually gated populations: ", nm)
+  filename <- paste0("../../plots/", nm, "/results_no_of_cells_", nm, ".pdf")
+  
+  pl <- 
+    ggplot(n_cells_tidy[[i]], aes(x = population, y = value)) + 
+    geom_bar(stat = "identity", fill = "darkgray") + 
+    geom_text(aes(label = value, y = value + offsets[[i]], angle = 90), hjust = "left", size = 3.5) + 
+    scale_y_continuous(limits = c(0, ymaxs[[i]]), labels = scales::comma) + 
+    xlab("manually gated population") + 
+    ylab("number of cells") + 
+    ggtitle(title) + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          axis.text.x = element_text(size = 9))
+  
+  print(pl)
+  
+  ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
+}
+
+
+
+
+#####################################################
+### RARE POPULATIONS: F1 SCORE, PRECISION, RECALL ###
+#####################################################
+
+# for data sets with a single rare population of interest (Nilsson_rare, Mosmann_rare)
+
+# arrange by decreasing F1 score
+ord_rare <- lapply(F1_df[data_sets_single], function(d) rev(order(d)))
+
+precision_rare <- precision_df[data_sets_single]
+recall_rare <- recall_df[data_sets_single]
+F1_rare <- F1_df[data_sets_single]
+
+for (i in 1:length(precision_rare)) {
+  precision_rare[[i]] <- unlist(precision_rare[[i]][ord_rare[[i]]])
+  recall_rare[[i]] <- unlist(recall_rare[[i]][ord_rare[[i]]])
+  F1_rare[[i]] <- unlist(F1_rare[[i]][ord_rare[[i]]])
+}
+
+# tidy data format (for ggplot)
+plot_data_rare <- mapply(f_plot_data, F1_rare, precision_rare, recall_rare, SIMPLIFY = FALSE)
 
 # bar plots
 
-barplot_F1_pr_re_Nilsson <- 
-  ggplot(plot_data_Nilsson, aes(x = method, y = value, group = variable, fill = variable)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
-  ylim(0, 1.05) + 
-  ylab("") + 
-  ggtitle("Rare cell population: Nilsson_2013_HSC") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.73, 0.955), 
-        legend.direction = "horizontal", 
-        legend.key.size = unit(4, "mm"), 
-        legend.key = element_blank(), 
-        legend.title = element_blank(), 
-        legend.background = element_blank())
-
-barplot_F1_pr_re_Nilsson
-ggplot2::ggsave("../plots/Nilsson_2013_HSC/results_barplot_F1_pr_re_Nilsson2013HSC.pdf", 
-                width = 5, height = 5)
-
-
-barplot_F1_pr_re_Mosmann <- 
-  ggplot(plot_data_Mosmann, aes(x = method, y = value, group = variable, fill = variable)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
-  ylim(0, 1.05) + 
-  ylab("") + 
-  ggtitle("Rare cell population: Mosmann_2014_activ") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.73, 0.955), 
-        legend.direction = "horizontal", 
-        legend.key.size = unit(4, "mm"), 
-        legend.key = element_blank(), 
-        legend.title = element_blank(), 
-        legend.background = element_blank())
-
-barplot_F1_pr_re_Mosmann
-ggplot2::ggsave("../plots/Mosmann_2014_activ/results_barplot_F1_pr_re_Mosmann2014activ.pdf", 
-                width = 5, height = 5)
+for (i in 1:2) {
+  nm <- names(plot_data_rare)[i]
+  title <- paste0("Rare population: ", nm)
+  filename <- paste0("../../plots/", nm, "/results_barplot_F1_pr_re_", nm, ".pdf")
+  
+  pl <- 
+    ggplot(plot_data_rare[[i]], aes(x = method, y = value, group = variable, fill = variable)) + 
+    geom_bar(stat = "identity", position = "dodge") + 
+    scale_fill_manual(values = c(gg_pal[1], cb_pal_black[4], cb_pal_black[3])) + 
+    ylim(0, 1.05) + 
+    ylab("") + 
+    ggtitle(title) + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          axis.title.x = element_blank(), 
+          axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+          legend.position = c(0.73, 0.955), 
+          legend.direction = "horizontal", 
+          legend.key.size = unit(4, "mm"), 
+          legend.key = element_blank(), 
+          legend.title = element_blank(), 
+          legend.background = element_blank())
+  
+  print(pl)
+  
+  ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
+}
 
 
 
@@ -466,10 +434,7 @@ ggplot2::ggsave("../plots/Mosmann_2014_activ/results_barplot_F1_pr_re_Mosmann201
 ### RUNTIME: BAR PLOTS ###
 ##########################
 
-# runtime results are loaded with a separate script (sourced at the beginning of this script)
-
-
-# convert data frames to tidy data format (for ggplot)
+# tidy data format (for ggplot)
 
 runtime_Levine_32_tidy <- data.frame(value = runtime_Levine_32_ord)
 runtime_Levine_32_tidy["method"] <- factor(rownames(runtime_Levine_32_tidy), 
