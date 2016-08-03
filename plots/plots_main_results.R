@@ -434,148 +434,70 @@ for (i in 1:2) {
 ### RUNTIME: BAR PLOTS ###
 ##########################
 
+# all data sets
+
+# arrange runtimes in ascending order
+res_runtime_ord <- lapply(res_runtime, function(r) {
+  r_ord <- unlist(r)
+  r_ord[order(r_ord)]
+})
+
 # tidy data format (for ggplot)
+runtime_tidy <- lapply(res_runtime_ord, function(r) {
+  d <- data.frame(value = r)
+  d["method"] <- factor(rownames(d), levels = rownames(d))
+  d
+})
 
-runtime_Levine_32_tidy <- data.frame(value = runtime_Levine_32_ord)
-runtime_Levine_32_tidy["method"] <- factor(rownames(runtime_Levine_32_tidy), 
-                                           levels = rownames(runtime_Levine_32_tidy))
+# which methods required subsampling
+runtime_tidy[["Levine_32dim"]]["subsampling"] <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
+runtime_tidy[["Levine_13dim"]]["subsampling"] <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
+runtime_tidy[["Samusik_01"]]["subsampling"]   <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
+runtime_tidy[["Samusik_all"]]["subsampling"]  <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
+runtime_tidy[["Nilsson_rare"]]["subsampling"] <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
+runtime_tidy[["Mosmann_rare"]]["subsampling"] <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
 
-runtime_Levine_13_tidy <- data.frame(value = runtime_Levine_13_ord)
-runtime_Levine_13_tidy["method"] <- factor(rownames(runtime_Levine_13_tidy), 
-                                           levels = rownames(runtime_Levine_13_tidy))
-
-runtime_Nilsson_tidy <- data.frame(value = runtime_Nilsson_ord)
-runtime_Nilsson_tidy["method"] <- factor(rownames(runtime_Nilsson_tidy), 
-                                         levels = rownames(runtime_Nilsson_tidy))
-
-runtime_Mosmann_tidy <- data.frame(value = runtime_Mosmann_ord)
-runtime_Mosmann_tidy["method"] <- factor(rownames(runtime_Mosmann_tidy), 
-                                         levels = rownames(runtime_Mosmann_tidy))
-
-
-# single or multiple cores used
-
-runtime_Levine_32_tidy$cores <- "single core"
-runtime_Levine_32_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple cores"
-runtime_Levine_32_tidy$cores <- factor(runtime_Levine_32_tidy$cores, 
-                                       levels = c("single core", "multiple cores"))
-
-runtime_Levine_13_tidy$cores <- "single core"
-runtime_Levine_13_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple cores"
-runtime_Levine_13_tidy$cores <- factor(runtime_Levine_13_tidy$cores, 
-                                       levels = c("single core", "multiple cores"))
-
-runtime_Nilsson_tidy$cores <- "single core"
-runtime_Nilsson_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple cores"
-runtime_Nilsson_tidy$cores <- factor(runtime_Nilsson_tidy$cores, 
-                                     levels = c("single core", "multiple cores"))
-
-runtime_Mosmann_tidy$cores <- "single core"
-runtime_Mosmann_tidy[c("SWIFT", "Rclusterpp"), "cores"] <- "multiple cores"
-runtime_Mosmann_tidy$cores <- factor(runtime_Mosmann_tidy$cores, 
-                                     levels = c("single core", "multiple cores"))
-
-
-# check
-
-runtime_Levine_32_tidy
-runtime_Levine_13_tidy
-runtime_Nilsson_tidy
-runtime_Mosmann_tidy
+# which methods required multiple cores
+runtime_tidy[["Levine_32dim"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
+runtime_tidy[["Levine_13dim"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
+runtime_tidy[["Samusik_01"]]["cores"]   <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
+runtime_tidy[["Samusik_all"]]["cores"]  <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
+runtime_tidy[["Nilsson_rare"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
+runtime_tidy[["Mosmann_rare"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
 
 
 # bar plots
 
-runtime_barplot_Levine_32 <- 
-  ggplot(runtime_Levine_32_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", aes(fill = cores)) + 
-  scale_fill_manual(values = c("mediumpurple", "darkgray")) + 
-  geom_text(aes(label = round(value, 0), y = value + 800, angle = 90), hjust = "left", size = 3.5) + 
-  ggtitle("Runtime: Levine_2015_marrow_32") + 
-  ylim(0, 38000) + 
-  ylab("seconds") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.16, 0.91), 
-        legend.key.size = unit(5, "mm"), 
-        legend.key = element_blank(), 
-        legend.title = element_blank(), 
-        legend.background = element_blank())
+offsets <- list(1000, 200, 500, 600, 150, 600)
+ymaxs <- list(50000, 11000, 25000, 29000, 6500, 30000)
 
-runtime_barplot_Levine_32
-ggplot2::ggsave("../plots/Levine_2015_marrow_32/runtime_barplot_Levine2015marrow32.pdf", 
-                width = 5, height = 5)
-
-
-runtime_barplot_Levine_13 <- 
-  ggplot(runtime_Levine_13_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", aes(fill = cores)) + 
-  scale_fill_manual(values = c("mediumpurple", "darkgray")) + 
-  geom_text(aes(label = round(value, 0), y = value + 200, angle = 90), hjust = "left", size = 3.5) + 
-  ggtitle("Runtime: Levine_2015_marrow_13") + 
-  ylim(0, 10500) + 
-  ylab("seconds") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.16, 0.91), 
-        legend.key.size = unit(5, "mm"), 
-        legend.key = element_blank(), 
-        legend.title = element_blank(), 
-        legend.background = element_blank())
-
-runtime_barplot_Levine_13
-ggplot2::ggsave("../plots/Levine_2015_marrow_13/runtime_barplot_Levine2015marrow13.pdf", 
-                width = 5, height = 5)
-
-
-runtime_barplot_Nilsson <- 
-  ggplot(runtime_Nilsson_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", aes(fill = cores)) + 
-  scale_fill_manual(values = c("mediumpurple", "darkgray")) + 
-  geom_text(aes(label = round(value, 0), y = value + 200, angle = 90), hjust = "left", size = 3.5) + 
-  ggtitle("Runtime: Nilsson_2013_HSC") + 
-  ylim(0, 10000) + 
-  ylab("seconds") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.16, 0.91), 
-        legend.key.size = unit(5, "mm"), 
-        legend.key = element_blank(), 
-        legend.title = element_blank(), 
-        legend.background = element_blank())
-
-runtime_barplot_Nilsson
-ggplot2::ggsave("../plots/Nilsson_2013_HSC/runtime_barplot_Nilsson2013HSC.pdf", 
-                width = 5, height = 5)
-
-
-runtime_barplot_Mosmann <- 
-  ggplot(runtime_Mosmann_tidy, aes(x = method, y = value)) + 
-  geom_bar(stat = "identity", aes(fill = cores)) + 
-  scale_fill_manual(values = c("mediumpurple", "darkgray")) + 
-  geom_text(aes(label = round(value, 0), y = value + 350, angle = 90), hjust = "left", size = 3.5) + 
-  ggtitle("Runtime: Mosmann_2014_activ") + 
-  ylim(0, 16750) + 
-  ylab("seconds") + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = 12), 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-        legend.position = c(0.16, 0.91), 
-        legend.key.size = unit(5, "mm"), 
-        legend.key = element_blank(), 
-        legend.title = element_blank(), 
-        legend.background = element_blank())
-
-runtime_barplot_Mosmann
-ggplot2::ggsave("../plots/Mosmann_2014_activ/runtime_barplot_Mosmann2014activ.pdf", 
-                width = 5, height = 5)
+for (i in 1:6) {
+  nm <- names(runtime_tidy)[i]
+  title <- paste0("Runtime: ", nm)
+  filename <- paste0("../../plots/", nm, "/runtime_barplot_", nm, ".pdf")
+  
+  pl <- 
+    ggplot(runtime_tidy[[i]], aes(x = method, y = value)) + 
+    geom_bar(stat = "identity", fill = "mediumpurple") + 
+    geom_text(aes(label = paste0(round(value, 0), " ", subsampling, cores), 
+                  y = value + offsets[[i]], angle = 90), hjust = "left", size = 3.5) + 
+    ggtitle(title) + 
+    ylim(0, ymaxs[[i]]) + 
+    ylab("seconds") + 
+    theme_bw() + 
+    theme(plot.title = element_text(size = 12), 
+          axis.title.x = element_blank(), 
+          axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
+          legend.position = c(0.16, 0.91), 
+          legend.key.size = unit(5, "mm"), 
+          legend.key = element_blank(), 
+          legend.title = element_blank(), 
+          legend.background = element_blank())
+  
+  print(pl)
+  
+  ggplot2::ggsave(filename, plot = pl, width = 5, height = 5)
+}
 
 
 
@@ -584,7 +506,7 @@ ggplot2::ggsave("../plots/Mosmann_2014_activ/runtime_barplot_Mosmann2014activ.pd
 ### RUNTIME: SCATTER PLOTS (RUNTIME VS. MEAN F1 SCORE) ###
 ##########################################################
 
-# for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
+# for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
 
 # create tidy data frames

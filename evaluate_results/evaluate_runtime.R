@@ -101,14 +101,3 @@ for (i in 1:length(RES_DIRS)) {
 }
 
 
-
-# ==========================
-# Arrange in ascending order
-# ==========================
-
-res_runtime_ord <- lapply(res_runtime, function(r) {
-  r_ord <- unlist(r)
-  r_ord[order(r_ord)]
-})
-
-
