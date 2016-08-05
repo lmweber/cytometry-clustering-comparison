@@ -132,20 +132,8 @@ K <- list(
   Samusik_all  = 40, 
   Nilsson_rare = 40, 
   Mosmann_rare = 40, 
-  FlowCAP_ND   = 1:10,   ####################### use 10 or optimal BIC instead; delete cores below; possibly replace pFlowMerge with individual functions
-  FlowCAP_WNV  = 1:10
-)
-
-# set up multiple processor cores using snow
-cores <- list(
-  Levine_32dim = NULL, 
-  Levine_13dim = NULL, 
-  Samusik_01   = NULL, 
-  Samusik_all  = NULL, 
-  Nilsson_rare = NULL, 
-  Mosmann_rare = NULL, 
-  FlowCAP_ND   = makeCluster(10), 
-  FlowCAP_WNV  = makeCluster(10)
+  FlowCAP_ND   = 10, 
+  FlowCAP_WNV  = 10
 )
 
 seed <- 123
@@ -157,7 +145,7 @@ for (i in 1:length(data)) {
   if (!is_FlowCAP[i]) {
     set.seed(seed)
     runtimes[[i]] <- system.time({
-      out[[i]] <- pFlowMerge(data[[i]], cl = cores[[i]], K = K[[i]], varNames = pars[[i]])
+      out[[i]] <- pFlowMerge(data[[i]], cl = NULL, K = K[[i]], varNames = pars[[i]])
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -169,7 +157,7 @@ for (i in 1:length(data)) {
     for (j in 1:length(data[[i]])) {
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- pFlowMerge(data[[i]], cl = cores[[i]], K = K[[i]], varNames = pars[[i]])
+        out[[i]][[j]] <- pFlowMerge(data[[i]], cl = NULL, K = K[[i]], varNames = pars[[i]])
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
