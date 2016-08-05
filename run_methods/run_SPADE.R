@@ -15,17 +15,17 @@ library(spade)
 ### LOAD DATA ###
 #################
 
-# filenames (non-transformed: SPADE transforms internally)
+# filenames
 
 DATA_DIR <- "../../../benchmark_data_sets"
 
 files <- list(
-  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim_notransform.fcs"), 
-  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim_notransform.fcs"), 
-  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01_notransform.fcs"), 
-  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all_notransform.fcs"), 
-  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare_notransform.fcs"), 
-  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare_notransform.fcs"), 
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
   FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
   FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
 )
@@ -127,18 +127,6 @@ k <- list(
   FlowCAP_WNV  = 4
 )
 
-# arcsinh transformation cofactor
-asinh_cof <- list(
-  Levine_32dim = 5, 
-  Levine_13dim = 5, 
-  Samusik_01   = 5, 
-  Samusik_all  = 5, 
-  Nilsson_rare = 150, 
-  Mosmann_rare = 150, 
-  FlowCAP_ND   = 150, 
-  FlowCAP_WNV  = 150
-)
-
 seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
@@ -152,8 +140,7 @@ for (i in 1:length(data)) {
     
     set.seed(seed)
     runtimes[[i]] <- system.time({
-      transforms <- flowCore::arcsinhTransform(a = 0, b = 1 / asinh_cof[[i]])
-      SPADE.driver(file_SPADE_data, out_dir = output_dir, transforms = transforms, k = k[[i]])
+      SPADE.driver(file_SPADE_data, out_dir = output_dir, transforms = NULL, k = k[[i]])
     })
     
     file_SPADE_out <- list.files(output_dir, "\\.cluster\\.fcs$")
@@ -173,8 +160,7 @@ for (i in 1:length(data)) {
       
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        transforms <- flowCore::arcsinhTransform(a = 0, b = 1 / asinh_cof[[i]])
-        SPADE.driver(file_SPADE_data, out_dir = output_dir, transforms = transforms, k = k[[i]])
+        SPADE.driver(file_SPADE_data, out_dir = output_dir, transforms = NULL, k = k[[i]])
       })
       
       file_SPADE_out <- list.files(output_dir, "\\.cluster\\.fcs$")
