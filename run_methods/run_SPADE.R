@@ -143,7 +143,7 @@ for (i in 1:length(data)) {
       SPADE.driver(file_SPADE_data, out_dir = output_dir, transforms = NULL, k = k[[i]])
     })
     
-    file_SPADE_out <- list.files(output_dir, "\\.cluster\\.fcs$")
+    file_SPADE_out <- list.files(output_dir, "\\.cluster\\.fcs$", full.names = TRUE)
     out[[i]] <- flowCore::exprs(flowCore::read.FCS(file_SPADE_out, transformation = FALSE, truncate_max_range = FALSE))
     
     cat("data set", names(data[i]), ": run complete\n")
@@ -163,7 +163,7 @@ for (i in 1:length(data)) {
         SPADE.driver(file_SPADE_data, out_dir = output_dir, transforms = NULL, k = k[[i]])
       })
       
-      file_SPADE_out <- list.files(output_dir, "\\.cluster\\.fcs$")
+      file_SPADE_out <- list.files(output_dir, "\\.cluster\\.fcs$", full.names = TRUE)
       out[[i]][[j]] <- flowCore::exprs(flowCore::read.FCS(file_SPADE_out, transformation = FALSE, truncate_max_range = FALSE))
     }
     cat("data set", names(data[i]), ": run complete\n")
