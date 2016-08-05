@@ -113,6 +113,8 @@ sapply(data[is_FlowCAP], function(d) {
 # run SPADE
 # note: results are saved in files in temporary directory
 
+# note: skip data set Levine_32dim due to error
+
 output_dir <- "../../../algorithms/SPADE_temp"
 
 # number of clusters k
@@ -131,7 +133,8 @@ seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
 
-for (i in 1:length(data)) {
+# skip data set Levine_32dim (i = 1) due to error
+for (i in 2:length(data)) {
   
   if (!is_FlowCAP[i]) {
     # save external data file (required due to FlowCAP data format: inconsistent cluster labels across samples)
@@ -204,7 +207,7 @@ sapply(clus, length)
 
 # cluster sizes and number of clusters
 # (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
-table(clus[[1]])
+table(clus[[2]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
