@@ -113,7 +113,7 @@ sapply(data[is_FlowCAP], function(d) {
 # run SPADE
 # note: results are saved in files in temporary directory
 
-# note: skip data set Levine_32dim due to error
+# note: skip data sets Levine_32dim and FlowCAP_WNV due to error
 
 output_dir <- "../../../algorithms/SPADE_temp"
 
@@ -133,8 +133,8 @@ seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
 
-# skip data set Levine_32dim (i = 1) due to error
-for (i in 2:length(data)) {
+# note: skip data sets Levine_32dim and FlowCAP_WNV (i = 1 and 8) due to error
+for (i in 2:7) {
   
   if (!is_FlowCAP[i]) {
     # save external data file (required due to FlowCAP data format: inconsistent cluster labels across samples)
@@ -183,7 +183,8 @@ for (i in 2:length(data)) {
 clus <- vector("list", length(data))
 names(clus) <- names(data)
 
-for (i in 1:length(clus)) {
+# note: skip data sets Levine_32dim and FlowCAP_WNV (i = 1 and 8) due to error
+for (i in 2:7) {
   if (!is_FlowCAP[i]) {
     clus[[i]] <- out[[i]][, "cluster"]
 
@@ -211,27 +212,31 @@ table(clus[[2]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../../results_manual/spade/spade_labels_", 
+files_labels <- paste0("../../results_manual/SPADE/SPADE_labels_", 
                        names(clus), ".txt")
 
-for (i in 1:length(files_labels)) {
+# note: skip data sets Levine_32dim and FlowCAP_WNV (i = 1 and 8) due to error
+for (i in 2:7) {
   res_i <- data.frame(label = clus[[i]])
   write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
 }
 
 # save runtimes
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
+# note: skip data sets Levine_32dim and FlowCAP_WNV (i = 1 and 8) due to error
+runtimes[[1]] <- NA
+runtimes[[8]] <- NA
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_manual/runtimes/runtime_spade.txt", 
+write.table(runtimes, file = "../../results_manual/runtimes/runtime_SPADE.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_manual/session_info/session_info_spade.txt")
+sink(file = "../../results_manual/session_info/session_info_SPADE.txt")
 print(sessionInfo())
 sink()
 
-cat("spade manual : all runs complete\n")
+cat("SPADE manual : all runs complete\n")
 
 
 
