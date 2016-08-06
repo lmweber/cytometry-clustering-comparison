@@ -68,15 +68,15 @@ sapply(data[is_FlowCAP], function(d) {
 })
 
 
-# subsampling for data sets with excessive runtime (> 1 day on server)
+# subsampling for data sets with excessive runtime (> 12 hrs on server)
 
 ix_subsample <- c(1, 4, 6)
-n_sub <- 100000
+n_sub <- c(50000, NA, NA, 50000, NA, 100000)
 
 for (i in ix_subsample) {
   if (!is_FlowCAP[i]) {
     set.seed(123)
-    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub[i]), ]
     # save subsampled population IDs
     true_labels_i <- flowCore::exprs(data[[i]])[, "label", drop = FALSE]
     files_true_labels_i <- paste0("../../results_manual/flowMerge/true_labels_flowMerge_", 
