@@ -69,7 +69,7 @@ sapply(data[is_FlowCAP], function(d) {
 })
 
 
-# subsampling for data sets with excessive runtime (> 1 day on server)
+# subsampling for data sets with excessive runtime (> 12 hrs on server)
 
 ix_subsample <- 4
 n_sub <- 100000
