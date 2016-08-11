@@ -6,7 +6,7 @@
 #
 # Use this function for data sets with a single (e.g. rare) population of interest
 #
-# Lukas Weber, July 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
@@ -15,6 +15,9 @@
 # - clus_truth: true cluster labels (1 = rare cluster of interest, 0 = all others)
 # (for both arguments: length = number of cells; names = cluster labels (integers))
 helper_match_evaluate_single <- function(clus_algorithm, clus_truth) {
+  
+  # number of detected clusters
+  n_clus <- length(table(clus_algorithm))
   
   tbl_algorithm <- table(clus_algorithm)
   tbl_truth <- table(clus_truth)
@@ -59,7 +62,8 @@ helper_match_evaluate_single <- function(clus_algorithm, clus_truth) {
   
   n_cells_matched <- sum(clus_algorithm == labels_matched, na.rm = TRUE)
   
-  return(list(pr = pr, 
+  return(list(n_clus = n_clus, 
+              pr = pr, 
               re = re, 
               F1 = F1, 
               labels_matched = labels_matched, 

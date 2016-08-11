@@ -6,7 +6,7 @@
 #
 # Use this function for data sets with multiple populations of interest
 #
-# Lukas Weber, July 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
@@ -18,6 +18,9 @@ library(clue)
 # - clus_truth: true cluster labels
 # (for both arguments: length = number of cells; names = cluster labels (integers))
 helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
+  
+  # number of detected clusters
+  n_clus <- length(table(clus_algorithm))
   
   # remove unassigned cells (NA's in clus_truth)
   unassigned <- is.na(clus_truth)
@@ -102,7 +105,8 @@ helper_match_evaluate_multiple <- function(clus_algorithm, clus_truth) {
   mean_re <- mean(re)
   mean_F1 <- mean(F1)
   
-  return(list(pr = pr, 
+  return(list(n_clus = n_clus, 
+              pr = pr, 
               re = re, 
               F1 = F1, 
               labels_matched = labels_matched, 

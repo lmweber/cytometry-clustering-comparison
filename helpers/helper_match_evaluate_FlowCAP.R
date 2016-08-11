@@ -8,7 +8,7 @@
 # Use this function for FlowCAP-I data sets. Results are averaged across populations for
 # each sample, and then averaged across samples.
 #
-# Lukas Weber, July 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
@@ -17,6 +17,9 @@
 # - clus_truth: true cluster labels
 # (for both arguments: length = number of cells; names = cluster labels (integers))
 helper_match_evaluate_FlowCAP <- function(clus_algorithm, clus_truth) {
+  
+  # number of detected clusters
+  n_clus <- sum(!grepl("NA", names(table(clus_algorithm))))
   
   # split cluster labels by sample
   spl <- strsplit(clus_algorithm, split = "_")
@@ -133,7 +136,8 @@ helper_match_evaluate_FlowCAP <- function(clus_algorithm, clus_truth) {
   mean_re <- mean(mean_re_by_sample)
   mean_F1 <- mean(mean_F1_by_sample)
   
-  return(list(mean_pr_by_sample = mean_pr_by_sample, 
+  return(list(n_clus = n_clus, 
+              mean_pr_by_sample = mean_pr_by_sample, 
               mean_re_by_sample = mean_re_by_sample, 
               mean_F1_by_sample = mean_F1_by_sample, 
               mean_pr = mean_pr, 
