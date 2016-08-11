@@ -462,9 +462,19 @@ names(out) <- names(runtimes) <- names(out_pre_manual)
 
 for (i in 1:length(out_pre_manual)) {
   if (!is_FlowCAP[i]) {
-    set.seed(seed)
     runtimes[[i]] <- system.time({
-      meta <- FlowSOM::metaClustering_consensus(out_pre_manual[[i]]$map$codes, k = k[[i]])
+      # note: In the current version of FlowSOM, the recommended function 
+      # FlowSOM::metaClustering_consensus() does not pass along the seed argument 
+      # correctly, so results are not reproducible. To get around this, we use the 
+      # dependency function ConsensusClusterPlus::ConsensusClusterPlus() instead. 
+      # However, this will be fixed in the next update of FlowSOM (version 1.5); after 
+      # the update the following (simpler) line of code can be used instead.
+      #meta <- FlowSOM::metaClustering_consensus(out_pre_manual[[i]]$map$codes, k = k[[i]], seed = seed)
+      
+      meta <- suppressMessages(
+        ConsensusClusterPlus::ConsensusClusterPlus(t(out_pre_manual[[i]]$map$codes), maxK = k[[i]], seed = seed)
+      )
+      meta <- meta[[k[[i]]]]$consensusClass
     })
     out[[i]] <- meta
     cat("data set", names(data[i]), ": run complete\n")
@@ -475,9 +485,19 @@ for (i in 1:length(out_pre_manual)) {
     names(out[[i]]) <- names(runtimes[[i]]) <- names(data[[i]])
     
     for (j in 1:length(data[[i]])) {
-      set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        meta <- FlowSOM::metaClustering_consensus(out_pre_manual[[i]][[j]]$map$codes, k = k[[i]])
+        # note: In the current version of FlowSOM, the recommended function 
+        # FlowSOM::metaClustering_consensus() does not pass along the seed argument 
+        # correctly, so results are not reproducible. To get around this, we use the 
+        # dependency function ConsensusClusterPlus::ConsensusClusterPlus() instead. 
+        # However, this will be fixed in the next update of FlowSOM (version 1.5); after 
+        # the update the following (simpler) line of code can be used instead.
+        #meta <- FlowSOM::metaClustering_consensus(out_pre_manual[[i]][[j]]$map$codes, k = k[[i]], seed = seed)
+        
+        meta <- suppressMessages(
+          ConsensusClusterPlus::ConsensusClusterPlus(t(out_pre_manual[[i]][[j]]$map$codes), maxK = k[[i]], seed = seed)
+        )
+        meta <- meta[[k[[i]]]]$consensusClass
       })
       out[[i]][[j]] <- meta
     }
