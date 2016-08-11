@@ -14,3 +14,69 @@
 # 5. After SWIFT completes, cluster labels will be saved in the file
 # "<original_filename>.Cluster_Output.txt" in the input directory. Cluster labels are in 
 # the "MergeCluster" column.
+
+
+
+
+###################
+### SUBSAMPLING ###
+###################
+
+# SWIFT requires subsampling for some data sets due to runtime. Use code below to
+# subsample and save true population labels.
+
+library(flowCore)
+
+# load data
+
+DATA_DIR <- "../../../benchmark_data_sets"
+
+files <- list(
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
+  FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
+  FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
+)
+
+is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
+
+data <- vector("list", length(files))
+names(data) <- names(files)
+
+for (i in 1:length(data)) {
+  f <- files[[i]]
+  
+  if (!is_FlowCAP[i]) {
+    data[[i]] <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+    
+  } else {
+    smp <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
+    smp <- smp[, "sample"]
+    d <- flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE)
+    d <- flowCore::split(d, smp)
+    data[[i]] <- lapply(d, function(s) flowCore::exprs(s))
+  }
+}
+
+# subsampling for data sets with excessive runtime (> 6 hrs on laptop)
+
+ix_subsample <- c(1, 4)
+n_sub <- c(100000, NA, NA, 100000, NA, NA)
+
+for (i in ix_subsample) {
+  if (!is_FlowCAP[i]) {
+    set.seed(123)
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub[i]), ]
+    
+    # save subsampled data sets in FCS format with population labels
+    files_sub_i <- paste0("../../results_auto/SWIFT/", names(data)[i], "_subsampled.fcs")
+    flowCore::write.FCS(flowCore::flowFrame(data[[i]]), filename = files_sub_i)
+  }
+}
+
+
+
