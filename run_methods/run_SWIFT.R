@@ -25,6 +25,8 @@
 # SWIFT requires subsampling for some data sets due to runtime. Use code below to
 # subsample and save true population labels.
 
+# note: use non-transformed data files
+
 library(flowCore)
 
 # load data
@@ -32,12 +34,12 @@ library(flowCore)
 DATA_DIR <- "../../../benchmark_data_sets"
 
 files <- list(
-  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
-  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
-  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
-  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
-  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
-  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim_notransform.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim_notransform.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01_notransform.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all_notransform.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare_notransform.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare_notransform.fcs"), 
   FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
   FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
 )
@@ -73,7 +75,7 @@ for (i in ix_subsample) {
     data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub[i]), ]
     
     # save subsampled data sets in FCS format with population labels
-    files_sub_i <- paste0("../../results_auto/SWIFT/", names(data)[i], "_subsampled.fcs")
+    files_sub_i <- paste0("../../results_auto/SWIFT/", names(data)[i], "_notransform_subsampled.fcs")
     flowCore::write.FCS(flowCore::flowFrame(data[[i]]), filename = files_sub_i)
   }
 }
