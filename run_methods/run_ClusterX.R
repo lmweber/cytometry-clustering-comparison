@@ -71,13 +71,13 @@ sapply(data[is_FlowCAP], function(d) {
 
 # subsampling (recommended in documentation for this method)
 
-ix_subsample <- 1:8
-n_sub <- 20000
+ix_subsample <- c(1, 4, 6, 7, 8)
+n_sub <- c(100000, NA, NA, 100000, NA, 100000, 10000, 10000)
 
 for (i in ix_subsample) {
   if (!is_FlowCAP[i]) {
     set.seed(123)
-    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub[i]), ]
     # save subsampled population IDs
     true_labels_i <- data[[i]][, "label", drop = FALSE]
     files_true_labels_i <- paste0("../../results_auto/ClusterX/true_labels_ClusterX_", 
@@ -90,7 +90,7 @@ for (i in ix_subsample) {
     # FlowCAP data sets
     for (j in 1:length(data[[i]])) {
       set.seed(123)
-      data[[i]][[j]] <- data[[i]][[j]][sample(1:nrow(data[[i]][[j]]), n_sub), ]
+      data[[i]][[j]] <- data[[i]][[j]][sample(1:nrow(data[[i]][[j]]), n_sub[i]), ]
       # save subsampled population IDs
       true_labels_ij <- data[[i]][[j]][, "label", drop = FALSE]
       files_true_labels_ij <- paste0("../../results_auto/ClusterX/true_labels_ClusterX_", 
