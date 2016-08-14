@@ -82,3 +82,36 @@ for (i in ix_subsample) {
 
 
 
+
+##############################################
+### FIX ERROR FOR FLOW CYTOMETRY DATA SETS ###
+##############################################
+
+# Some of the non-marker columns (forward scatter etc) included in the flow cytometry 
+# data sets (Nilsson_rare, Mosmann_rare) appear to cause an error while trying to load 
+# the data in SWIFT. To fix this, save data sets containing marker columns only.
+
+# indices of protein marker columns
+
+marker_cols <- list(
+  Levine_32dim = 5:36, 
+  Levine_13dim = 1:13, 
+  Samusik_01   = 9:47, 
+  Samusik_all  = 9:47, 
+  Nilsson_rare = c(5:7, 9:18), 
+  Mosmann_rare = c(7:9, 11:21), 
+  FlowCAP_ND   = 3:12, 
+  FlowCAP_WNV  = 3:8
+)
+sapply(marker_cols, length)
+
+# subset and save data files: protein marker columns only
+
+for (i in c(5, 6)) {
+  data[[i]] <- data[[i]][, marker_cols[[i]]]
+  files_i <- paste0("../../results_auto/SWIFT/", names(data)[i], "_notransform_markers_only.fcs")
+  flowCore::write.FCS(flowCore::flowFrame(data[[i]]), filename = files_i)
+}
+
+
+
