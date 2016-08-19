@@ -1,1 +1,1 @@
-run script "evaluate_all.R" to load and evaluate results from all methods
+run script "evaluate_all_methods.R" to load and evaluate results from all methods

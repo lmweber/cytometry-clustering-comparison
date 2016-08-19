@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load and evaluate results for ClusterX
 #
-# Lukas Weber, July 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
@@ -20,7 +20,7 @@ RES_DIR_CLUSTERX <- "../../results_auto/ClusterX"
 DATA_DIR <- "../../../benchmark_data_sets"
 
 # which data sets required subsampling for this method (see parameters spreadsheet)
-is_subsampled <- c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
+is_subsampled <- c(TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, TRUE, TRUE)
 
 # alternate FlowCAP results at the end
 is_rare    <- c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE)
@@ -30,19 +30,19 @@ n_FlowCAP <- 2
 
 
 
-###################################################
-### load truth (manual gating population labels) ##
-###################################################
+####################################################
+### load truth (manual gating population labels) ###
+####################################################
 
 # files with true population labels (subsampled labels if subsampling was required for
 # this method; see parameters spreadsheet)
 
 files_truth <- list(
   Levine_32dim = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Levine_32dim.txt"), 
-  Levine_13dim = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Levine_13dim.txt"), 
-  Samusik_01   = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Samusik_01.txt"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
   Samusik_all  = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Samusik_all.txt"), 
-  Nilsson_rare = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Nilsson_rare.txt"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
   Mosmann_rare = file.path(RES_DIR_CLUSTERX, "true_labels_ClusterX_Mosmann_rare.txt"), 
   FlowCAP_ND   = paste0(RES_DIR_CLUSTERX, "/true_labels_ClusterX_FlowCAP_ND_", 1:30, ".txt"), 
   FlowCAP_WNV  = paste0(RES_DIR_CLUSTERX, "/true_labels_ClusterX_FlowCAP_WNV_", 1:13, ".txt")

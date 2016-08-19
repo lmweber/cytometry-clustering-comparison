@@ -30,9 +30,9 @@ n_FlowCAP <- 2
 
 
 
-###################################################
-### load truth (manual gating population labels) ##
-###################################################
+####################################################
+### load truth (manual gating population labels) ###
+####################################################
 
 # files with true population labels (subsampled labels if subsampling was required for
 # this method; see parameters spreadsheet)

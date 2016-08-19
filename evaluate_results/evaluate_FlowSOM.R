@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load and evaluate results for FlowSOM
 #
-# Lukas Weber, July 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
@@ -30,9 +30,9 @@ n_FlowCAP <- 2
 
 
 
-###################################################
-### load truth (manual gating population labels) ##
-###################################################
+####################################################
+### load truth (manual gating population labels) ###
+####################################################
 
 # files with true population labels (subsampled labels if subsampling was required for
 # this method; see parameters spreadsheet)

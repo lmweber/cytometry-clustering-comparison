@@ -15,12 +15,12 @@ source("../helpers/helper_match_evaluate_FlowCAP.R")
 source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
 # which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
-RES_DIR_IMMUNOCLUST <- "../../results_manual/immunoClust"
+RES_DIR_IMMUNOCLUST <- "../../results_auto/immunoClust"
 
 DATA_DIR <- "../../../benchmark_data_sets"
 
 # which data sets required subsampling for this method (see parameters spreadsheet)
-is_subsampled <- c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
+is_subsampled <- c(TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
 
 # alternate FlowCAP results at the end
 is_rare    <- c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE)
@@ -30,15 +30,15 @@ n_FlowCAP <- 2
 
 
 
-###################################################
-### load truth (manual gating population labels) ##
-###################################################
+####################################################
+### load truth (manual gating population labels) ###
+####################################################
 
 # files with true population labels (subsampled labels if subsampling was required for
 # this method; see parameters spreadsheet)
 
 files_truth <- list(
-  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
+  Levine_32dim = file.path(RES_DIR_IMMUNOCLUST, "true_labels_immunoClust_Levine_32dim.txt"), 
   Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
   Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
   Samusik_all  = file.path(RES_DIR_IMMUNOCLUST, "true_labels_immunoClust_Samusik_all.txt"), 

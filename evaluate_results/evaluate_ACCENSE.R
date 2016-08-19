@@ -1,18 +1,74 @@
 #########################################################################################
-# R script to load and calculate results for ACCENSE
+# R script to load and evaluate results for ACCENSE
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
 library(flowCore)
+library(clue)
 
-# helper functions
-source("helper_match_clusters_and_evaluate.R")
-source("helper_match_one_rare_cluster_and_evaluate.R")
+# helper functions to match clusters and evaluate
+source("../helpers/helper_match_evaluate_multiple.R")
+source("../helpers/helper_match_evaluate_single.R")
+source("../helpers/helper_match_evaluate_FlowCAP.R")
+source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
-# results directories
-source("load_results_directories.R")
+# which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
+RES_DIR_ACCENSE <- "../../results_auto/ACCENSE"
+
+DATA_DIR <- "../../../benchmark_data_sets"
+
+# which data sets required subsampling for this method (see parameters spreadsheet)
+is_subsampled <- c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
+
+is_rare <- c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE)
+
+# note: no FlowCAP data sets for this method
+
+
+
+
+####################################################
+### load truth (manual gating population labels) ###
+####################################################
+
+# files with true population labels (subsampled labels if subsampling was required for
+# this method; see parameters spreadsheet)
+
+files_truth <- list(
+  Levine_32dim = file.path(RES_DIR_ACCENSE, "accense_output_Levine_32dim.csv"), 
+  Levine_13dim = file.path(RES_DIR_ACCENSE, "accense_output_Levine_13dim.csv"), 
+  Samusik_01   = file.path(RES_DIR_ACCENSE, "accense_output_Samusik_01.csv"), 
+  Samusik_all  = file.path(RES_DIR_ACCENSE, "accense_output_Samusik_all.csv"), 
+  Nilsson_rare = file.path(RES_DIR_ACCENSE, "accense_output_Nilsson_rare.csv"), 
+  Mosmann_rare = file.path(RES_DIR_ACCENSE, "accense_output_Mosmann_rare.csv")
+)
+
+# extract true population labels
+
+clus_truth <- vector("list", length(files_truth))
+names(clus_truth) <- names(files_truth)
+
+for (i in 1:length(clus_truth)) {
+  if (!is_subsampled[i]) {
+    data_truth_i <- flowCore::exprs(flowCore::read.FCS(files_truth[[i]], transformation = FALSE, truncate_max_range = FALSE))
+  } else if (is_subsampled[i]) {
+    data_truth_i <- read.csv(files_truth[[i]], stringsAsFactors = FALSE)
+  }
+  clus_truth[[i]] <- data_truth_i[, "label"]
+}
+
+sapply(clus_truth, length)
+
+# cluster sizes and number of clusters
+# (for data sets with single rare population: 1 = rare population of interest, 0 = all others)
+
+tbl_truth <- lapply(clus_truth, table)
+
+tbl_truth
+sapply(tbl_truth, length)
+
 
 
 
@@ -20,100 +76,53 @@ source("load_results_directories.R")
 ### load ACCENSE results ###
 ############################
 
-# note ACCENSE uses subsampled data, so truth labels also need to be re-calculated
+# load cluster labels
 
+files_out <- files_truth
 
-# load "accense_output.csv" files
+clus <- lapply(files_out, function(f) {
+  read.csv(f, stringsAsFactors = FALSE)[, "population"]
+})
 
-file_ACCENSE_Levine_32 <- file.path(RES_DIR_ACCENSE, "ACCENSE/accense_output_Levine_2015_marrow_32.csv")
-file_ACCENSE_Levine_13 <- file.path(RES_DIR_ACCENSE, "ACCENSE/accense_output_Levine_2015_marrow_13.csv")
-file_ACCENSE_Nilsson <- file.path(RES_DIR_ACCENSE, "ACCENSE/accense_output_Nilsson_2013_HSC.csv")
-file_ACCENSE_Mosmann <- file.path(RES_DIR_ACCENSE, "ACCENSE/accense_output_Mosmann_2014_activ.csv")
+sapply(clus, length)
 
-data_ACCENSE_Levine_32 <- read.csv(file_ACCENSE_Levine_32)
-data_ACCENSE_Levine_13 <- read.csv(file_ACCENSE_Levine_13)
-data_ACCENSE_Nilsson <- read.csv(file_ACCENSE_Nilsson)
-data_ACCENSE_Mosmann <- read.csv(file_ACCENSE_Mosmann)
+# cluster sizes and number of clusters
+# (for data sets with single rare population: 1 = rare population of interest, 0 = all others)
 
-head(data_ACCENSE_Levine_32)
-head(data_ACCENSE_Levine_13)
-head(data_ACCENSE_Nilsson)
-head(data_ACCENSE_Mosmann)
+tbl <- lapply(clus, table)
 
-dim(data_ACCENSE_Levine_32)
-dim(data_ACCENSE_Levine_13)
-dim(data_ACCENSE_Nilsson)
-dim(data_ACCENSE_Mosmann)
-
-
-# extract truth labels from subsampled data set
-
-clus_truth_Levine_32_subsampled <- data_ACCENSE_Levine_32[, "label"]
-clus_truth_Levine_13_subsampled <- data_ACCENSE_Levine_13[, "label"]
-clus_truth_Nilsson_subsampled <- data_ACCENSE_Nilsson[, "label"]
-clus_truth_Mosmann_subsampled <- data_ACCENSE_Mosmann[, "label"]
-
-table(clus_truth_Levine_32_subsampled)
-table(clus_truth_Levine_13_subsampled)
-table(clus_truth_Nilsson_subsampled)
-table(clus_truth_Mosmann_subsampled)  # note: too few cells; subsampling is not suitable for rare cell types
-
-length(clus_truth_Levine_32_subsampled)
-length(clus_truth_Levine_13_subsampled)
-length(clus_truth_Nilsson_subsampled)
-length(clus_truth_Mosmann_subsampled)
-
-
-# extract ACCENSE cluster labels
-
-clus_ACCENSE_Levine_32 <- data_ACCENSE_Levine_32[, "population"]
-clus_ACCENSE_Levine_13 <- data_ACCENSE_Levine_13[, "population"]
-clus_ACCENSE_Nilsson <- data_ACCENSE_Nilsson[, "population"]
-clus_ACCENSE_Mosmann <- data_ACCENSE_Mosmann[, "population"]
-
-length(clus_ACCENSE_Levine_32)
-length(clus_ACCENSE_Levine_13)
-length(clus_ACCENSE_Nilsson)
-length(clus_ACCENSE_Mosmann)
-
+tbl
+sapply(tbl, length)
 
 # contingency tables
 
-table(clus_ACCENSE_Levine_32, clus_truth_Levine_32_subsampled)
-table(clus_ACCENSE_Levine_13, clus_truth_Levine_13_subsampled)
-table(clus_ACCENSE_Nilsson, clus_truth_Nilsson_subsampled)
-table(clus_ACCENSE_Mosmann, clus_truth_Mosmann_subsampled)
+for (i in 1:length(clus)) {
+  print(table(clus[[i]], clus_truth[[i]]))
+}
 
 
-# cluster sizes and number of clusters
-
-tbl_ACCENSE_Levine_32 <- table(clus_ACCENSE_Levine_32)
-tbl_ACCENSE_Levine_13 <- table(clus_ACCENSE_Levine_13)
-tbl_ACCENSE_Nilsson <- table(clus_ACCENSE_Nilsson)
-tbl_ACCENSE_Mosmann <- table(clus_ACCENSE_Mosmann)
-
-tbl_ACCENSE_Levine_32
-tbl_ACCENSE_Levine_13
-tbl_ACCENSE_Nilsson
-tbl_ACCENSE_Mosmann
-
-length(tbl_ACCENSE_Levine_32)
-length(tbl_ACCENSE_Levine_13)
-length(tbl_ACCENSE_Nilsson)
-length(tbl_ACCENSE_Mosmann)
 
 
-# match cluster labels by highest F1 score and calculate results
-# precision, recall, F1 score, matched cluster labels, number of cells per matched cluster
+###################################
+### match clusters and evaluate ###
+###################################
 
-res_ACCENSE_Levine_32 <- helper_match_clusters_and_evaluate(clus_ACCENSE_Levine_32, clus_truth_Levine_32_subsampled)
-res_ACCENSE_Levine_13 <- helper_match_clusters_and_evaluate(clus_ACCENSE_Levine_13, clus_truth_Levine_13_subsampled)
-res_ACCENSE_Nilsson <- helper_match_one_rare_cluster_and_evaluate(clus_ACCENSE_Nilsson, clus_truth_Nilsson_subsampled)
-res_ACCENSE_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_ACCENSE_Mosmann, clus_truth_Mosmann_subsampled)
+# see helper function scripts for details on matching strategy and evaluation
 
-res_ACCENSE_Levine_32
-res_ACCENSE_Levine_13
-res_ACCENSE_Nilsson
-res_ACCENSE_Mosmann
+res <- vector("list", length(clus))
+names(res) <- names(clus)
+
+for (i in 1:length(clus)) {
+  if (!is_rare[i]) {
+    res[[i]] <- helper_match_evaluate_multiple(clus[[i]], clus_truth[[i]])
+  } else if (is_rare[i]) {
+    res[[i]] <- helper_match_evaluate_single(clus[[i]], clus_truth[[i]])
+  }
+}
+
+# return named object (used in plotting scripts)
+
+res_ACCENSE <- res
+
 
 
