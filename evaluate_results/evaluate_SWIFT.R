@@ -1,101 +1,131 @@
 #########################################################################################
-# R script to load and calculate results for SWIFT
+# R script to load and evaluate results for SWIFT
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
 library(flowCore)
+library(clue)
 
-# helper functions
-source("helper_match_clusters_and_evaluate.R")
-source("helper_match_one_rare_cluster_and_evaluate.R")
+# helper functions to match clusters and evaluate
+source("../helpers/helper_match_evaluate_multiple.R")
+source("../helpers/helper_match_evaluate_single.R")
+source("../helpers/helper_match_evaluate_FlowCAP.R")
+source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
-# true (manually gated) cluster labels
-source("load_results_truth.R")
+# which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
+RES_DIR_SWIFT <- "../../results_auto/SWIFT"
 
-# results directories
-source("load_results_directories.R")
+DATA_DIR <- "../../../benchmark_data_sets"
+
+# which data sets required subsampling for this method (see parameters spreadsheet)
+is_subsampled <- c(TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
+
+is_rare <- c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE)
+
+# note: no FlowCAP data sets for this method
 
 
 
-##########################
+
+####################################################
+### load truth (manual gating population labels) ###
+####################################################
+
+# files with true population labels (subsampled labels if subsampling was required for
+# this method; see parameters spreadsheet)
+
+files_truth <- list(
+  Levine_32dim = file.path(RES_DIR_SWIFT, "Levine_32dim_notransform_subsampled.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
+  Samusik_all  = file.path(RES_DIR_SWIFT, "Samusik_all_notransform_subsampled.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs")
+)
+
+# extract true population labels
+
+clus_truth <- vector("list", length(files_truth))
+names(clus_truth) <- names(files_truth)
+
+for (i in 1:length(clus_truth)) {
+  data_truth_i <- flowCore::exprs(flowCore::read.FCS(files_truth[[i]], transformation = FALSE, truncate_max_range = FALSE))
+  clus_truth[[i]] <- data_truth_i[, "label"]
+}
+
+sapply(clus_truth, length)
+
+# cluster sizes and number of clusters
+# (for data sets with single rare population: 1 = rare population of interest, 0 = all others)
+
+tbl_truth <- lapply(clus_truth, table)
+
+tbl_truth
+sapply(tbl_truth, length)
+
+
+
+
+############################
 ### load SWIFT results ###
-##########################
+############################
 
-# load SWIFT output files
+# load cluster labels
 
-file_SWIFT_Levine_32 <- file.path(RES_DIR_SWIFT, "SWIFT/Levine_2015_marrow_32/Levine_2015_marrow_32_notransform.fcs.Cluster_Output.txt")
-file_SWIFT_Levine_13 <- file.path(RES_DIR_SWIFT, "SWIFT/Levine_2015_marrow_13/Levine_2015_marrow_13_notransform.fcs.Cluster_Output.txt")
-file_SWIFT_Nilsson <- file.path(RES_DIR_SWIFT, "SWIFT/Nilsson_2013_HSC/Nilsson_2013_HSC_notransform.fcs.Cluster_Output.txt")
-file_SWIFT_Mosmann <- file.path(RES_DIR_SWIFT, "SWIFT/Mosmann_2014_activ/Mosmann_2014_activ_notransform.fcs.Cluster_Output.txt")
+files_out <- list(
+  Levine_32dim = file.path(RES_DIR_SWIFT, "Levine_32dim_notransform_subsampled.fcs.Cluster_Output.txt"), 
+  Levine_13dim = file.path(RES_DIR_SWIFT, "Levine_13dim_notransform.fcs.Cluster_Output.txt"), 
+  Samusik_01   = file.path(RES_DIR_SWIFT, "Samusik_01_notransform.fcs.Cluster_Output.txt"), 
+  Samusik_all  = file.path(RES_DIR_SWIFT, "Samusik_all_notransform_subsampled.fcs.Cluster_Output.txt"), 
+  Nilsson_rare = file.path(RES_DIR_SWIFT, "Nilsson_rare_notransform_markers_only.fcs.Cluster_Output.txt"), 
+  Mosmann_rare = file.path(RES_DIR_SWIFT, "Mosmann_rare_notransform_markers_only.fcs.Cluster_Output.txt")
+)
 
-data_SWIFT_Levine_32 <- read.table(file_SWIFT_Levine_32, header = TRUE, sep = "\t", comment.char = "")
-data_SWIFT_Levine_13 <- read.table(file_SWIFT_Levine_13, header = TRUE, sep = "\t", comment.char = "")
-data_SWIFT_Nilsson <- read.table(file_SWIFT_Nilsson, header = TRUE, sep = "\t", comment.char = "")
-data_SWIFT_Mosmann <- read.table(file_SWIFT_Mosmann, header = TRUE, sep = "\t", comment.char = "")
+clus <- lapply(files_out, function(f) {
+  read.table(f, header = TRUE, sep = "\t", comment.char = "")[, "MergeCluster."]
+})
 
-head(data_SWIFT_Levine_32)
-head(data_SWIFT_Levine_13)
-head(data_SWIFT_Nilsson)
-head(data_SWIFT_Mosmann)
+sapply(clus, length)
 
-dim(data_SWIFT_Levine_32)
-dim(data_SWIFT_Levine_13)
-dim(data_SWIFT_Nilsson)
-dim(data_SWIFT_Mosmann)
+# cluster sizes and number of clusters
+# (for data sets with single rare population: 1 = rare population of interest, 0 = all others)
 
+tbl <- lapply(clus, table)
 
-# extract cluster labels
-
-clus_SWIFT_Levine_32 <- data_SWIFT_Levine_32[, "MergeCluster."]
-clus_SWIFT_Levine_13 <- data_SWIFT_Levine_13[, "MergeCluster."]
-clus_SWIFT_Nilsson <- data_SWIFT_Nilsson[, "MergeCluster."]
-clus_SWIFT_Mosmann <- data_SWIFT_Mosmann[, "MergeCluster."]
-
-length(clus_SWIFT_Levine_32)
-length(clus_SWIFT_Levine_13)
-length(clus_SWIFT_Nilsson)
-length(clus_SWIFT_Mosmann)
-
+tbl
+sapply(tbl, length)
 
 # contingency tables
 
-table(clus_SWIFT_Levine_32, clus_truth_Levine_32)
-table(clus_SWIFT_Levine_13, clus_truth_Levine_13)
-table(clus_SWIFT_Nilsson, clus_truth_Nilsson)
-table(clus_SWIFT_Mosmann, clus_truth_Mosmann)
+for (i in 1:length(clus)) {
+  print(table(clus[[i]], clus_truth[[i]]))
+}
 
 
-# cluster sizes and number of clusters
-
-tbl_SWIFT_Levine_32 <- table(clus_SWIFT_Levine_32)
-tbl_SWIFT_Levine_13 <- table(clus_SWIFT_Levine_13)
-tbl_SWIFT_Nilsson <- table(clus_SWIFT_Nilsson)
-tbl_SWIFT_Mosmann <- table(clus_SWIFT_Mosmann)
-
-tbl_SWIFT_Levine_32
-tbl_SWIFT_Levine_13
-tbl_SWIFT_Nilsson
-tbl_SWIFT_Mosmann
-
-length(tbl_SWIFT_Levine_32)
-length(tbl_SWIFT_Levine_13)
-length(tbl_SWIFT_Nilsson)
-length(tbl_SWIFT_Mosmann)
 
 
-# match cluster labels by highest F1 score and calculate results
-# precision, recall, F1 score, matched cluster labels, number of cells per matched cluster
+###################################
+### match clusters and evaluate ###
+###################################
 
-res_SWIFT_Levine_32 <- helper_match_clusters_and_evaluate(clus_SWIFT_Levine_32, clus_truth_Levine_32)
-res_SWIFT_Levine_13 <- helper_match_clusters_and_evaluate(clus_SWIFT_Levine_13, clus_truth_Levine_13)
-res_SWIFT_Nilsson <- helper_match_one_rare_cluster_and_evaluate(clus_SWIFT_Nilsson, clus_truth_Nilsson)
-res_SWIFT_Mosmann <- helper_match_one_rare_cluster_and_evaluate(clus_SWIFT_Mosmann, clus_truth_Mosmann)
+# see helper function scripts for details on matching strategy and evaluation
 
-res_SWIFT_Levine_32
-res_SWIFT_Levine_13
-res_SWIFT_Nilsson
-res_SWIFT_Mosmann
+res <- vector("list", length(clus))
+names(res) <- names(clus)
+
+for (i in 1:length(clus)) {
+  if (!is_rare[i]) {
+    res[[i]] <- helper_match_evaluate_multiple(clus[[i]], clus_truth[[i]])
+  } else if (is_rare[i]) {
+    res[[i]] <- helper_match_evaluate_single(clus[[i]], clus_truth[[i]])
+  }
+}
+
+# return named object (used in plotting scripts)
+
+res_SWIFT <- res
+
 
 

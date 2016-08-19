@@ -4,8 +4,8 @@
 
 # Requires: Matlab, Statistics Toolbox, Parallel Computing Toolbox
 
-# 1. Copy FCS file into a temporary directory, since results files will also be saved 
-# here.
+# 1. Copy FCS file into a temporary directory; results files will be saved in the same
+# directory.
 # 2. Run SWIFT graphical interface from Matlab by typing "swift_main" in command window.
 # 3. After graphical interface opens, select FCS file to import data. Note that SWIFT
 # will automatically perform an arcsinh transform, so the FCS file should not be
@@ -89,7 +89,7 @@ for (i in ix_subsample) {
 
 # Some of the non-marker columns (forward scatter etc) included in the flow cytometry 
 # data sets (Nilsson_rare, Mosmann_rare) appear to cause an error while trying to load 
-# the data in SWIFT. To fix this, save data sets containing marker columns only.
+# the data into SWIFT. To fix this, save data sets containing marker columns only.
 
 # indices of protein marker columns
 
