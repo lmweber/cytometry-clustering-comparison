@@ -72,7 +72,7 @@ sapply(data[is_FlowCAP], function(d) {
 # subsampling for data sets with excessive runtime (> 12 hrs on server)
 
 ix_subsample <- c(1, 2, 3, 4, 6)
-n_sub <- c(5000, 100000, 20000, 20000, NA, 100000)
+n_sub <- c(10000, 100000, 20000, 20000, NA, 100000)
 
 for (i in ix_subsample) {
   if (!is_FlowCAP[i]) {
@@ -132,6 +132,8 @@ sapply(data[is_FlowCAP], function(d) {
 
 # run flowClust with manual selection of number of clusters
 
+# note: skip data set Levine_32dim (runtime is too long for this data set)
+
 # number of clusters K
 K <- list(
   Levine_32dim = 40, 
@@ -148,7 +150,8 @@ seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
 
-for (i in 1:length(data)) {
+# note: skip data set Levine_32dim
+for (i in 2:length(data)) {
   
   if (!is_FlowCAP[i]) {
     set.seed(seed)
@@ -182,7 +185,8 @@ for (i in 1:length(data)) {
 clus <- vector("list", length(data))
 names(clus) <- names(data)
 
-for (i in 1:length(clus)) {
+# note: skip data set Levine_32dim
+for (i in 2:length(clus)) {
   if (!is_FlowCAP[i]) {
     clus[[i]] <- out[[i]]@label
     
@@ -208,20 +212,23 @@ sapply(clus, length)
 
 # cluster sizes and number of clusters
 # (for FlowCAP data sets, total no. of clusters = no. samples * no. clusters per sample)
-table(clus[[1]])
+table(clus[[2]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
 files_labels <- paste0("../../results_manual/flowClust/flowClust_labels_", 
                        names(clus), ".txt")
 
-for (i in 1:length(files_labels)) {
+# note: skip data set Levine_32dim
+for (i in 2:length(files_labels)) {
   res_i <- data.frame(label = clus[[i]])
   write.table(res_i, file = files_labels[i], row.names = FALSE, quote = FALSE, sep = "\t")
 }
 
 # save runtimes
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
+# note: skip data set Levine_32dim
+runtimes[[1]] <- NA
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
 write.table(runtimes, file = "../../results_manual/runtimes/runtime_flowClust.txt", 
