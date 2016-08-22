@@ -1,5 +1,5 @@
 #########################################################################################
-# R script to load and evaluate results for SWIFT
+# R script to load and evaluate results for X-shift
 #
 # Lukas Weber, August 2016
 #########################################################################################
@@ -15,12 +15,12 @@ source("../helpers/helper_match_evaluate_FlowCAP.R")
 source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
 # which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
-RES_DIR_SWIFT <- "../../results_auto/SWIFT"
+RES_DIR_XSHIFT <- "../../results_manual/XSHIFT"
 
 DATA_DIR <- "../../../benchmark_data_sets"
 
 # which data sets required subsampling for this method (see parameters spreadsheet)
-is_subsampled <- c(TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
+is_subsampled <- c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
 
 is_rare <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
 
@@ -37,10 +37,10 @@ is_rare <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
 # this method; see parameters spreadsheet)
 
 files_truth <- list(
-  Levine_32dim = file.path(RES_DIR_SWIFT, "Levine_32dim_notransform_subsampled.fcs"), 
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
   Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
   Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
-  Samusik_all  = file.path(RES_DIR_SWIFT, "Samusik_all_notransform_subsampled.fcs"), 
+  Samusik_all  = file.path(RES_DIR_XSHIFT, "Samusik_all_subsampled.fcs"), 
   Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
   Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs")
 )
@@ -69,23 +69,36 @@ sapply(tbl_truth, length)
 
 
 ############################
-### load SWIFT results ###
+### load X-shift results ###
 ############################
 
 # load cluster labels
 
 files_out <- list(
-  Levine_32dim = file.path(RES_DIR_SWIFT, "Levine_32dim_notransform_subsampled.fcs.Cluster_Output.txt"), 
-  Levine_13dim = file.path(RES_DIR_SWIFT, "Levine_13dim_notransform.fcs.Cluster_Output.txt"), 
-  Samusik_01   = file.path(RES_DIR_SWIFT, "Samusik_01_notransform.fcs.Cluster_Output.txt"), 
-  Samusik_all  = file.path(RES_DIR_SWIFT, "Samusik_all_notransform_subsampled.fcs.Cluster_Output.txt"), 
-  Nilsson_rare = file.path(RES_DIR_SWIFT, "Nilsson_rare_notransform_markers_only.fcs.Cluster_Output.txt"), 
-  Mosmann_rare = file.path(RES_DIR_SWIFT, "Mosmann_rare_notransform_markers_only.fcs.Cluster_Output.txt")
+  Levine_32dim = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Levine_32dim_145.0.txt"), 
+  Levine_13dim = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Levine_13dim_150.0.txt"), 
+  Samusik_01   = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Samusik_01_130.0.txt"), 
+  Samusik_all  = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Samusik_all_150.0.txt"), 
+  Nilsson_rare = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Nilsson_rare_40.0.txt"), 
+  Mosmann_rare = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Mosmann_rare_105.0.txt")
 )
 
-clus <- lapply(files_out, function(f) {
-  read.table(f, header = TRUE, sep = "\t", comment.char = "")[, "MergeCluster."]
-})
+clus <- vector("list", length(files_out))
+names(clus) <- names(files_out)
+
+for (i in 1:length(clus)) {
+  data_i <- read.table(files_out[[i]], sep = "\t", stringsAsFactors = FALSE, header = TRUE)
+  
+  # re-number cluster IDs
+  clusterid <- data_i[, "ClusterID"]
+  clusterid <- factor(clusterid, labels = 1:length(table(clusterid)))
+  
+  # event IDs (note: add 1 since event IDs count from 0)
+  profileid <- as.numeric(gsub("^.*\\ ", "", data_i[, "ProfileID"])) + 1
+  names(clusterid) <- profileid
+  
+  clus[[i]] <- clusterid[as.character(1:length(clusterid))]
+}
 
 sapply(clus, length)
 
@@ -125,7 +138,7 @@ for (i in 1:length(clus)) {
 
 # return named object (used in plotting scripts)
 
-res_SWIFT <- res
+res_Xshift <- res
 
 
 
