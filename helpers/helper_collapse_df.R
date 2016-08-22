@@ -1,9 +1,12 @@
 # helper functions to collapse list to data frame if some true clusters (rows) are 
-# missing for some methods (fill empty values with zeros or NAs, and return as a data
-# frame)
+# missing for some methods (fill empty values with zeros or NAs, and return as a data 
+# frame); and remove entries for methods that are entirely missing
 
 # collapse data frame with zeros as padding
-collapse_data_frame_zeros <- function(l) {
+collapse_df_zeros <- function(l) {
+  # remove entries for missing methods
+  missing <- sapply(l, is.null)
+  l <- l[!missing]
   # total number of true clusters
   max_len <- max(sapply(l, length))
   # empty matrix
@@ -22,7 +25,10 @@ collapse_data_frame_zeros <- function(l) {
 
 
 # collapse data frame with zeros as padding
-collapse_data_frame_NAs <- function(l) {
+collapse_df_NAs <- function(l) {
+  # remove entries for missing methods
+  missing <- sapply(l, is.null)
+  l <- l[!missing]
   # total number of true clusters
   max_len <- max(sapply(l, length))
   # empty matrix
@@ -36,4 +42,5 @@ collapse_data_frame_NAs <- function(l) {
   # return as data frame
   as.data.frame(m)
 }
+
 

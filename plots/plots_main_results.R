@@ -11,12 +11,12 @@ library(cowplot)  # note masks ggplot2::ggsave()
 library(ggrepel)
 
 # helper function for plots
-source("../helpers/helper_collapse_data_frame.R")
+source("../helpers/helper_collapse_df.R")
 
 # load and evaluate results
 CURRENT_DIR <- getwd()
 setwd("../evaluate_results")
-source("evaluate_all_methods.R")  ## takes 15 min
+source("evaluate_all_methods.R")  ## takes 20 min
 source("evaluate_runtime.R")
 setwd(CURRENT_DIR)
 
@@ -37,94 +37,100 @@ gg_pal <- c("#F8766D", "#00BA38", "#619CFF")
 # results for all methods
 
 res_all <- list(
-  #ACCENSE = res_ACCENSE, 
+  ACCENSE = res_ACCENSE, 
   ClusterX = res_ClusterX, 
   DensVM = res_DensVM, 
   FLOCK = res_FLOCK, 
+  flowClust = res_flowClust, 
   flowMeans = res_flowMeans, 
+  #flowMerge = res_flowMerge, 
   flowPeaks = res_flowPeaks, 
   FlowSOM = res_FlowSOM, 
   FlowSOM_pre = res_FlowSOM_pre, 
   immunoClust = res_immunoClust, 
   kmeans = res_kmeans, 
-  #PhenoGraph = res_PhenoGraph, 
+  PhenoGraph = res_PhenoGraph, 
   Rclusterpp = res_Rclusterpp, 
-  SamSPECTRAL = res_SamSPECTRAL#, 
-  #SWIFT = res_SWIFT)
+  SamSPECTRAL = res_SamSPECTRAL, 
+  SPADE = res_SPADE, 
+  SWIFT = res_SWIFT, 
+  Xshift = res_Xshift
 )
 
 
-# collapse into data frames (use helper functions to pad with zeros or NAs for clusters removed by subsampling)
+# collapse into data frames (use helper functions to pad with zeros or NAs for missing
+# methods or true populations removed by subsampling)
 
 precision_df <- list(
-  Levine_32dim = as.data.frame(sapply(res_all, function(res) res[["Levine_32dim"]][["pr"]])), 
-  Levine_13dim = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Levine_13dim"]][["pr"]])), 
-  Samusik_01   = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_01"]][["pr"]])), 
-  Samusik_all  = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_all"]][["pr"]])), 
+  Levine_32dim = collapse_df_zeros(lapply(res_all, function(res) res[["Levine_32dim"]][["pr"]])), 
+  Levine_13dim = collapse_df_zeros(lapply(res_all, function(res) res[["Levine_13dim"]][["pr"]])), 
+  Samusik_01   = collapse_df_zeros(lapply(res_all, function(res) res[["Samusik_01"]][["pr"]])), 
+  Samusik_all  = collapse_df_zeros(lapply(res_all, function(res) res[["Samusik_all"]][["pr"]])), 
   Nilsson_rare = as.data.frame(lapply(res_all, function(res) res[["Nilsson_rare"]][["pr"]])), 
   Mosmann_rare = as.data.frame(lapply(res_all, function(res) res[["Mosmann_rare"]][["pr"]]))
 )
 
 precision_df_FlowCAP <- list(
-  FlowCAP_ND   = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND"]][["pr"]])), 
-  FlowCAP_WNV  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV"]][["pr"]])), 
-  FlowCAP_ND_alternate  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["pr"]])), 
-  FlowCAP_WNV_alternate = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["pr"]]))
+  FlowCAP_ND   = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_ND"]][["mean_pr"]])))), 
+  FlowCAP_WNV  = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_WNV"]][["mean_pr"]])))), 
+  FlowCAP_ND_alternate  = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["mean_pr"]])))), 
+  FlowCAP_WNV_alternate = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["mean_pr"]]))))
 )
 
 
 recall_df <- list(
-  Levine_32dim = as.data.frame(sapply(res_all, function(res) res[["Levine_32dim"]][["re"]])), 
-  Levine_13dim = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Levine_13dim"]][["re"]])), 
-  Samusik_01   = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_01"]][["re"]])), 
-  Samusik_all  = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_all"]][["re"]])), 
+  Levine_32dim = collapse_df_zeros(lapply(res_all, function(res) res[["Levine_32dim"]][["re"]])), 
+  Levine_13dim = collapse_df_zeros(lapply(res_all, function(res) res[["Levine_13dim"]][["re"]])), 
+  Samusik_01   = collapse_df_zeros(lapply(res_all, function(res) res[["Samusik_01"]][["re"]])), 
+  Samusik_all  = collapse_df_zeros(lapply(res_all, function(res) res[["Samusik_all"]][["re"]])), 
   Nilsson_rare = as.data.frame(lapply(res_all, function(res) res[["Nilsson_rare"]][["re"]])), 
   Mosmann_rare = as.data.frame(lapply(res_all, function(res) res[["Mosmann_rare"]][["re"]]))
 )
 
 recall_df_FlowCAP <- list(
-  FlowCAP_ND   = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND"]][["re"]])), 
-  FlowCAP_WNV  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV"]][["re"]])), 
-  FlowCAP_ND_alternate  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["re"]])), 
-  FlowCAP_WNV_alternate = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["re"]]))
+  FlowCAP_ND   = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_ND"]][["mean_re"]])))), 
+  FlowCAP_WNV  = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_WNV"]][["mean_re"]])))), 
+  FlowCAP_ND_alternate  = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["mean_re"]])))), 
+  FlowCAP_WNV_alternate = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["mean_re"]]))))
 )
 
 
 F1_df <- list(
-  Levine_32dim = as.data.frame(sapply(res_all, function(res) res[["Levine_32dim"]][["F1"]])), 
-  Levine_13dim = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Levine_13dim"]][["F1"]])), 
-  Samusik_01   = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_01"]][["F1"]])), 
-  Samusik_all  = collapse_data_frame_zeros(sapply(res_all, function(res) res[["Samusik_all"]][["F1"]])), 
+  Levine_32dim = collapse_df_zeros(lapply(res_all, function(res) res[["Levine_32dim"]][["F1"]])), 
+  Levine_13dim = collapse_df_zeros(lapply(res_all, function(res) res[["Levine_13dim"]][["F1"]])), 
+  Samusik_01   = collapse_df_zeros(lapply(res_all, function(res) res[["Samusik_01"]][["F1"]])), 
+  Samusik_all  = collapse_df_zeros(lapply(res_all, function(res) res[["Samusik_all"]][["F1"]])), 
   Nilsson_rare = as.data.frame(lapply(res_all, function(res) res[["Nilsson_rare"]][["F1"]])), 
   Mosmann_rare = as.data.frame(lapply(res_all, function(res) res[["Mosmann_rare"]][["F1"]]))
 )
 
 F1_df_FlowCAP <- list(
-  FlowCAP_ND   = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND"]][["F1"]])), 
-  FlowCAP_WNV  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV"]][["F1"]])), 
-  FlowCAP_ND_alternate  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["F1"]])), 
-  FlowCAP_WNV_alternate = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["F1"]]))
+  FlowCAP_ND   = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_ND"]][["mean_F1"]])))), 
+  FlowCAP_WNV  = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_WNV"]][["mean_F1"]])))), 
+  FlowCAP_ND_alternate  = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["mean_F1"]])))), 
+  FlowCAP_WNV_alternate = as.data.frame(t(unlist(lapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["mean_F1"]]))))
 )
 
 
 labels_matched_df <- list(
-  Levine_32dim = as.data.frame(sapply(res_all, function(res) res[["Levine_32dim"]][["labels_matched"]])), 
-  Levine_13dim = collapse_data_frame_NAs(sapply(res_all, function(res) res[["Levine_13dim"]][["labels_matched"]])), 
-  Samusik_01   = collapse_data_frame_NAs(sapply(res_all, function(res) res[["Samusik_01"]][["labels_matched"]])), 
-  Samusik_all  = collapse_data_frame_NAs(sapply(res_all, function(res) res[["Samusik_all"]][["labels_matched"]])), 
+  Levine_32dim = collapse_df_NAs(lapply(res_all, function(res) res[["Levine_32dim"]][["labels_matched"]])), 
+  Levine_13dim = collapse_df_NAs(lapply(res_all, function(res) res[["Levine_13dim"]][["labels_matched"]])), 
+  Samusik_01   = collapse_df_NAs(lapply(res_all, function(res) res[["Samusik_01"]][["labels_matched"]])), 
+  Samusik_all  = collapse_df_NAs(lapply(res_all, function(res) res[["Samusik_all"]][["labels_matched"]])), 
   Nilsson_rare = as.data.frame(lapply(res_all, function(res) res[["Nilsson_rare"]][["labels_matched"]])), 
   Mosmann_rare = as.data.frame(lapply(res_all, function(res) res[["Mosmann_rare"]][["labels_matched"]]))
 )
 
-labels_matched_df_FlowCAP <- list(
-  FlowCAP_ND   = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND"]][["labels_matched"]])), 
-  FlowCAP_WNV  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV"]][["labels_matched"]])), 
-  FlowCAP_ND_alternate  = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_ND_alternate"]][["labels_matched"]])), 
-  FlowCAP_WNV_alternate = as.data.frame(sapply(res_all, function(res) res[["FlowCAP_WNV_alternate"]][["labels_matched"]]))
-)
+# note: labels_matched not available for FlowCAP data sets
 
 
-# population sizes: number of assigned cells per true population
+
+
+#############################
+### TRUE POPULATION SIZES ###
+#############################
+
+# number of assigned (i.e. manually gated) cells per true population
 
 files_truth <- list(
   Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
@@ -143,16 +149,20 @@ clus_truth <- lapply(files_truth, function(f) {
 })
 
 sapply(clus_truth, length)
+
 tbl_truth <- lapply(clus_truth, table)
-tbl_truth
-sapply(tbl_truth, length)
+
+n_cells_truth <- tbl_truth
+n_cells_truth
+
+sapply(tbl_truth, length)  # number of true populations
 
 
 
 
-#########################
-### TABLES OF RESULTS ###
-#########################
+##############################
+### MAIN TABLES OF RESULTS ###
+##############################
 
 data_sets_multiple <- 1:4
 data_sets_single   <- 5:6
@@ -164,22 +174,26 @@ data_sets_FlowCAP_alternate <- 9:10
 
 # data sets with multiple populations (mean F1 score)
 sapply(res_all, function(r) sapply(r[data_sets_multiple], function(s) s$mean_F1))
+lapply(lapply(F1_df[data_sets_multiple], colMeans), t)  # alternative calculation: use for checking
 # data sets with single population of interest (F1 score)
 sapply(res_all, function(r) sapply(r[data_sets_single], function(s) s$F1))
+F1_df[data_sets_single]  # alternative calculation: use for checking
 
 
 # FlowCAP data sets (Hungarian algorithm matching, unweighted averages)
 sapply(res_all, function(r) sapply(r[data_sets_FlowCAP], function(s) s$mean_F1))
+F1_df_FlowCAP[1:2]  # alternative calculation: use for checking
 
 # FlowCAP data sets: alternate (max F1 score matching, averages weighted by number of cells)
 sapply(res_all, function(r) sapply(r[data_sets_FlowCAP_alternate], function(s) s$mean_F1))
+F1_df_FlowCAP[3:4]  # alternative calculation: use for checking
 
 
 
 
-#####################
-### MEAN F1 SCORE ###
-#####################
+############################
+### PLOTS: MEAN F1 SCORE ###
+############################
 
 # for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
@@ -230,9 +244,9 @@ for (i in 1:4) {
 
 
 
-###########################
-### F1 SCORE: BOX PLOTS ###
-###########################
+#################################
+### PLOTS: F1 SCORE BOX PLOTS ###
+#################################
 
 # for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
@@ -281,9 +295,9 @@ for (i in 1:4) {
 
 
 
-##################################################
-### MEAN F1 SCORE, MEAN PRECISION, MEAN RECALL ###
-##################################################
+#########################################################
+### PLOTS: MEAN F1 SCORE, MEAN PRECISION, MEAN RECALL ###
+#########################################################
 
 # for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
@@ -343,9 +357,9 @@ for (i in 1:4) {
 
 
 
-########################
-### POPULATION SIZES ###
-########################
+###############################
+### PLOTS: POPULATION SIZES ###
+###############################
 
 # for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
@@ -391,9 +405,9 @@ for (i in 1:4) {
 
 
 
-#####################################################
-### RARE POPULATIONS: F1 SCORE, PRECISION, RECALL ###
-#####################################################
+############################################################
+### PLOTS: RARE POPULATIONS: F1 SCORE, PRECISION, RECALL ###
+############################################################
 
 # for data sets with a single rare population of interest (Nilsson_rare, Mosmann_rare)
 
@@ -450,9 +464,9 @@ for (i in 1:2) {
 
 
 
-##########################
-### RUNTIME: BAR PLOTS ###
-##########################
+################################
+### PLOTS: RUNTIME BAR PLOTS ###
+################################
 
 # arrange runtimes in ascending order
 res_runtime_ord <- lapply(res_runtime, function(r) {
@@ -564,9 +578,9 @@ for (i in 1:2) {
 
 
 
-##########################################################
-### RUNTIME: SCATTER PLOTS (RUNTIME VS. MEAN F1 SCORE) ###
-##########################################################
+################################################################
+### PLOTS: RUNTIME SCATTER PLOTS (RUNTIME VS. MEAN F1 SCORE) ###
+################################################################
 
 # data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
@@ -655,9 +669,9 @@ for (i in 1:2) {
 
 
 
-#########################
-### MULTI-PANEL PLOTS ###
-#########################
+##########################
+### PLOTS: MULTI-PANEL ###
+##########################
 
 # combine into one multi-panel plot for each data set
 
