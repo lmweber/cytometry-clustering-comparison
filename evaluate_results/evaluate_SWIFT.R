@@ -68,9 +68,14 @@ sapply(tbl_truth, length)
 
 
 
-############################
+##########################
 ### load SWIFT results ###
-############################
+##########################
+
+# note: using results from older version of SWIFT (2.0) for data sets Nilsson_rare and 
+# Mosmann_rare -- the latest version (3.0) has an error during data filtering, which 
+# results in almost all cells being removed from these data sets (and data filtering 
+# cannot be disabled)
 
 # load cluster labels
 
@@ -79,8 +84,8 @@ files_out <- list(
   Levine_13dim = file.path(RES_DIR_SWIFT, "Levine_13dim_notransform.fcs.Cluster_Output.txt"), 
   Samusik_01   = file.path(RES_DIR_SWIFT, "Samusik_01_notransform.fcs.Cluster_Output.txt"), 
   Samusik_all  = file.path(RES_DIR_SWIFT, "Samusik_all_notransform_subsampled.fcs.Cluster_Output.txt"), 
-  Nilsson_rare = file.path(RES_DIR_SWIFT, "Nilsson_rare_notransform_markers_only.fcs.Cluster_Output.txt"), 
-  Mosmann_rare = file.path(RES_DIR_SWIFT, "Mosmann_rare_notransform_markers_only.fcs.Cluster_Output.txt")
+  Nilsson_rare = file.path(RES_DIR_SWIFT, "SWIFT_version_2.0/Nilsson_2013_HSC/Nilsson_2013_HSC_notransform.fcs.Cluster_Output.txt"), 
+  Mosmann_rare = file.path(RES_DIR_SWIFT, "SWIFT_version_2.0/Mosmann_2014_activ/Mosmann_2014_activ_notransform.fcs.Cluster_Output.txt")
 )
 
 clus <- lapply(files_out, function(f) {
