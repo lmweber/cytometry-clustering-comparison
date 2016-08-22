@@ -615,7 +615,7 @@ runtime_vs_F1_tidy <- mapply(f_runtime_vs_F1_tidy, runtime_vs_F1_tidy, mean_F1, 
 runtime_scatterplots <- vector("list", length(runtime_vs_F1_tidy))
 names(runtime_scatterplots) <- names(runtime_vs_F1_tidy)
 
-ymaxs_scatter <- list(45000, 10000, 23000, 26000)
+ymaxs_scatter <- list(33000, 31000, 28000, 44500)
 
 for (i in 1:4) {
   nm <- names(runtime_vs_F1_tidy)[i]
@@ -657,8 +657,8 @@ runtime_vs_F1_tidy_rare <- mapply(f_runtime_vs_F1_tidy_rare, runtime_vs_F1_tidy_
 runtime_scatterplots_rare <- vector("list", length(runtime_vs_F1_tidy_rare))
 names(runtime_scatterplots_rare) <- names(runtime_vs_F1_tidy_rare)
 
-ymaxs_scatter_rare <- list(6100, 27000)
-ymins_scatter_rare <- list(-500, -2000)
+ymaxs_scatter_rare <- list(16000, 29000)
+ymins_scatter_rare <- list(-1000, -2000)
 
 for (i in 1:2) {
   nm <- names(runtime_vs_F1_tidy_rare)[i]
