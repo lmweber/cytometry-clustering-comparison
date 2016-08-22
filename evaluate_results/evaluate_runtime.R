@@ -8,9 +8,11 @@
 # with results saved as .txt files in folders "results_auto/runtime/" or 
 # "results_manual/runtime/".
 
-# Methods not accessible via R were timed manually using a stopwatch app or the Matlab
+# Methods not accessible via R were timed manually using a stopwatch app or the Matlab 
 # "clock" command, with results saved in the spreadsheet 
-# "Supp_Table_S1_clustering_methods_parameters.xlsx".
+# "Supp_Table_S1_clustering_methods_parameters.xlsx". These values need to be entered
+# manually here.
+
 
 
 
@@ -31,25 +33,41 @@ res_runtime <- list(
 
 
 
+
 # =================================================================================
-# Manually enter runtimes for methods not accessible via R (copied from spreadsheet
+# Manually enter runtimes for methods not accessible via R (values from spreadsheet
 # "clustering_methods_details.xlsx")
 # =================================================================================
 
-res_runtime[["Levine_32dim"]][["ACCENSE"]] <- (4 * 60) + 49
-res_runtime[["Levine_13dim"]][["ACCENSE"]] <- (4 * 60) + 41
-res_runtime[["Nilsson_rare"]][["ACCENSE"]] <- (5 * 60) + 40
-res_runtime[["Mosmann_rare"]][["ACCENSE"]] <- (4 * 60) + 7
+res_runtime[["Levine_32dim"]][["ACCENSE"]] <- (5 * 60) + 32
+res_runtime[["Levine_13dim"]][["ACCENSE"]] <- (4 * 60) + 48
+res_runtime[["Samusik_01"]][["ACCENSE"]]   <- (6 * 60) + 21
+res_runtime[["Samusik_all"]][["ACCENSE"]]  <- (5 * 60) + 32
+res_runtime[["Nilsson_rare"]][["ACCENSE"]] <- (6 * 60) + 11
+res_runtime[["Mosmann_rare"]][["ACCENSE"]] <- (4 * 60) + 37
 
-res_runtime[["Levine_32dim"]][["PhenoGraph"]] <- (37 * 60) + 42
-res_runtime[["Levine_13dim"]][["PhenoGraph"]] <- (13 * 60) + 11
-res_runtime[["Nilsson_rare"]][["PhenoGraph"]] <- (2 * 60) + 2
-res_runtime[["Mosmann_rare"]][["PhenoGraph"]] <- (49 * 60) + 59
+res_runtime[["Levine_32dim"]][["PhenoGraph"]] <- (37 * 60) + 0
+res_runtime[["Levine_13dim"]][["PhenoGraph"]] <- (12 * 60) + 09
+res_runtime[["Samusik_01"]][["PhenoGraph"]]   <- (5 * 60) + 55
+res_runtime[["Samusik_all"]][["PhenoGraph"]]  <- (5 * 3600) + (30 * 60) + 35
+res_runtime[["Nilsson_rare"]][["PhenoGraph"]] <- (1 * 60) + 58
+res_runtime[["Mosmann_rare"]][["PhenoGraph"]] <- (43 * 60) + 43
 
-res_runtime[["Levine_32dim"]][["SWIFT"]] <- (2 * 3600) + (35 * 60) + 48
-res_runtime[["Levine_13dim"]][["SWIFT"]] <- (56 * 60) + 13
+res_runtime[["Levine_32dim"]][["SWIFT"]] <- (2 * 3600) + (27 * 60) + 39
+res_runtime[["Levine_13dim"]][["SWIFT"]] <- (1 * 3600) + (7 * 60) + 3
+res_runtime[["Samusik_01"]][["SWIFT"]]   <- (2 * 3600) + (19 * 60) + 30
+res_runtime[["Samusik_all"]][["SWIFT"]]  <- (2 * 3600) + (50 * 60) + 8
+# note using results from SWIFT version 2.0 for Nilsson_rare and Mosmann_rare
 res_runtime[["Nilsson_rare"]][["SWIFT"]] <- (11 * 60) + 26
 res_runtime[["Mosmann_rare"]][["SWIFT"]] <- (34 * 60) + 34
+
+res_runtime[["Levine_32dim"]][["Xshift"]] <- (4 * 3600) + (43 * 60) + 50
+res_runtime[["Levine_13dim"]][["Xshift"]] <- (58 * 60) + 27
+res_runtime[["Samusik_01"]][["Xshift"]]   <- (28 * 60) + 16
+res_runtime[["Samusik_all"]][["Xshift"]]  <- (4 * 3600) + (24 * 60) + 52
+res_runtime[["Nilsson_rare"]][["Xshift"]] <- (4 * 60) + 47
+res_runtime[["Mosmann_rare"]][["Xshift"]] <- (4 * 3600) + (11 * 60) + 15
+
 
 
 
@@ -60,29 +78,37 @@ res_runtime[["Mosmann_rare"]][["SWIFT"]] <- (34 * 60) + 34
 # run script "evaluate_all_methods.R" to load results directories (automatic or manual
 # number of clusters)
 
-#source("evaluate_all_methods.R")  ## takes 15 min
+#source("evaluate_all_methods.R")  ## takes 20 min
 
 RES_DIRS <- c(RES_DIR_CLUSTERX, 
               RES_DIR_DENSVM, 
               RES_DIR_FLOCK, 
+              RES_DIR_FLOWCLUST, 
               RES_DIR_FLOWMEANS, 
+              #RES_DIR_FLOWMERGE, 
               RES_DIR_FLOWPEAKS, 
               RES_DIR_FLOWSOM, 
               RES_DIR_FLOWSOM_PRE, 
               RES_DIR_IMMUNOCLUST, 
               RES_DIR_KMEANS, 
-              RES_DIR_RCLUSTERPP)
+              RES_DIR_RCLUSTERPP, 
+              RES_DIR_SAMSPECTRAL, 
+              RES_DIR_SPADE)
 
 method_names <- c("ClusterX", 
                   "DensVM", 
                   "FLOCK", 
+                  "flowClust", 
                   "flowMeans", 
+                  #"flowMerge", 
                   "flowPeaks", 
                   "FlowSOM", 
                   "FlowSOM_pre", 
                   "immunoClust", 
                   "kmeans", 
-                  "Rclusterpp")
+                  "Rclusterpp", 
+                  "SamSPECTRAL", 
+                  "SPADE")
 
 
 # load runtime results files
@@ -99,5 +125,6 @@ for (i in 1:length(RES_DIRS)) {
   res_runtime[["FlowCAP_ND"]][[method_names[i]]]   <- data_i["FlowCAP_ND", "runtime"]
   res_runtime[["FlowCAP_WNV"]][[method_names[i]]]  <- data_i["FlowCAP_WNV", "runtime"]
 }
+
 
 
