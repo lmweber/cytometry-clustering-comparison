@@ -523,6 +523,9 @@ names(runtime_barplots) <- names(runtime_tidy)[data_sets_multiple]
 offsets_runtime <- list(800, 700, 650, 1000)
 ymaxs_runtime <- list(40000, 35500, 32000, 52000)
 
+x_legend <- list(4.2, 4.6, 4.5, 4.5)
+y_legend <- list(37000, 33000, 29750, 48500)
+
 for (i in 1:4) {
   nm <- names(runtime_tidy)[i]
   title <- paste0("Runtime: ", nm)
@@ -533,6 +536,8 @@ for (i in 1:4) {
     geom_bar(stat = "identity", fill = "mediumpurple") + 
     geom_text(aes(label = paste0(round(value, 0), " ", subsampling, cores), 
                   y = value + offsets_runtime[[i]], angle = 90), hjust = "left", size = 3.5) + 
+    annotate("text", x = x_legend[[i]], y = y_legend[[i]], 
+             label = "* subsampling required    \n^ multiple processor cores") + 
     ggtitle(title) + 
     ylim(0, ymaxs_runtime[[i]]) + 
     ylab("seconds") + 
@@ -540,8 +545,6 @@ for (i in 1:4) {
     theme(plot.title = element_text(size = 12), 
           axis.title.x = element_blank(), 
           axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-          legend.position = c(0.16, 0.91), 
-          legend.key.size = unit(5, "mm"), 
           legend.key = element_blank(), 
           legend.title = element_blank(), 
           legend.background = element_blank())
@@ -563,6 +566,9 @@ names(runtime_barplots_rare) <- names(runtime_tidy_rare)
 offsets_runtime_rare <- list(350, 700)
 ymaxs_runtime_rare <- list(18500, 34000)
 
+x_legend_rare <- list(4.5, 4.5)
+y_legend_rare <- list(17250, 31750)
+
 for (i in 1:2) {
   nm <- names(runtime_tidy_rare)[i]
   title <- paste0("Runtime: ", nm)
@@ -573,6 +579,8 @@ for (i in 1:2) {
     geom_bar(stat = "identity", fill = "mediumpurple") + 
     geom_text(aes(label = paste0(round(value, 0), " ", subsampling, cores), 
                   y = value + offsets_runtime_rare[[i]], angle = 90), hjust = "left", size = 3.5) + 
+    annotate("text", x = x_legend_rare[[i]], y = y_legend_rare[[i]], 
+             label = "* subsampling required    \n^ multiple processor cores") + 
     ggtitle(title) + 
     ylim(0, ymaxs_runtime_rare[[i]]) + 
     ylab("seconds") + 
@@ -580,8 +588,6 @@ for (i in 1:2) {
     theme(plot.title = element_text(size = 12), 
           axis.title.x = element_blank(), 
           axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), 
-          legend.position = c(0.16, 0.91), 
-          legend.key.size = unit(5, "mm"), 
           legend.key = element_blank(), 
           legend.title = element_blank(), 
           legend.background = element_blank())
