@@ -470,6 +470,7 @@ for (i in 1:2) {
 
 # arrange runtimes in ascending order
 res_runtime_ord <- lapply(res_runtime, function(r) {
+  r <- r[!is.na(r)]
   r_ord <- unlist(r)
   r_ord[order(r_ord)]
 })
@@ -481,21 +482,37 @@ runtime_tidy <- lapply(res_runtime_ord[c(data_sets_multiple, data_sets_single)],
   d
 })
 
-# which methods required subsampling
-runtime_tidy[["Levine_32dim"]]["subsampling"] <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
-runtime_tidy[["Levine_13dim"]]["subsampling"] <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
-runtime_tidy[["Samusik_01"]]["subsampling"]   <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
-runtime_tidy[["Samusik_all"]]["subsampling"]  <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
-runtime_tidy[["Nilsson_rare"]]["subsampling"] <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
-runtime_tidy[["Mosmann_rare"]]["subsampling"] <- c("*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*")
+# plotting symbols
+symbol_sub <- "*"
+symbol_cores <- "^"
 
-# which methods required multiple cores
-runtime_tidy[["Levine_32dim"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
-runtime_tidy[["Levine_13dim"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
-runtime_tidy[["Samusik_01"]]["cores"]   <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
-runtime_tidy[["Samusik_all"]]["cores"]  <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
-runtime_tidy[["Nilsson_rare"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
-runtime_tidy[["Mosmann_rare"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^")
+# which methods required subsampling (from script "evaluate_runtime.R")
+runtime_tidy[["Levine_32dim"]][, "subsampling"] <- ""
+runtime_tidy[["Levine_32dim"]][which_sub_Levine_32dim, "subsampling"] <- symbol_sub
+runtime_tidy[["Levine_13dim"]][, "subsampling"] <- ""
+runtime_tidy[["Levine_13dim"]][which_sub_Levine_13dim, "subsampling"] <- symbol_sub
+runtime_tidy[["Samusik_01"]][, "subsampling"] <- ""
+runtime_tidy[["Samusik_01"]][which_sub_Samusik_01, "subsampling"] <- symbol_sub
+runtime_tidy[["Samusik_all"]][, "subsampling"] <- ""
+runtime_tidy[["Samusik_all"]][which_sub_Samusik_all, "subsampling"] <- symbol_sub
+runtime_tidy[["Nilsson_rare"]][, "subsampling"] <- ""
+runtime_tidy[["Nilsson_rare"]][which_sub_Nilsson_rare, "subsampling"] <- symbol_sub
+runtime_tidy[["Mosmann_rare"]][, "subsampling"] <- ""
+runtime_tidy[["Mosmann_rare"]][which_sub_Mosmann_rare, "subsampling"] <- symbol_sub
+
+# which methods required multiple cores (from script "evaluate_runtime.R")
+runtime_tidy[["Levine_32dim"]][, "cores"] <- ""
+runtime_tidy[["Levine_32dim"]][which_cores_Levine_32dim, "cores"] <- symbol_cores
+runtime_tidy[["Levine_13dim"]][, "cores"] <- ""
+runtime_tidy[["Levine_13dim"]][which_cores_Levine_13dim, "cores"] <- symbol_cores
+runtime_tidy[["Samusik_01"]][, "cores"] <- ""
+runtime_tidy[["Samusik_01"]][which_cores_Samusik_01, "cores"] <- symbol_cores
+runtime_tidy[["Samusik_all"]][, "cores"] <- ""
+runtime_tidy[["Samusik_all"]][which_cores_Samusik_all, "cores"] <- symbol_cores
+runtime_tidy[["Nilsson_rare"]][, "cores"] <- ""
+runtime_tidy[["Nilsson_rare"]][which_cores_Nilsson_rare, "cores"] <- symbol_cores
+runtime_tidy[["Mosmann_rare"]][, "cores"] <- ""
+runtime_tidy[["Mosmann_rare"]][which_cores_Mosmann_rare, "cores"] <- symbol_cores
 
 
 # bar plots: data sets with multiple populations
@@ -503,8 +520,8 @@ runtime_tidy[["Mosmann_rare"]]["cores"] <- c("^", "^", "^", "^", "^", "^", "^", 
 runtime_barplots <- vector("list", length(runtime_tidy[data_sets_multiple]))
 names(runtime_barplots) <- names(runtime_tidy)[data_sets_multiple]
 
-offsets_runtime <- list(1000, 200, 500, 600)
-ymaxs_runtime <- list(50000, 11000, 25000, 29000)
+offsets_runtime <- list(800, 700, 650, 1000)
+ymaxs_runtime <- list(40000, 35500, 32000, 52000)
 
 for (i in 1:4) {
   nm <- names(runtime_tidy)[i]
@@ -543,8 +560,8 @@ runtime_tidy_rare <- runtime_tidy[data_sets_single]
 runtime_barplots_rare <- vector("list", length(runtime_tidy_rare))
 names(runtime_barplots_rare) <- names(runtime_tidy_rare)
 
-offsets_runtime_rare <- list(150, 600)
-ymaxs_runtime_rare <- list(7000, 30000)
+offsets_runtime_rare <- list(350, 700)
+ymaxs_runtime_rare <- list(18500, 34000)
 
 for (i in 1:2) {
   nm <- names(runtime_tidy_rare)[i]
