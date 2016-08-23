@@ -1,5 +1,5 @@
 #########################################################################################
-# R script to generate main plots of results
+# R script to generate plots and tables of main results
 #
 # Lukas Weber, August 2016
 #########################################################################################
