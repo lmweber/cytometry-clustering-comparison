@@ -171,7 +171,6 @@ data_sets_FlowCAP  <- 7:8
 data_sets_FlowCAP_alternate <- 9:10
 
 
-
 # --------------------------
 # mean F1 scores / F1 scores
 # --------------------------
@@ -197,7 +196,6 @@ tbl_combined <- as.data.frame(cbind(t(tbl_multiple), t(tbl_single)))
 tbl_combined
 
 
-
 # --------
 # runtimes
 # --------
@@ -216,14 +214,12 @@ tbl_runtime_formatted <- as.data.frame(tbl_runtime_formatted)
 tbl_runtime_formatted
 
 
-
 # --------------------------
 # combined (with formatting)
 # --------------------------
 
 tbl_main <- cbind(tbl_combined, tbl_runtime_formatted)[, c(1, 7, 2, 8, 3, 9, 4, 10, 5, 11, 6, 12)]
 tbl_main
-
 
 
 # -----------------
@@ -251,7 +247,6 @@ rownames(tbl_FlowCAP_alt) <- c("Nilsson_rare", "Mosmann_rare")
 tbl_FlowCAP_alt <- t(tbl_FlowCAP_alt)
 
 tbl_FlowCAP_alt
-
 
 
 # ---------------------------------------
