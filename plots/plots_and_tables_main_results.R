@@ -10,6 +10,7 @@ library(reshape2)
 library(cowplot)  # note masks ggplot2::ggsave()
 library(ggrepel)
 library(lubridate)
+library(xtable)
 
 # helper function for plots
 source("../helpers/helper_collapse_df.R")
@@ -126,10 +127,9 @@ labels_matched_df <- list(
 
 
 
-
-#############################
-### TRUE POPULATION SIZES ###
-#############################
+# ---------------------
+# true population sizes
+# ---------------------
 
 # number of assigned (i.e. manually gated) cells per true population
 
@@ -196,6 +196,7 @@ tbl_combined <- as.data.frame(cbind(t(tbl_multiple), t(tbl_single)))
 tbl_combined
 
 
+
 # --------
 # runtimes
 # --------
@@ -214,12 +215,19 @@ tbl_runtime_formatted <- as.data.frame(tbl_runtime_formatted)
 tbl_runtime_formatted
 
 
+
 # --------------------------
 # combined (with formatting)
 # --------------------------
 
 tbl_main <- cbind(tbl_combined, tbl_runtime_formatted)[, c(1, 7, 2, 8, 3, 9, 4, 10, 5, 11, 6, 12)]
 tbl_main
+
+# export table in Latex format
+sink("../../tables/table_main_results.txt")
+print(xtable(tbl_main, digits = 3))
+sink()
+
 
 
 # -----------------
@@ -233,7 +241,7 @@ tbl_FlowCAP <- sapply(res_all, function(r) {
   })
 })
 rownames(tbl_FlowCAP) <- c("Nilsson_rare", "Mosmann_rare")
-tbl_FlowCAP <- t(tbl_FlowCAP)
+tbl_FlowCAP <- as.data.frame(t(tbl_FlowCAP))
 
 tbl_FlowCAP
 
@@ -244,10 +252,21 @@ tbl_FlowCAP_alt <- sapply(res_all, function(r) {
     ifelse(is.null(s$mean_F1), NA, round(as.numeric(s$mean_F1), 3))
   })
 })
-rownames(tbl_FlowCAP_alt) <- c("Nilsson_rare", "Mosmann_rare")
-tbl_FlowCAP_alt <- t(tbl_FlowCAP_alt)
+rownames(tbl_FlowCAP_alt) <- c("Nilsson_rare_alt", "Mosmann_rare_alt")
+tbl_FlowCAP_alt <- as.data.frame(t(tbl_FlowCAP_alt))
 
 tbl_FlowCAP_alt
+
+
+# combined table (with formatting); export in Latex format
+tbl_FlowCAP_combined <- cbind(tbl_FlowCAP, " " = "", tbl_FlowCAP_alt)
+tbl_FlowCAP_combined
+
+# export table in Latex format
+sink("../../tables/table_FlowCAP_results.txt")
+print(xtable(tbl_FlowCAP_combined, digits = 3))
+sink()
+
 
 
 # ---------------------------------------
