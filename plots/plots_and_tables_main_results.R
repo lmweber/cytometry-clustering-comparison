@@ -170,25 +170,66 @@ data_sets_FlowCAP  <- 7:8
 data_sets_FlowCAP_alternate <- 9:10
 
 
+
 # mean F1 score (multiple populations) or F1 score (single population) for each method and data set
 
 
 # data sets with multiple populations of interest (mean F1 score)
-sapply(res_all, function(r) sapply(r[data_sets_multiple], function(s) s$mean_F1))
-lapply(lapply(F1_df[data_sets_multiple], colMeans), t)  # alternative: use for checking
+tbl_multiple <- sapply(res_all, function(r) {
+  sapply(r[data_sets_multiple], function(s) {
+    ifelse(is.null(s$mean_F1), NA, round(as.numeric(s$mean_F1), 3))
+  })
+})
+tbl_multiple
+
+sapply(res_all, function(r) sapply(r[data_sets_multiple], function(s) s$mean_F1))  # for checking
+lapply(lapply(F1_df[data_sets_multiple], colMeans), t)  # alternative calculation: for checking
+
 
 # data sets with single rare population of interest (F1 score)
-sapply(res_all, function(r) sapply(r[data_sets_single], function(s) s$F1))
-F1_df[data_sets_single]  # alternative: use for checking
+tbl_single <- sapply(res_all, function(r) {
+  sapply(r[data_sets_single], function(s) {
+    ifelse(is.null(s$F1), NA, round(as.numeric(s$F1), 3))
+  })
+})
+tbl_single
+
+sapply(res_all, function(r) sapply(r[data_sets_single], function(s) s$F1))  # for checking
+F1_df[data_sets_single]  # alternative calculation: for checking
+
+# combined table with formatting
+tbl_combined <- cbind(t(tbl_multiple), t(tbl_single))
+tbl_combined
+
+
+
+# FlowCAP data sets
 
 
 # FlowCAP data sets (Hungarian algorithm for cluster matching; unweighted averages)
-sapply(res_all, function(r) sapply(r[data_sets_FlowCAP], function(s) s$mean_F1))
-F1_df_FlowCAP[1:2]  # alternative: use for checking
+tbl_FlowCAP <- sapply(res_all, function(r) {
+  sapply(r[data_sets_FlowCAP], function(s) {
+    ifelse(is.null(s$mean_F1), NA, round(as.numeric(s$mean_F1), 3))
+  })
+})
+rownames(tbl_FlowCAP) <- c("Nilsson_rare", "Mosmann_rare")
+t(tbl_FlowCAP)
+
+sapply(res_all, function(r) sapply(r[data_sets_FlowCAP], function(s) s$mean_F1))  # for checking
+F1_df_FlowCAP[1:2]  # alternative: for checking
+
 
 # FlowCAP data sets: alternate (maximum F1 score for cluster matching; averages weighted by number of cells)
-sapply(res_all, function(r) sapply(r[data_sets_FlowCAP_alternate], function(s) s$mean_F1))
-F1_df_FlowCAP[3:4]  # alternative: use for checking
+tbl_FlowCAP_alt <- sapply(res_all, function(r) {
+  sapply(r[data_sets_FlowCAP_alternate], function(s) {
+    ifelse(is.null(s$mean_F1), NA, round(as.numeric(s$mean_F1), 3))
+  })
+})
+rownames(tbl_FlowCAP_alt) <- c("Nilsson_rare", "Mosmann_rare")
+t(tbl_FlowCAP_alt)
+
+sapply(res_all, function(r) sapply(r[data_sets_FlowCAP_alternate], function(s) s$mean_F1))  # for checking
+F1_df_FlowCAP[3:4]  # alternative: for checking
 
 
 
