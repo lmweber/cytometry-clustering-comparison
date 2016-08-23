@@ -170,7 +170,6 @@ data_sets_FlowCAP  <- 7:8
 data_sets_FlowCAP_alternate <- 9:10
 
 
-
 # mean F1 score (multiple populations) or F1 score (single population) for each method and data set
 
 
