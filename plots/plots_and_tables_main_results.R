@@ -237,6 +237,7 @@ tbl_FlowCAP <- t(tbl_FlowCAP)
 
 tbl_FlowCAP
 
+
 # FlowCAP data sets: alternate (maximum F1 score for cluster matching; averages weighted by number of cells)
 tbl_FlowCAP_alt <- sapply(res_all, function(r) {
   sapply(r[data_sets_FlowCAP_alternate], function(s) {
