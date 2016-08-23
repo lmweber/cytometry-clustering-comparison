@@ -9,6 +9,7 @@ library(ggplot2)
 library(reshape2)
 library(cowplot)  # note masks ggplot2::ggsave()
 library(ggrepel)
+library(lubridate)
 
 # helper function for plots
 source("../helpers/helper_collapse_df.R")
@@ -170,8 +171,10 @@ data_sets_FlowCAP  <- 7:8
 data_sets_FlowCAP_alternate <- 9:10
 
 
-# mean F1 score (multiple populations) or F1 score (single population) for each method and data set
 
+# --------------------------
+# mean F1 scores / F1 scores
+# --------------------------
 
 # data sets with multiple populations of interest (mean F1 score)
 tbl_multiple <- sapply(res_all, function(r) {
@@ -181,10 +184,6 @@ tbl_multiple <- sapply(res_all, function(r) {
 })
 tbl_multiple
 
-sapply(res_all, function(r) sapply(r[data_sets_multiple], function(s) s$mean_F1))  # for checking
-lapply(lapply(F1_df[data_sets_multiple], colMeans), t)  # alternative calculation: for checking
-
-
 # data sets with single rare population of interest (F1 score)
 tbl_single <- sapply(res_all, function(r) {
   sapply(r[data_sets_single], function(s) {
@@ -193,17 +192,43 @@ tbl_single <- sapply(res_all, function(r) {
 })
 tbl_single
 
-sapply(res_all, function(r) sapply(r[data_sets_single], function(s) s$F1))  # for checking
-F1_df[data_sets_single]  # alternative calculation: for checking
-
 # combined table with formatting
-tbl_combined <- cbind(t(tbl_multiple), t(tbl_single))
+tbl_combined <- as.data.frame(cbind(t(tbl_multiple), t(tbl_single)))
 tbl_combined
 
 
 
-# FlowCAP data sets
+# --------
+# runtimes
+# --------
 
+tbl_runtime <- as.data.frame(sapply(res_runtime[1:6], as.data.frame))
+tbl_runtime
+
+tbl_runtime_formatted <- sapply(tbl_runtime, function(col) {
+  time <- round(as.numeric(col), 0)
+  time <- lubridate::seconds_to_period(time)
+  sprintf("%02d:%02d:%02d", lubridate::hour(time), lubridate::minute(time), lubridate::second(time))
+})
+rownames(tbl_runtime_formatted) <- rownames(tbl_runtime)
+colnames(tbl_runtime_formatted) <- paste0(colnames(tbl_runtime_formatted), "_time")
+tbl_runtime_formatted <- as.data.frame(tbl_runtime_formatted)
+tbl_runtime_formatted
+
+
+
+# --------------------------
+# combined (with formatting)
+# --------------------------
+
+tbl_main <- cbind(tbl_combined, tbl_runtime_formatted)[, c(1, 7, 2, 8, 3, 9, 4, 10, 5, 11, 6, 12)]
+tbl_main
+
+
+
+# -----------------
+# FlowCAP data sets
+# -----------------
 
 # FlowCAP data sets (Hungarian algorithm for cluster matching; unweighted averages)
 tbl_FlowCAP <- sapply(res_all, function(r) {
@@ -212,11 +237,9 @@ tbl_FlowCAP <- sapply(res_all, function(r) {
   })
 })
 rownames(tbl_FlowCAP) <- c("Nilsson_rare", "Mosmann_rare")
-t(tbl_FlowCAP)
+tbl_FlowCAP <- t(tbl_FlowCAP)
 
-sapply(res_all, function(r) sapply(r[data_sets_FlowCAP], function(s) s$mean_F1))  # for checking
-F1_df_FlowCAP[1:2]  # alternative: for checking
-
+tbl_FlowCAP
 
 # FlowCAP data sets: alternate (maximum F1 score for cluster matching; averages weighted by number of cells)
 tbl_FlowCAP_alt <- sapply(res_all, function(r) {
@@ -225,10 +248,31 @@ tbl_FlowCAP_alt <- sapply(res_all, function(r) {
   })
 })
 rownames(tbl_FlowCAP_alt) <- c("Nilsson_rare", "Mosmann_rare")
-t(tbl_FlowCAP_alt)
+tbl_FlowCAP_alt <- t(tbl_FlowCAP_alt)
 
-sapply(res_all, function(r) sapply(r[data_sets_FlowCAP_alternate], function(s) s$mean_F1))  # for checking
-F1_df_FlowCAP[3:4]  # alternative: for checking
+tbl_FlowCAP_alt
+
+
+
+# ---------------------------------------
+# alternative calculations (for checking)
+# ---------------------------------------
+
+# data sets with multiple populations
+sapply(res_all, function(r) sapply(r[data_sets_multiple], function(s) s$mean_F1))
+lapply(lapply(F1_df[data_sets_multiple], colMeans), t)
+
+# data sets with single population
+sapply(res_all, function(r) sapply(r[data_sets_single], function(s) s$F1))
+F1_df[data_sets_single]
+
+# FlowCAP data sets
+sapply(res_all, function(r) sapply(r[data_sets_FlowCAP], function(s) s$mean_F1))
+F1_df_FlowCAP[1:2]
+
+# FlowCAP data sets: alternate
+sapply(res_all, function(r) sapply(r[data_sets_FlowCAP_alternate], function(s) s$mean_F1))
+F1_df_FlowCAP[3:4]
 
 
 
