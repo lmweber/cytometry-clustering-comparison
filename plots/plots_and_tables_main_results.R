@@ -172,21 +172,23 @@ data_sets_FlowCAP_alternate <- 9:10
 
 # mean F1 score (multiple populations) or F1 score (single population) for each method and data set
 
-# data sets with multiple populations (mean F1 score)
+
+# data sets with multiple populations of interest (mean F1 score)
 sapply(res_all, function(r) sapply(r[data_sets_multiple], function(s) s$mean_F1))
-lapply(lapply(F1_df[data_sets_multiple], colMeans), t)  # alternative calculation: use for checking
-# data sets with single population of interest (F1 score)
+lapply(lapply(F1_df[data_sets_multiple], colMeans), t)  # alternative: use for checking
+
+# data sets with single rare population of interest (F1 score)
 sapply(res_all, function(r) sapply(r[data_sets_single], function(s) s$F1))
-F1_df[data_sets_single]  # alternative calculation: use for checking
+F1_df[data_sets_single]  # alternative: use for checking
 
 
-# FlowCAP data sets (Hungarian algorithm matching, unweighted averages)
+# FlowCAP data sets (Hungarian algorithm for cluster matching; unweighted averages)
 sapply(res_all, function(r) sapply(r[data_sets_FlowCAP], function(s) s$mean_F1))
-F1_df_FlowCAP[1:2]  # alternative calculation: use for checking
+F1_df_FlowCAP[1:2]  # alternative: use for checking
 
-# FlowCAP data sets: alternate (max F1 score matching, averages weighted by number of cells)
+# FlowCAP data sets: alternate (maximum F1 score for cluster matching; averages weighted by number of cells)
 sapply(res_all, function(r) sapply(r[data_sets_FlowCAP_alternate], function(s) s$mean_F1))
-F1_df_FlowCAP[3:4]  # alternative calculation: use for checking
+F1_df_FlowCAP[3:4]  # alternative: use for checking
 
 
 
