@@ -750,13 +750,15 @@ for (i in 1:2) {
 
 
 
-###########################
-### SESSION INFORMATION ###
-###########################
+###############################################
+### SAVE SESSION INFORMATION AND RDATA FILE ###
+###############################################
 
 sink(file = "../plots/session_info_plots_main_results.txt")
 print(sessionInfo())
 sink()
+
+save.image("main_results.RData")
 
 
 
