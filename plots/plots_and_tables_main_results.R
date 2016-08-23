@@ -202,6 +202,9 @@ tbl_combined
 # --------
 
 tbl_runtime <- as.data.frame(sapply(res_runtime[1:6], as.data.frame))
+
+# re-order
+tbl_runtime <- tbl_runtime[rownames(tbl_combined), ]
 tbl_runtime
 
 tbl_runtime_formatted <- sapply(tbl_runtime, function(col) {
