@@ -132,13 +132,13 @@ for (i in 1:length(RES_DIRS)) {
 # which methods required subsampling (see parameters spreadsheet); not including methods 
 # that were not included in final results (e.g. due to errors)
 
-which_sub_Levine_32dim <- c("ACCENSE", "ClusterX", "DensVM", "immunoClust", "Rclusterpp", "SWIFT")
+which_sub_Levine_32dim <- c("ACCENSE", "ClusterX", "DensVM", "immunoClust", "SWIFT")
 which_sub_Levine_13dim <- c("ACCENSE", "DensVM", "flowClust")
 which_sub_Samusik_01   <- c("ACCENSE", "flowClust")
 which_sub_Samusik_all  <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMeans", 
-                            "immunoClust", "Rclusterpp", "SamSPECTRAL", "SWIFT", "Xshift")
+                            "immunoClust", "SamSPECTRAL", "SWIFT", "Xshift")
 which_sub_Nilsson_rare <- c("ACCENSE")
-which_sub_Mosmann_rare <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "Rclusterpp")
+which_sub_Mosmann_rare <- c("ACCENSE", "ClusterX", "DensVM", "flowClust")
 which_sub_FlowCAP_ND   <- c("ClusterX", "DensVM")
 which_sub_FlowCAP_WNV  <- c("ClusterX", "DensVM")
 
