@@ -70,8 +70,8 @@ sapply(data[is_FlowCAP], function(d) {
 
 # subsampling for data sets with excessive runtime (> 12 hrs on server)
 
-ix_subsample <- c(1, 2, 3, 4, 5, 6)
-n_sub <- c(10000, 100000, 20000, 10000, 20000, 100000)
+ix_subsample <- c(1, 2, 3, 4, 5, 6, 7, 8)
+n_sub <- c(10000, 100000, 20000, 10000, 20000, 100000, 10000, 10000)
 
 for (i in ix_subsample) {
   if (!is_FlowCAP[i]) {
@@ -83,6 +83,20 @@ for (i in ix_subsample) {
                                   names(data)[i], ".txt")
     for (f in files_true_labels_i) {
       write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
+    }
+    
+  } else {
+    # FlowCAP data sets
+    for (j in 1:length(data[[i]])) {
+      set.seed(123)
+      data[[i]][[j]] <- data[[i]][[j]][sample(1:nrow(data[[i]][[j]]), n_sub[i]), ]
+      # save subsampled population IDs
+      true_labels_ij <- flowCore::exprs(data[[i]][[j]])[, "label", drop = FALSE]
+      files_true_labels_ij <- paste0("../../results_manual/flowMerge/true_labels_flowMerge_", 
+                                     names(data)[i], "_", j, ".txt")
+      for (f in files_true_labels_ij) {
+        write.table(true_labels_ij, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
+      }
     }
   }
 }
