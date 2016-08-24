@@ -69,26 +69,6 @@ sapply(data[is_FlowCAP], function(d) {
 })
 
 
-# subsampling for data sets with excessive runtime (> 12 hrs on server)
-
-ix_subsample <- c(1, 4, 6)
-n_sub <- 100000
-
-for (i in ix_subsample) {
-  if (!is_FlowCAP[i]) {
-    set.seed(123)
-    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
-    # save subsampled population IDs
-    true_labels_i <- data[[i]][, "label", drop = FALSE]
-    files_true_labels_i <- paste0("../../results_manual/Rclusterpp/true_labels_Rclusterpp_", 
-                                  names(data)[i], ".txt")
-    for (f in files_true_labels_i) {
-      write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
-    }
-  }
-}
-
-
 # indices of protein marker columns
 
 marker_cols <- list(
@@ -133,7 +113,7 @@ sapply(data[is_FlowCAP], function(d) {
 # run Rclusterpp
 # note: uses maximum number of cores if setThreads is left as default
 
-n_cores <- 16
+n_cores <- 8
 
 # number of clusters k
 k <- list(
@@ -158,7 +138,7 @@ for (i in 1:length(data)) {
     runtimes[[i]] <- system.time({
       # set number of cores
       Rclusterpp.setThreads(n_cores)
-      out[[i]] <- Rclusterpp.hclust(data[[i]], method = "average", distance = "euclidean")
+      out[[i]] <- Rclusterpp.hclust(data[[i]], method = "ward")
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -172,7 +152,7 @@ for (i in 1:length(data)) {
       runtimes[[i]][[j]] <- system.time({
         # set number of cores
         Rclusterpp.setThreads(n_cores)
-        out[[i]][[j]] <- Rclusterpp.hclust(data[[i]][[j]], method = "average", distance = "euclidean")
+        out[[i]][[j]] <- Rclusterpp.hclust(data[[i]][[j]], method = "ward")
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
