@@ -82,7 +82,7 @@ RES_DIRS <- c(RES_DIR_CLUSTERX,
               RES_DIR_FLOCK, 
               RES_DIR_FLOWCLUST, 
               RES_DIR_FLOWMEANS, 
-              #RES_DIR_FLOWMERGE, 
+              RES_DIR_FLOWMERGE, 
               RES_DIR_FLOWPEAKS, 
               RES_DIR_FLOWSOM, 
               RES_DIR_FLOWSOM_PRE, 
@@ -97,7 +97,7 @@ method_names <- c("ClusterX",
                   "FLOCK", 
                   "flowClust", 
                   "flowMeans", 
-                  #"flowMerge", 
+                  "flowMerge", 
                   "flowPeaks", 
                   "FlowSOM", 
                   "FlowSOM_pre", 
@@ -133,12 +133,12 @@ for (i in 1:length(RES_DIRS)) {
 # that were not included in final results (e.g. due to errors)
 
 which_sub_Levine_32dim <- c("ACCENSE", "ClusterX", "DensVM", "immunoClust", "SWIFT")
-which_sub_Levine_13dim <- c("ACCENSE", "DensVM", "flowClust")
-which_sub_Samusik_01   <- c("ACCENSE", "flowClust")
-which_sub_Samusik_all  <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMeans", 
-                            "immunoClust", "SamSPECTRAL", "SWIFT", "Xshift")
-which_sub_Nilsson_rare <- c("ACCENSE")
-which_sub_Mosmann_rare <- c("ACCENSE", "ClusterX", "DensVM", "flowClust")
+which_sub_Levine_13dim <- c("ACCENSE", "DensVM", "flowClust", "flowMerge")
+which_sub_Samusik_01   <- c("ACCENSE", "flowClust", "flowMerge")
+which_sub_Samusik_all  <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMerge", 
+                            "flowMeans", "immunoClust", "SamSPECTRAL", "SWIFT", "Xshift")
+which_sub_Nilsson_rare <- c("ACCENSE", "flowMerge")
+which_sub_Mosmann_rare <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMerge")
 which_sub_FlowCAP_ND   <- c("ClusterX", "DensVM")
 which_sub_FlowCAP_WNV  <- c("ClusterX", "DensVM")
 

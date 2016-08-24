@@ -43,10 +43,10 @@ files_truth <- list(
   Samusik_01   = file.path(RES_DIR_FLOWMERGE, "true_labels_flowMerge_Samusik_01.txt"), 
   Samusik_all  = file.path(RES_DIR_FLOWMERGE, "true_labels_flowMerge_Samusik_all.txt"), 
   Nilsson_rare = file.path(RES_DIR_FLOWMERGE, "true_labels_flowMerge_Nilsson_rare.txt"), 
-  Mosmann_rare = file.path(RES_DIR_FLOWMERGE, "true_labels_flowMerge_Mosmann_rare.txt"), 
-  FlowCAP_ND   = paste0(RES_DIR_FLOWMERGE, "/true_labels_flowMerge_FlowCAP_ND_", 1:30, ".txt"), 
-  FlowCAP_WNV  = paste0(RES_DIR_FLOWMERGE, "/true_labels_flowMerge_FlowCAP_WNV_", 1:13, ".txt")
-)
+  Mosmann_rare = file.path(RES_DIR_FLOWMERGE, "true_labels_flowMerge_Mosmann_rare.txt"))#, 
+#  FlowCAP_ND   = paste0(RES_DIR_FLOWMERGE, "/true_labels_flowMerge_FlowCAP_ND_", 1:30, ".txt"), 
+#  FlowCAP_WNV  = paste0(RES_DIR_FLOWMERGE, "/true_labels_flowMerge_FlowCAP_WNV_", 1:13, ".txt")
+#)
 
 # extract true population labels
 
@@ -93,10 +93,10 @@ files_out <- list(
   Samusik_01   = file.path(RES_DIR_FLOWMERGE, "flowMerge_labels_Samusik_01.txt"), 
   Samusik_all  = file.path(RES_DIR_FLOWMERGE, "flowMerge_labels_Samusik_all.txt"), 
   Nilsson_rare = file.path(RES_DIR_FLOWMERGE, "flowMerge_labels_Nilsson_rare.txt"), 
-  Mosmann_rare = file.path(RES_DIR_FLOWMERGE, "flowMerge_labels_Mosmann_rare.txt"), 
-  FlowCAP_ND   = file.path(RES_DIR_FLOWMERGE, "flowMerge_labels_FlowCAP_ND.txt"), 
-  FlowCAP_WNV  = file.path(RES_DIR_FLOWMERGE, "flowMerge_labels_FlowCAP_WNV.txt")
-)
+  Mosmann_rare = file.path(RES_DIR_FLOWMERGE, "flowMerge_labels_Mosmann_rare.txt"))#, 
+#  FlowCAP_ND   = file.path(RES_DIR_FLOWMERGE, "flowMerge_labels_FlowCAP_ND.txt"), 
+#  FlowCAP_WNV  = file.path(RES_DIR_FLOWMERGE, "flowMerge_labels_FlowCAP_WNV.txt")
+#)
 
 clus <- vector("list", length(files_out))
 names(clus) <- names(files_out)
