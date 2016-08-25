@@ -69,6 +69,24 @@ sapply(data[is_FlowCAP], function(d) {
 })
 
 
+# subsampling for data sets with excessive runtime (> 12 hrs on server)
+
+ix_subsample <- 4
+n_sub <- 250000
+
+for (i in ix_subsample) {
+  if (!is_FlowCAP[i]) {
+    set.seed(123)
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    # save subsampled population IDs
+    true_labels_i <- data[[i]][, "label", drop = FALSE]
+    files_true_labels_i <- paste0("../../results_manual/Rclusterpp/true_labels_Rclusterpp_", 
+                                  names(data)[i], ".txt")
+    write.table(true_labels_i, file = files_true_labels_i, row.names = FALSE, quote = FALSE, sep = "\t")
+  }
+}
+
+
 # indices of protein marker columns
 
 marker_cols <- list(

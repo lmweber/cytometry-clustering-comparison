@@ -20,7 +20,7 @@ RES_DIR_RCLUSTERPP <- "../../results_manual/Rclusterpp"
 DATA_DIR <- "../../../benchmark_data_sets"
 
 # which data sets required subsampling for this method (see parameters spreadsheet)
-is_subsampled <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+is_subsampled <- c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
 
 # alternate FlowCAP results at the end
 is_rare    <- c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE)
@@ -41,7 +41,7 @@ files_truth <- list(
   Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
   Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
   Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
-  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
+  Samusik_all  = file.path(RES_DIR_RCLUSTERPP, "true_labels_Rclusterpp_Samusik_all.txt"), 
   Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
   Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
   FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
