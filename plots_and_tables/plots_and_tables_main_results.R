@@ -243,7 +243,7 @@ tbl_FlowCAP <- sapply(res_all, function(r) {
     ifelse(is.null(s$mean_F1), NA, round(as.numeric(s$mean_F1), 3))
   })
 })
-rownames(tbl_FlowCAP) <- c("Nilsson_rare", "Mosmann_rare")
+rownames(tbl_FlowCAP) <- c("FlowCAP_ND", "FlowCAP_WNV")
 tbl_FlowCAP <- as.data.frame(t(tbl_FlowCAP))
 
 tbl_FlowCAP
@@ -255,7 +255,7 @@ tbl_FlowCAP_alt <- sapply(res_all, function(r) {
     ifelse(is.null(s$mean_F1), NA, round(as.numeric(s$mean_F1), 3))
   })
 })
-rownames(tbl_FlowCAP_alt) <- c("Nilsson_rare_alt", "Mosmann_rare_alt")
+rownames(tbl_FlowCAP_alt) <- c("FlowCAP_ND_alt", "FlowCAP_WNV_alt")
 tbl_FlowCAP_alt <- as.data.frame(t(tbl_FlowCAP_alt))
 
 tbl_FlowCAP_alt
