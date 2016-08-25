@@ -71,8 +71,8 @@ sapply(data[is_FlowCAP], function(d) {
 
 # subsampling for data sets with excessive runtime (> 12 hrs on server)
 
-ix_subsample <- 4
-n_sub <- 250000
+ix_subsample <- c(4, 6)
+n_sub <- 100000
 
 for (i in ix_subsample) {
   if (!is_FlowCAP[i]) {
@@ -145,6 +145,18 @@ k <- list(
   FlowCAP_WNV  = 4
 )
 
+# method
+method <- list(
+  Levine_32dim = "ward", 
+  Levine_13dim = "ward", 
+  Samusik_01   = "ward", 
+  Samusik_all  = "ward", 
+  Nilsson_rare = "ward", 
+  Mosmann_rare = "average", 
+  FlowCAP_ND   = "ward", 
+  FlowCAP_WNV  = "ward"
+)
+
 seed <- 123
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
@@ -156,7 +168,7 @@ for (i in 1:length(data)) {
     runtimes[[i]] <- system.time({
       # set number of cores
       Rclusterpp.setThreads(n_cores)
-      out[[i]] <- Rclusterpp.hclust(data[[i]], method = "ward")
+      out[[i]] <- Rclusterpp.hclust(data[[i]], method = method[[i]])
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -170,7 +182,7 @@ for (i in 1:length(data)) {
       runtimes[[i]][[j]] <- system.time({
         # set number of cores
         Rclusterpp.setThreads(n_cores)
-        out[[i]][[j]] <- Rclusterpp.hclust(data[[i]][[j]], method = "ward")
+        out[[i]][[j]] <- Rclusterpp.hclust(data[[i]][[j]], method = method[[i]])
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
