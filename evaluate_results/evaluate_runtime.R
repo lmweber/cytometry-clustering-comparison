@@ -130,17 +130,17 @@ for (i in 1:length(RES_DIRS)) {
 # ===========
 
 # which methods required subsampling (see parameters spreadsheet); not including methods 
-# that were not included in final results (e.g. due to errors)
+# that were not included in final results (e.g. due to errors or non-completion)
 
-which_sub_Levine_32dim <- c("ACCENSE", "ClusterX", "DensVM", "immunoClust", "SWIFT")
+which_sub_Levine_32dim <- c("ACCENSE", "ClusterX", "DensVM", "immunoClust", "SWIFT")  ## exclude: flowClust, flowMerge
 which_sub_Levine_13dim <- c("ACCENSE", "DensVM", "flowClust", "flowMerge")
 which_sub_Samusik_01   <- c("ACCENSE", "flowClust", "flowMerge")
-which_sub_Samusik_all  <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMerge", 
-                            "flowMeans", "immunoClust", "SamSPECTRAL", "SWIFT", "Xshift")
+which_sub_Samusik_all  <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMeans", "flowMerge", 
+                            "immunoClust", "Rclusterpp", "SamSPECTRAL", "SWIFT", "Xshift")
 which_sub_Nilsson_rare <- c("ACCENSE", "flowMerge")
-which_sub_Mosmann_rare <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMerge")
-which_sub_FlowCAP_ND   <- c("ClusterX", "DensVM")
-which_sub_FlowCAP_WNV  <- c("ClusterX", "DensVM")
+which_sub_Mosmann_rare <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMerge", "Rclusterpp")
+which_sub_FlowCAP_ND   <- c("ClusterX", "DensVM")  ## add when complete: flowMerge
+which_sub_FlowCAP_WNV  <- c("ClusterX", "DensVM")  ## add when complete: flowMerge
 
 
 
@@ -151,13 +151,13 @@ which_sub_FlowCAP_WNV  <- c("ClusterX", "DensVM")
 # which methods required multiple processor cores (see parameters spreadsheeet); not
 # including methods that were not included in final results (e.g. due to errors)
 
-which_cores_Levine_32dim <- c("Rclusterpp", "SWIFT", "Xshift")
+which_cores_Levine_32dim <- c("Rclusterpp", "SWIFT", "Xshift")  ## exclude: SPADE
 which_cores_Levine_13dim <- c("Rclusterpp", "SPADE", "SWIFT", "Xshift")
 which_cores_Samusik_01   <- c("Rclusterpp", "SPADE", "SWIFT", "Xshift")
 which_cores_Samusik_all  <- c("Rclusterpp", "SPADE", "SWIFT", "Xshift")
 which_cores_Nilsson_rare <- c("Rclusterpp", "SPADE", "SWIFT", "Xshift")
 which_cores_Mosmann_rare <- c("Rclusterpp", "SPADE", "SWIFT", "Xshift")
-which_cores_FlowCAP_ND   <- c("Rclusterpp", "SPADE")
-which_cores_FlowCAP_WNV  <- c("Rclusterpp")
+which_cores_FlowCAP_ND   <- c("Rclusterpp", "SPADE")  ## exclude: SWIFT, X-shift
+which_cores_FlowCAP_WNV  <- c("Rclusterpp")  ## exclude: SPADE, SWIFT, X-shift
 
 
