@@ -45,7 +45,7 @@ res_all <- list(
   FLOCK = res_FLOCK, 
   flowClust = res_flowClust, 
   flowMeans = res_flowMeans, 
-  #flowMerge = res_flowMerge, 
+  flowMerge = res_flowMerge, 
   flowPeaks = res_flowPeaks, 
   FlowSOM = res_FlowSOM, 
   FlowSOM_pre = res_FlowSOM_pre, 
