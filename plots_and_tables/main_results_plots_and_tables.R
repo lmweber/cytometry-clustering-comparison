@@ -856,7 +856,7 @@ for (i in 1:2) {
 ### SAVE SESSION INFORMATION AND RDATA FILE ###
 ###############################################
 
-sink(file = "../plots/session_info_plots_main_results.txt")
+sink(file = "../plots/session_info_main_results.txt")
 print(sessionInfo())
 sink()
 
