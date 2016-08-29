@@ -139,8 +139,8 @@ which_sub_Samusik_all  <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowM
                             "immunoClust", "Rclusterpp", "SamSPECTRAL", "SWIFT", "Xshift")
 which_sub_Nilsson_rare <- c("ACCENSE", "flowMerge")
 which_sub_Mosmann_rare <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMerge", "Rclusterpp")
-which_sub_FlowCAP_ND   <- c("ClusterX", "DensVM")  ## add when complete: flowMerge
-which_sub_FlowCAP_WNV  <- c("ClusterX", "DensVM")  ## add when complete: flowMerge
+which_sub_FlowCAP_ND   <- c("ClusterX", "DensVM", "flowMerge")
+which_sub_FlowCAP_WNV  <- c("ClusterX", "DensVM")
 
 
 
