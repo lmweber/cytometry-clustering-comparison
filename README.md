@@ -1,5 +1,7 @@
 # Comparison of clustering methods for high-dimensional single-cell flow and mass cytometry data
 
+**NOTE: We are currently working on an updated version of this paper. R scripts in this repository have only been partially updated so far (as at Aug 29th, 2016). The updated version should be complete by around early to mid September, so please check back soon.**
+
 This repository contains R scripts to reproduce the analyses and figures in our paper on comparing clustering methods for high-dimensional single-cell flow cytometry and mass cytometry (CyTOF) data.
 
 A preprint of the paper is available on [bioRxiv](http://biorxiv.org/content/early/2016/04/07/047613).
