@@ -174,7 +174,7 @@ for (i in 2:length(data)) {
     for (j in 1:length(data[[i]])) {
       set.seed(seed)
       runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- pFlowMerge(data[[i]], cl = NULL, K = K[[i]], varNames = pars[[i]])
+        out[[i]][[j]] <- pFlowMerge(data[[i]][[j]], cl = NULL, K = K[[i]], varNames = pars[[i]])
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
