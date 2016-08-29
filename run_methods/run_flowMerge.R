@@ -70,8 +70,8 @@ sapply(data[is_FlowCAP], function(d) {
 
 # subsampling for data sets with excessive runtime (> 12 hrs on server)
 
-ix_subsample <- 1:8
-n_sub <- c(10000, 100000, 20000, 10000, 20000, 100000, 10000, 10000)
+ix_subsample <- c(1, 2, 3, 4, 5, 6, 7)
+n_sub <- c(10000, 100000, 20000, 10000, 20000, 100000, 10000)
 
 for (i in ix_subsample) {
   if (!is_FlowCAP[i]) {
