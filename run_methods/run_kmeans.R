@@ -143,7 +143,7 @@ for (i in 1:length(data)) {
   if (!is_FlowCAP[i]) {
     set.seed(seed[[i]])
     runtimes[[i]] <- system.time({
-      out[[i]] <- kmeans(data[[i]], k[[i]])
+      out[[i]] <- kmeans(data[[i]], centers = k[[i]])
     })
     cat("data set", names(data[i]), ": run complete\n")
     
@@ -155,7 +155,7 @@ for (i in 1:length(data)) {
     for (j in 1:length(data[[i]])) {
       set.seed(seed[[i]])
       runtimes[[i]][[j]] <- system.time({
-        out[[i]][[j]] <- kmeans(data[[i]][[j]], k[[i]])
+        out[[i]][[j]] <- kmeans(data[[i]][[j]], centers = k[[i]])
       })
     }
     cat("data set", names(data[i]), ": run complete\n")
