@@ -121,8 +121,6 @@ k <- list(
   FlowCAP_WNV  = 4
 )
 
-iter.max <- 50
-
 seed <- list(
   Levine_32dim = 123, 
   Levine_13dim = 123, 
@@ -135,7 +133,7 @@ seed <- list(
 )
 
 # run k-means
-# note: additional iterations required; and returns errors for some random seeds
+# note: returns errors for some random seeds
 
 out <- runtimes <- vector("list", length(data))
 names(out) <- names(runtimes) <- names(data)
