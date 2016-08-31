@@ -16,8 +16,8 @@ random_starts_FLOCK <- function(data) {
   CURRENT_DIR <- getwd()
   setwd("../../../algorithms/FLOCK")
   
-  out <- runtimes <- vector("list", length(data))
-  names(out) <- names(runtimes) <- names(data)
+  out <- vector("list", length(data))
+  names(out) <- names(data)
   
   # run once for each data set
   
