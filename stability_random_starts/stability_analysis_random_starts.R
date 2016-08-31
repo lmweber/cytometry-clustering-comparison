@@ -15,7 +15,6 @@ library(flowMeans)
 library(flowPeaks)
 library(FlowSOM)
 library(immunoClust)
-library(Rclusterpp)
 library(SamSPECTRAL)
 
 # helper functions to match clusters and evaluate
@@ -34,7 +33,6 @@ source("random_starts_FlowSOM_pre.R")
 source("random_starts_FlowSOM.R")
 source("random_starts_immunoClust.R")
 source("random_starts_kmeans.R")
-source("random_starts_Rclusterpp.R")
 source("random_starts_SamSPECTRAL.R")
 
 # directory to save results
@@ -78,11 +76,6 @@ cat("stability analysis (random starts) : immunoClust complete\n")
 res_random_starts_kmeans <- bplapply(data, random_starts_kmeans, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : kmeans complete\n")
 
-# Rclusterpp: data set Levine_32dim only (due to subsampling)
-data_Rclusterpp <- lapply(data, function(l) l["Levine_32dim"])
-res_random_starts_Rclusterpp <- bplapply(data_Rclusterpp, random_starts_Rclusterpp, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
-cat("stability analysis (random starts) : Rclusterpp complete\n")
-
 res_random_starts_SamSPECTRAL <- bplapply(data, random_starts_SamSPECTRAL, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : SamSPECTRAL complete\n")
 
@@ -113,12 +106,10 @@ res_random_starts <- list(FLOCK = res_random_starts_FLOCK,
                           FlowSOM = res_random_starts_FlowSOM, 
                           immunoClust = res_random_starts_immunoClust, 
                           kmeans = res_random_starts_kmeans, 
-                          Rclusterpp = res_random_starts_Rclusterpp, 
                           SamSPECTRAL = res_random_starts_SamSPECTRAL)
 
 # remove any methods skipped for each data set
 res_Levine_32dim <- res_random_starts[-which(names(res_random_starts) == "immunoClust")]
-res_Mosmann_rare <- res_random_starts[-which(names(res_random_starts) == "Rclusterpp")]
 
 
 # collapse into one data frame per data set
