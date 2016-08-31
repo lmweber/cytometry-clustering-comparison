@@ -6,7 +6,7 @@
 #########################################################################################
 
 
-random_starts_immmunoClust <- function(data) {
+random_starts_immunoClust <- function(data) {
   
   # run once for each data set
   # note: don't set any random seeds, since we want a different random seed each time
