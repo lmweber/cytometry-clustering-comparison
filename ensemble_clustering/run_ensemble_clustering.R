@@ -37,8 +37,9 @@ source("../evaluate_results/evaluate_Xshift.R")
 # - methods that use subsampled data, since consensus clustering requires same data for
 # each method (see parameters spreadsheet)
 # - methods that remove outliers, since consensus clustering requires same data for each 
-# method (SamSPECTRAL for all data sets; X-shift for all data sets except Samusik_01 and 
-# Nilsson_rare))
+# method (SamSPECTRAL for all data sets; flowClust for Nilsson_rare and Mosmann_rare;
+# SWIFT for data sets with multiple populations; X-shift for all data sets except
+# Samusik_01 and Nilsson_rare)
 # - methods that give a large number of small clusters (FlowSOM_pre; SWIFT for data sets
 # with multiple populations), since this greatly slows down runtime
 
@@ -87,7 +88,6 @@ partition_Samusik_all  <- list(as.cl_partition(clus_FLOCK[[4]]),
 partition_Nilsson_rare <- list(as.cl_partition(clus_ClusterX[[5]]), 
                                as.cl_partition(clus_DensVM[[5]]), 
                                as.cl_partition(clus_FLOCK[[5]]), 
-                               as.cl_partition(clus_flowClust[[5]]), 
                                as.cl_partition(clus_flowMeans[[5]]), 
                                as.cl_partition(clus_flowPeaks[[5]]), 
                                as.cl_partition(clus_FlowSOM[[5]]), 
