@@ -110,6 +110,7 @@ res_random_starts <- list(FLOCK = res_random_starts_FLOCK,
 
 # remove any methods skipped for each data set
 res_Levine_32dim <- res_random_starts[-which(names(res_random_starts) == "immunoClust")]
+res_Mosmann_rare <- res_random_starts
 
 
 # collapse into one data frame per data set
