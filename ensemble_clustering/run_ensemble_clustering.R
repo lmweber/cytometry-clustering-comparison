@@ -7,12 +7,23 @@
 
 library(clue)
 
-# load clustering results from previous steps
-source("load_results_FLOCK.R")
-source("load_results_PhenoGraph.R")
-source("load_results_SWIFT.R")
-source("load_results_truth.R")
-source("load_results_all_other_methods.R")
+
+# load clustering results
+source("../evaluate_results/evaluate_ClusterX.R")
+source("../evaluate_results/evaluate_DensVM.R")
+source("../evaluate_results/evaluate_FLOCK.R")
+source("../evaluate_results/evaluate_flowClust.R")
+source("../evaluate_results/evaluate_flowMeans.R")
+source("../evaluate_results/evaluate_flowPeaks.R")
+source("../evaluate_results/evaluate_FlowSOM.R")
+source("../evaluate_results/evaluate_immunoClust.R")
+source("../evaluate_results/evaluate_kmeans.R")
+source("../evaluate_results/evaluate_PhenoGraph.R")
+source("../evaluate_results/evaluate_Rclusterpp.R")
+source("../evaluate_results/evaluate_SamSPECTRAL.R")
+source("../evaluate_results/evaluate_SPADE.R")
+source("../evaluate_results/evaluate_SWIFT.R")
+source("../evaluate_results/evaluate_Xshift.R")
 
 
 
@@ -21,79 +32,105 @@ source("load_results_all_other_methods.R")
 ### ENSEMBLE CLUSTERING ###
 ###########################
 
-# calculate using the top 5 methods for each data set, excluding the following:
-# - methods that use subsampled data (ACCENSE, DensVM, Rclusterpp) and methods that 
-# remove outliers (ACCENSE, immunoClust, SamSPECTRAL), since consensus clustering
-# requires same data for each method
-# - methods that give large numbers of clusters (FlowSOM, immunoClust, immunoClust_all,
-# SWIFT), since this greatly increases runtime; except for the Nilsson data set, which is
-# small enough that runtime remains fast
+# calculate ensemble clustering using all methods for each data set, excluding the 
+# following:
+# - methods that use subsampled data, since consensus clustering requires same data for
+# each method (see parameters spreadsheet)
+# - methods that remove outliers, since consensus clustering requires same data for each 
+# method (SamSPECTRAL for all data sets; X-shift for all data sets except Samusik_01 and 
+# Nilsson_rare))
+# - methods that give a large number of small clusters (FlowSOM_pre; SWIFT for data sets
+# with multiple populations), since this greatly slows down runtime
 
 
 # create partitions in format required by CLUE
 
-partition_Levine_32 <- list(as.cl_partition(clus_FlowSOM_meta_Levine_32), 
-                            as.cl_partition(clus_flowMeans_Levine_32), 
-                            as.cl_partition(clus_FLOCK_Levine_32), 
-                            as.cl_partition(clus_PhenoGraph_Levine_32), 
-                            as.cl_partition(clus_kmeans_Levine_32))
+partition_Levine_32dim <- list(as.cl_partition(clus_FLOCK[[1]]), 
+                               as.cl_partition(clus_flowMeans[[1]]), 
+                               as.cl_partition(clus_flowPeaks[[1]]), 
+                               as.cl_partition(clus_FlowSOM[[1]]), 
+                               as.cl_partition(clus_kmeans[[1]]), 
+                               as.cl_partition(clus_PhenoGraph[[1]]), 
+                               as.cl_partition(clus_Rclusterpp[[1]]))
 
-partition_Levine_13 <- list(as.cl_partition(clus_FlowSOM_meta_Levine_13), 
-                            as.cl_partition(clus_PhenoGraph_Levine_13), 
-                            as.cl_partition(clus_flowMeans_Levine_13), 
-                            as.cl_partition(clus_kmeans_Levine_13), 
-                            as.cl_partition(clus_FLOCK_Levine_13))
+partition_Levine_13dim <- list(as.cl_partition(clus_ClusterX[[2]]), 
+                               as.cl_partition(clus_FLOCK[[2]]), 
+                               as.cl_partition(clus_flowMeans[[2]]), 
+                               as.cl_partition(clus_flowPeaks[[2]]), 
+                               as.cl_partition(clus_FlowSOM[[2]]), 
+                               as.cl_partition(clus_immunoClust[[2]]), 
+                               as.cl_partition(clus_kmeans[[2]]), 
+                               as.cl_partition(clus_PhenoGraph[[2]]), 
+                               as.cl_partition(clus_Rclusterpp[[2]]), 
+                               as.cl_partition(clus_SPADE[[2]]))
 
-partition_Nilsson <- list(as.cl_partition(clus_kmeans_Nilsson), 
-                          as.cl_partition(clus_FlowSOM_meta_Nilsson), 
-                          as.cl_partition(clus_FlowSOM_Nilsson), 
-                          as.cl_partition(clus_flowMeans_Nilsson), 
-                          as.cl_partition(clus_SWIFT_Nilsson))
+partition_Samusik_01   <- list(as.cl_partition(clus_ClusterX[[3]]), 
+                               as.cl_partition(clus_DensVM[[3]]), 
+                               as.cl_partition(clus_FLOCK[[3]]), 
+                               as.cl_partition(clus_flowMeans[[3]]), 
+                               as.cl_partition(clus_flowPeaks[[3]]), 
+                               as.cl_partition(clus_FlowSOM[[3]]), 
+                               as.cl_partition(clus_immunoClust[[3]]), 
+                               as.cl_partition(clus_kmeans[[3]]), 
+                               as.cl_partition(clus_PhenoGraph[[3]]), 
+                               as.cl_partition(clus_Rclusterpp[[3]]), 
+                               as.cl_partition(clus_SPADE[[3]]), 
+                               as.cl_partition(clus_Xshift[[3]]))
 
-partition_Mosmann <- list(as.cl_partition(clus_FlowSOM_meta_Mosmann), 
-                          as.cl_partition(clus_PhenoGraph_Mosmann), 
-                          as.cl_partition(clus_flowMeans_Mosmann), 
-                          as.cl_partition(clus_FLOCK_Mosmann), 
-                          as.cl_partition(clus_kmeans_Mosmann))
+partition_Samusik_all  <- list(as.cl_partition(clus_FLOCK[[4]]), 
+                               as.cl_partition(clus_flowPeaks[[4]]), 
+                               as.cl_partition(clus_FlowSOM[[4]]), 
+                               as.cl_partition(clus_kmeans[[4]]), 
+                               as.cl_partition(clus_PhenoGraph[[4]]), 
+                               as.cl_partition(clus_SPADE[[4]]))
+
+partition_Nilsson_rare <- list(as.cl_partition(clus_ClusterX[[5]]), 
+                               as.cl_partition(clus_DensVM[[5]]), 
+                               as.cl_partition(clus_FLOCK[[5]]), 
+                               as.cl_partition(clus_flowClust[[5]]), 
+                               as.cl_partition(clus_flowMeans[[5]]), 
+                               as.cl_partition(clus_flowPeaks[[5]]), 
+                               as.cl_partition(clus_FlowSOM[[5]]), 
+                               as.cl_partition(clus_immunoClust[[5]]), 
+                               as.cl_partition(clus_kmeans[[5]]), 
+                               as.cl_partition(clus_PhenoGraph[[5]]), 
+                               as.cl_partition(clus_Rclusterpp[[5]]), 
+                               as.cl_partition(clus_SPADE[[5]]), 
+                               as.cl_partition(clus_SWIFT[[5]]), 
+                               as.cl_partition(clus_Xshift[[5]]))
+
+partition_Mosmann_rare <- list(as.cl_partition(clus_FLOCK[[6]]), 
+                               as.cl_partition(clus_flowMeans[[6]]), 
+                               as.cl_partition(clus_flowPeaks[[6]]), 
+                               as.cl_partition(clus_FlowSOM[[6]]), 
+                               as.cl_partition(clus_immunoClust[[6]]), 
+                               as.cl_partition(clus_kmeans[[6]]), 
+                               as.cl_partition(clus_PhenoGraph[[6]]), 
+                               as.cl_partition(clus_SPADE[[6]]), 
+                               as.cl_partition(clus_SWIFT[[6]]))
 
 
 # create cluster ensembles
 
-ens_Levine_32 <- cl_ensemble(list = partition_Levine_32)
-ens_Levine_13 <- cl_ensemble(list = partition_Levine_13)
-ens_Nilsson <- cl_ensemble(list = partition_Nilsson)
-ens_Mosmann <- cl_ensemble(list = partition_Mosmann)
+partitions <- list(partition_Levine_32dim, 
+                   partition_Levine_13dim, 
+                   partition_Samusik_01, 
+                   partition_Samusik_all, 
+                   partition_Nilsson_rare, 
+                   partition_Mosmann_rare)
+
+ensembles <- lapply(partitions, function(p) cl_ensemble(list = p))
 
 
 # calculate consensus clustering
 
-set.seed(1234)
-system.time(
-  cons_Levine_32 <- cl_consensus(ens_Levine_32)  # runtime: ~1 min
-)
-
-set.seed(1234)
-system.time(
-  cons_Levine_13 <- cl_consensus(ens_Levine_13)  # runtime: ~20 sec
-)
-
-set.seed(1234)
-system.time(
-  cons_Nilsson <- cl_consensus(ens_Nilsson)  # runtime: ~20 sec
-)
-
-set.seed(1234)
-system.time(
-  cons_Mosmann <- cl_consensus(ens_Mosmann)  # runtime: ~1 min
-)
+set.seed(123)
+consensus <- lapply(ensembles, cl_consensus)
 
 
 # get class IDs
 
-cons_clus_Levine_32 <- cl_class_ids(cons_Levine_32)
-cons_clus_Levine_13 <- cl_class_ids(cons_Levine_13)
-cons_clus_Nilsson <- cl_class_ids(cons_Nilsson)
-cons_clus_Mosmann <- cl_class_ids(cons_Mosmann)
+clus_consensus <- lapply(consensus, cl_class_ids)
 
 
 
@@ -104,35 +141,20 @@ cons_clus_Mosmann <- cl_class_ids(cons_Mosmann)
 
 # save cluster labels
 
-res_ensemble_Levine_32 <- data.frame(label = as.numeric(cons_clus_Levine_32))
-res_ensemble_Levine_13 <- data.frame(label = as.numeric(cons_clus_Levine_13))
-res_ensemble_Nilsson <- data.frame(label = as.numeric(cons_clus_Nilsson))
-res_ensemble_Mosmann <- data.frame(label = as.numeric(cons_clus_Mosmann))
+datasets <- c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all", "Nilsson_rare", "Mosmann_rare")
+files_out <- paste0("../../results_ensemble/ensemble_labels_", datasets, ".txt")
 
-write.table(res_ensemble_Levine_32, 
-            file = "../results_ensemble/ensemble_clustering/ensemble_labels_Levine_2015_marrow_32.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_ensemble_Levine_13, 
-            file = "../results_ensemble/ensemble_clustering/ensemble_labels_Levine_2015_marrow_13.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_ensemble_Nilsson, 
-            file = "../results_ensemble/ensemble_clustering/ensemble_labels_Nilsson_2013_HSC.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
-write.table(res_ensemble_Mosmann, 
-            file = "../results_ensemble/ensemble_clustering/ensemble_labels_Mosmann_2014_activ.txt", 
-            row.names = FALSE, quote = FALSE, sep = "\t")
+for (i in 1:length(files_out)) {
+  res <- data.frame(label = as.numeric(clus_consensus[[i]]))
+  write.table(res, file = files_out[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
 
 
 # save session information
 
-sink(file = "../results_ensemble/session_info/session_info_ensemble_clustering.txt")
+sink(file = "../results_ensemble/session_info_ensemble.txt")
 sessionInfo()
 sink()
-
-
-# save R objects
-
-save.image(file = "../results_ensemble/RData_files/results_ensemble_clustering.RData")
 
 
 

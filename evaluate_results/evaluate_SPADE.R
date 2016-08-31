@@ -120,6 +120,10 @@ for (i in 2:7) {
   }
 }
 
+# store named object (for ensemble clustering)
+
+clus_SPADE <- clus
+
 
 
 
@@ -147,7 +151,7 @@ for (i in 2:7) {
   }
 }
 
-# return named object (used in plotting scripts)
+# store named object (for plotting scripts)
 
 res_SPADE <- res
 

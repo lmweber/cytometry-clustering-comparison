@@ -108,6 +108,10 @@ for (i in 1:length(clus)) {
   print(table(clus[[i]], clus_truth[[i]]))
 }
 
+# store named object (for ensemble clustering)
+
+clus_SWIFT <- clus
+
 
 
 
@@ -128,7 +132,7 @@ for (i in 1:length(clus)) {
   }
 }
 
-# return named object (used in plotting scripts)
+# store named object (for plotting scripts)
 
 res_SWIFT <- res
 

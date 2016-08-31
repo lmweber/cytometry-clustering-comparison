@@ -115,6 +115,10 @@ for (i in 1:length(clus)) {
   }
 }
 
+# store named object (for ensemble clustering)
+
+clus_Rclusterpp <- clus
+
 
 
 
@@ -141,7 +145,7 @@ for (i in 1:length(clus)) {
   }
 }
 
-# return named object (used in plotting scripts)
+# store named object (for plotting scripts)
 
 res_Rclusterpp <- res
 

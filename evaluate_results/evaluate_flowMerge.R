@@ -126,6 +126,10 @@ for (i in 2:length(clus)) {
   }
 }
 
+# store named object (for ensemble clustering)
+
+clus_flowMerge <- clus
+
 
 
 
@@ -153,7 +157,7 @@ for (i in 2:length(clus)) {
   }
 }
 
-# return named object (used in plotting scripts)
+# store named object (for plotting scripts)
 
 res_flowMerge <- res
 
