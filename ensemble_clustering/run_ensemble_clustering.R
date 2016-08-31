@@ -124,8 +124,12 @@ ensembles <- lapply(partitions, function(p) cl_ensemble(list = p))
 
 # calculate consensus clustering
 
-set.seed(123)
-consensus <- lapply(ensembles, cl_consensus)
+consensus <- vector("list", length(ensembles))
+
+for (i in 1:length(consensus)) {
+  set.seed(123)
+  consensus[[i]] <- cl_consensus(ensembles[[i]])
+}
 
 
 # get class IDs
