@@ -1,92 +1,133 @@
 #########################################################################################
-# R script to load and calculate results for ensemble clustering
+# R script to load and evaluate results for ensemble clustering
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, August 2016
 #########################################################################################
 
 
-# helper functions
-source("helper_match_clusters_and_evaluate.R")
-source("helper_match_one_rare_cluster_and_evaluate.R")
+library(flowCore)
+library(clue)
 
-# true (manually gated) cluster labels
-source("load_results_truth.R")
+# helper functions to match clusters and evaluate
+source("../helpers/helper_match_evaluate_multiple.R")
+source("../helpers/helper_match_evaluate_single.R")
 
+# directory with saved results
+RES_DIR_ENSEMBLE <- "../../results_ensemble"
 
+DATA_DIR <- "../../../benchmark_data_sets"
 
-
-####################
-### LOAD RESULTS ###
-####################
-
-# load ensemble clustering results
-
-file_ensemble_Levine_32 <- "../results_ensemble/ensemble_clustering/ensemble_labels_Levine_2015_marrow_32.txt"
-file_ensemble_Levine_13 <- "../results_ensemble/ensemble_clustering/ensemble_labels_Levine_2015_marrow_13.txt"
-file_ensemble_Nilsson <- "../results_ensemble/ensemble_clustering/ensemble_labels_Nilsson_2013_HSC.txt"
-file_ensemble_Mosmann <- "../results_ensemble/ensemble_clustering/ensemble_labels_Mosmann_2014_activ.txt"
-
-data_ensemble_Levine_32 <- read.table(file_ensemble_Levine_32, header = TRUE, sep = "\t")
-data_ensemble_Levine_13 <- read.table(file_ensemble_Levine_13, header = TRUE, sep = "\t")
-data_ensemble_Nilsson <- read.table(file_ensemble_Nilsson, header = TRUE, sep = "\t")
-data_ensemble_Mosmann <- read.table(file_ensemble_Mosmann, header = TRUE, sep = "\t")
-
-cons_clus_Levine_32 <- data_ensemble_Levine_32[, 1]
-cons_clus_Levine_13 <- data_ensemble_Levine_13[, 1]
-cons_clus_Nilsson <- data_ensemble_Nilsson[, 1]
-cons_clus_Mosmann <- data_ensemble_Mosmann[, 1]
-
-
-# cluster frequency tables
-
-table(cons_clus_Levine_32)
-table(cons_clus_Levine_13)
-table(cons_clus_Nilsson)
-table(cons_clus_Mosmann)
-
-
-# number of consensus clusters
-
-length(table(cons_clus_Levine_32))
-length(table(cons_clus_Levine_13))
-length(table(cons_clus_Nilsson))
-length(table(cons_clus_Mosmann))
-
-
-# confusion matrices
-
-table(ensemble = cons_clus_Levine_32, true = clus_truth_Levine_32)
-table(ensemble = cons_clus_Levine_13, true = clus_truth_Levine_13)
-table(ensemble = cons_clus_Nilsson, true = clus_truth_Nilsson)
-table(ensemble = cons_clus_Mosmann, true = clus_truth_Mosmann)
+# alternate FlowCAP results at the end
+is_rare    <- c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE)
 
 
 
 
-#############################################
-### CALCULATE F1 SCORE, PRECISION, RECALL ###
-#############################################
+####################################################
+### load truth (manual gating population labels) ###
+####################################################
 
-# for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
+# files with true population labels
 
-# mean F1 score, mean precision, mean recall
+files_truth <- list(
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
+  FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
+  FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
+)
 
-res_ensemble_Levine_32 <- helper_match_clusters_and_evaluate(cons_clus_Levine_32, clus_truth_Levine_32)
-res_ensemble_Levine_13 <- helper_match_clusters_and_evaluate(cons_clus_Levine_13, clus_truth_Levine_13)
+# extract true population labels
 
-mean(res_ensemble_Levine_32$F1)
-mean(res_ensemble_Levine_13$F1)
+clus_truth <- vector("list", length(files_truth))
+names(clus_truth) <- names(files_truth)
+
+for (i in 1:length(clus_truth)) {
+  data_truth_i <- flowCore::exprs(flowCore::read.FCS(files_truth[[i]], transformation = FALSE, truncate_max_range = FALSE))
+  clus_truth[[i]] <- data_truth_i[, "label"]
+}
+
+sapply(clus_truth, length)
+
+# cluster sizes and number of clusters
+# (for data sets with single rare population: 1 = rare population of interest, 0 = all others)
+
+tbl_truth <- lapply(clus_truth, table)
+
+tbl_truth
+sapply(tbl_truth, length)
 
 
-# for data sets with a single rare cell population of interest (Nilsson_2013_HSC, Mosmann_2014_activ)
 
-# F1 score, precision, recall
 
-res_ensemble_Nilsson <- helper_match_one_rare_cluster_and_evaluate(cons_clus_Nilsson, clus_truth_Nilsson)
-res_ensemble_Mosmann <- helper_match_one_rare_cluster_and_evaluate(cons_clus_Mosmann, clus_truth_Mosmann)
+########################################
+### load ensemble clustering results ###
+########################################
 
-res_ensemble_Nilsson$F1
-res_ensemble_Mosmann$F1
+# load cluster labels
+
+files_out <- list(
+  Levine_32dim = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Levine_32dim.txt"), 
+  Levine_13dim = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Levine_13dim.txt"), 
+  Samusik_01   = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Samusik_01.txt"), 
+  Samusik_all  = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Samusik_all.txt"), 
+  Nilsson_rare = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Nilsson_rare.txt"), 
+  Mosmann_rare = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Mosmann_rare.txt"), 
+  FlowCAP_ND   = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_FlowCAP_ND.txt"), 
+  FlowCAP_WNV  = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_FlowCAP_WNV.txt")
+)
+
+clus <- lapply(files_out, function(f) {
+  read.table(f, header = TRUE, stringsAsFactors = FALSE)[, "label"]
+})
+
+sapply(clus, length)
+
+# cluster sizes and number of clusters
+# (for data sets with single rare population: 1 = rare population of interest, 0 = all others)
+
+tbl <- lapply(clus, table)
+
+tbl
+sapply(tbl, length)
+
+# contingency tables
+
+for (i in 1:length(clus)) {
+  print(table(clus[[i]], clus_truth[[i]]))
+}
+
+# store named object
+
+clus_ensemble <- clus
+
+
+
+
+###################################
+### match clusters and evaluate ###
+###################################
+
+# see helper function scripts for details on matching strategy and evaluation
+
+res <- vector("list", length(clus))
+names(res) <- names(clus)
+
+for (i in 1:length(clus)) {
+  if (!is_rare[i]) {
+    res[[i]] <- helper_match_evaluate_multiple(clus[[i]], clus_truth[[i]])
+    
+  } else if (is_rare[i]) {
+    res[[i]] <- helper_match_evaluate_single(clus[[i]], clus_truth[[i]])
+  }
+}
+
+# store named object (for plotting scripts)
+
+res_ensemble <- res
 
 
 
