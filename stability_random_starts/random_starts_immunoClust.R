@@ -2,7 +2,7 @@
 # Stability analysis (multiple random starts):
 # Function to run and evaluate immunoClust once for each data set
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
@@ -16,7 +16,7 @@ random_starts_immunoClust <- function(data) {
   
   for (i in 1:length(out)) {
     data_i <- flowCore::flowFrame(data[[i]])  ## input data must be flowFrame
-    out[[i]] <- immunoClust::cell.process(data[[i]], classify.all = TRUE)
+    out[[i]] <- immunoClust::cell.process(data_i, classify.all = TRUE)
   }
   
   # extract cluster labels

@@ -3,7 +3,7 @@
 # R script to run and evaluate all methods. Methods are run multiple times in parallel 
 # using BiocParallel::bplapply() (where possible).
 # 
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
