@@ -1,5 +1,5 @@
 #########################################################################################
-# Stability analysis (multiple random starts):
+# Stability analysis (bootstrap resamples):
 # R script to run and evaluate all methods. Methods are run multiple times in parallel 
 # using BiocParallel::bplapply() (where possible).
 # 
@@ -36,23 +36,29 @@ source("run_kmeans_stability.R")
 source("run_SamSPECTRAL_stability.R")
 
 # directory to save results
-RESULTS_DIR <- "../../results_stability_random_starts"
+RESULTS_DIR <- "../../results_stability_bootstrap"
 
 # number of times to run each method
-n <- 30
+n <- 5
 
 
 
 
-#####################################
-### REPLICATE DATA: RANDOM STARTS ###
-#####################################
+###########################################
+### REPLICATE DATA: BOOTSTRAP RESAMPLES ###
+###########################################
 
-# replicate data n times
+# replicate data n times (bootstrap resamples)
 
-data <- rep(list(data), n)
+fn_bootstrap <- function(d) {
+  d <- d[sample(1:nrow(d), nrow(d), replace = TRUE), ]
+}
 
-data_notransform <- rep(list(data_notransform), n)
+set.seed(123)
+data <- lapply(1:n, function(i) lapply(data, fn_bootstrap))
+
+set.seed(123)
+data_notransform <- lapply(1:n, function(i) lapply(data_notransform, fn_bootstrap))
 
 
 
@@ -65,27 +71,27 @@ data_notransform <- rep(list(data_notransform), n)
 
 seed <- 123
 
-res_random_starts_flowMeans <- bplapply(data, run_flowMeans_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_bootstrap_flowMeans <- bplapply(data, run_flowMeans_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : flowMeans complete\n")
 
-res_random_starts_flowPeaks <- bplapply(data, run_flowPeaks_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_bootstrap_flowPeaks <- bplapply(data, run_flowPeaks_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : flowPeaks complete\n")
 
-res_random_starts_FlowSOM_pre <- bplapply(data, run_FlowSOM_pre_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_bootstrap_FlowSOM_pre <- bplapply(data, run_FlowSOM_pre_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : FlowSOM_pre complete\n")
 
-res_random_starts_FlowSOM <- bplapply(data, run_FlowSOM_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_bootstrap_FlowSOM <- bplapply(data, run_FlowSOM_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : FlowSOM complete\n")
 
 # immunoClust: data set Mosmann_rare only (due to subsampling); also use non-transformed data due to automatic transform
 data_immunoClust <- lapply(data_notransform, function(l) l["Mosmann_rare"])
-res_random_starts_immunoClust <- bplapply(data_immunoClust, run_immunoClust_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_bootstrap_immunoClust <- bplapply(data_immunoClust, run_immunoClust_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : immunoClust complete\n")
 
-res_random_starts_kmeans <- bplapply(data, run_kmeans_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_bootstrap_kmeans <- bplapply(data, run_kmeans_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : kmeans complete\n")
 
-res_random_starts_SamSPECTRAL <- bplapply(data, run_SamSPECTRAL_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_bootstrap_SamSPECTRAL <- bplapply(data, run_SamSPECTRAL_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : SamSPECTRAL complete\n")
 
 
@@ -98,7 +104,7 @@ cat("stability analysis (random starts) : SamSPECTRAL complete\n")
 # run methods multiple times in series (parallelization not possible)
 
 set.seed(seed)
-res_random_starts_FLOCK <- lapply(data, run_FLOCK_stability)
+res_bootstrap_FLOCK <- lapply(data, run_FLOCK_stability)
 cat("stability analysis (random starts) : FLOCK complete\n")
 
 
@@ -108,18 +114,18 @@ cat("stability analysis (random starts) : FLOCK complete\n")
 ### SAVE RESULTS ###
 ####################
 
-res_random_starts <- list(FLOCK = res_random_starts_FLOCK, 
-                          flowMeans = res_random_starts_flowMeans, 
-                          flowPeaks = res_random_starts_flowPeaks, 
-                          FlowSOM_pre = res_random_starts_FlowSOM_pre, 
-                          FlowSOM = res_random_starts_FlowSOM, 
-                          immunoClust = res_random_starts_immunoClust, 
-                          kmeans = res_random_starts_kmeans, 
-                          SamSPECTRAL = res_random_starts_SamSPECTRAL)
+res_bootstrap <- list(FLOCK = res_bootstrap_FLOCK, 
+                      flowMeans = res_bootstrap_flowMeans, 
+                      flowPeaks = res_bootstrap_flowPeaks, 
+                      FlowSOM_pre = res_bootstrap_FlowSOM_pre, 
+                      FlowSOM = res_bootstrap_FlowSOM, 
+                      immunoClust = res_bootstrap_immunoClust, 
+                      kmeans = res_bootstrap_kmeans, 
+                      SamSPECTRAL = res_bootstrap_SamSPECTRAL)
 
 # remove any methods skipped for each data set
-res_Levine_32dim <- res_random_starts[-which(names(res_random_starts) == "immunoClust")]
-res_Mosmann_rare <- res_random_starts
+res_Levine_32dim <- res_bootstrap[-which(names(res_bootstrap) == "immunoClust")]
+res_Mosmann_rare <- res_bootstrap
 
 
 # collapse into one data frame per data set
@@ -135,13 +141,13 @@ res_Mosmann_rare <- lapply(res_Mosmann_rare,
 
 for (i in 1:length(res_Levine_32dim)) {
   method_name <- names(res_Levine_32dim)[i]
-  file = file.path(RESULTS_DIR, method_name, paste0("stability_random_starts_", method_name, "_Levine_32dim.txt"))
+  file = file.path(RESULTS_DIR, method_name, paste0("stability_bootstrap_", method_name, "_Levine_32dim.txt"))
   write.table(res_Levine_32dim[[i]], file = file, row.names = FALSE, quote = FALSE, sep = "\t")
 }
 
 for (i in 1:length(res_Mosmann_rare)) {
   method_name <- names(res_Mosmann_rare)[i]
-  file = file.path(RESULTS_DIR, method_name, paste0("stability_random_starts_", method_name, "_Mosmann_rare.txt"))
+  file = file.path(RESULTS_DIR, method_name, paste0("stability_bootstrap_", method_name, "_Mosmann_rare.txt"))
   write.table(res_Mosmann_rare[[i]], file = file, row.names = FALSE, quote = FALSE, sep = "\t")
 }
 
