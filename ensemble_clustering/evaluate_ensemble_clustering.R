@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load and evaluate results for ensemble clustering
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
@@ -75,9 +75,7 @@ files_out <- list(
   Samusik_01   = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Samusik_01.txt"), 
   Samusik_all  = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Samusik_all.txt"), 
   Nilsson_rare = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Nilsson_rare.txt"), 
-  Mosmann_rare = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Mosmann_rare.txt"), 
-  FlowCAP_ND   = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_FlowCAP_ND.txt"), 
-  FlowCAP_WNV  = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_FlowCAP_WNV.txt")
+  Mosmann_rare = file.path(RES_DIR_ENSEMBLE, "ensemble_labels_Mosmann_rare.txt")
 )
 
 clus <- lapply(files_out, function(f) {

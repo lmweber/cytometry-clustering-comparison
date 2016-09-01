@@ -1,14 +1,14 @@
 #########################################################################################
 # R script to run ensemble clustering
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
 library(clue)
 
 
-# load clustering results
+# load clustering results (runtime: 15 mins)
 source("../evaluate_results/evaluate_ClusterX.R")
 source("../evaluate_results/evaluate_DensVM.R")
 source("../evaluate_results/evaluate_FLOCK.R")
@@ -122,7 +122,7 @@ partitions <- list(partition_Levine_32dim,
 ensembles <- lapply(partitions, function(p) cl_ensemble(list = p))
 
 
-# calculate consensus clustering
+# calculate consensus clustering (runtime: 35 mins)
 
 consensus <- vector("list", length(ensembles))
 
@@ -156,7 +156,7 @@ for (i in 1:length(files_out)) {
 
 # save session information
 
-sink(file = "../results_ensemble/session_info_ensemble.txt")
+sink(file = "../../results_ensemble/session_info_ensemble.txt")
 sessionInfo()
 sink()
 
