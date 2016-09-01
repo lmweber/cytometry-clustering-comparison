@@ -1,22 +1,12 @@
 #########################################################################################
 # Stability analysis (multiple random starts):
-# Function to run and evaluate k-means once for each data set
+# Function to run and evaluate immunoClust once for each data set
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
-random_starts_kmeans <- function(data) {
-  
-  # parameters
-  
-  # number of clusters k
-  k <- list(
-    Levine_32dim = 40, 
-    Mosmann_rare = 40
-  )
-  
-  iter.max <- 50  ## some random seeds require more iterations
+run_immunoClust_stability <- function(data) {
   
   # run once for each data set
   # note: don't set any random seeds, since we want a different random seed each time
@@ -25,7 +15,8 @@ random_starts_kmeans <- function(data) {
   names(out) <- names(data)
   
   for (i in 1:length(out)) {
-    out[[i]] <- kmeans(data[[i]], centers = k[[i]], iter.max = iter.max)
+    data_i <- flowCore::flowFrame(data[[i]])  ## input data must be flowFrame
+    out[[i]] <- immunoClust::cell.process(data_i, classify.all = TRUE)
   }
   
   # extract cluster labels
@@ -33,7 +24,7 @@ random_starts_kmeans <- function(data) {
   names(clus) <- names(data)
   
   for (i in 1:length(clus)) {
-    clus[[i]] <- out[[i]]$cluster
+    clus[[i]] <- out[[i]]@label
   }
   
   # calculate mean F1 scores / F1 scores

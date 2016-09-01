@@ -1,16 +1,20 @@
 #########################################################################################
 # Stability analysis (multiple random starts):
-# Function to run and evaluate SamSPECTRAL once for each data set
+# Function to run and evaluate flowMeans once for each data set
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
-random_starts_SamSPECTRAL <- function(data) {
+run_flowMeans_stability <- function(data) {
   
   # parameters
-  normal.sigma <- 100
-  separation.factor <- 1
+  
+  # number of clusters k
+  k <- list(
+    Levine_32dim = 40, 
+    Mosmann_rare = 40
+  )
   
   # run once for each data set
   # note: don't set any random seeds, since we want a different random seed each time
@@ -19,7 +23,7 @@ random_starts_SamSPECTRAL <- function(data) {
   names(out) <- names(data)
   
   for (i in 1:length(out)) {
-    out[[i]] <- SamSPECTRAL(data[[i]], normal.sigma = normal.sigma, separation.factor = separation.factor)
+    out[[i]] <- flowMeans(data[[i]], Standardize = FALSE, NumC = k[[i]])
   }
   
   # extract cluster labels
@@ -27,7 +31,7 @@ random_starts_SamSPECTRAL <- function(data) {
   names(clus) <- names(data)
   
   for (i in 1:length(clus)) {
-    clus[[i]] <- out[[i]]
+    clus[[i]] <- out[[i]]@Label
   }
   
   # calculate mean F1 scores / F1 scores

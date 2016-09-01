@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to generate plots and tables of main results
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
@@ -18,7 +18,7 @@ source("../helpers/helper_collapse_df.R")
 # load and evaluate results
 CURRENT_DIR <- getwd()
 setwd("../evaluate_results")
-source("evaluate_all_methods.R")  ## takes 20 min
+source("evaluate_all_methods.R")  ## runtime: 20 min
 source("evaluate_runtime.R")
 setwd(CURRENT_DIR)
 

@@ -1,20 +1,22 @@
 #########################################################################################
 # Stability analysis (multiple random starts):
-# Function to run and evaluate FlowSOM_pre once for each data set
+# Function to run and evaluate k-means once for each data set
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
-random_starts_FlowSOM_pre <- function(data) {
+run_kmeans_stability <- function(data) {
   
   # parameters
   
-  # grid sizes
-  grid_size <- list(
-    Levine_32dim = 10, 
-    Mosmann_rare = 20
+  # number of clusters k
+  k <- list(
+    Levine_32dim = 40, 
+    Mosmann_rare = 40
   )
+  
+  iter.max <- 50  ## some random seeds require more iterations
   
   # run once for each data set
   # note: don't set any random seeds, since we want a different random seed each time
@@ -23,14 +25,7 @@ random_starts_FlowSOM_pre <- function(data) {
   names(out) <- names(data)
   
   for (i in 1:length(out)) {
-    data_i <- flowCore::flowFrame(data[[i]])  ## input data must be flowFrame
-    fSOM <- FlowSOM::ReadInput(data_i, transform = FALSE, scale = FALSE)
-    fSOM <- FlowSOM::BuildSOM(fSOM, 
-                              colsToUse = NULL,  ## use all columns since already subsetted
-                              xdim = grid_size[[i]], 
-                              ydim = grid_size[[i]])
-    #fSOM <- FlowSOM::BuildMST(fSOM)  ## not required
-    out[[i]] <- fSOM
+    out[[i]] <- kmeans(data[[i]], centers = k[[i]], iter.max = iter.max)
   }
   
   # extract cluster labels
@@ -38,7 +33,7 @@ random_starts_FlowSOM_pre <- function(data) {
   names(clus) <- names(data)
   
   for (i in 1:length(clus)) {
-    clus[[i]] <- out[[i]]$map$mapping[, 1]
+    clus[[i]] <- out[[i]]$cluster
   }
   
   # calculate mean F1 scores / F1 scores

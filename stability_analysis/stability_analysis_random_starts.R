@@ -22,18 +22,18 @@ source("../helpers/helper_match_evaluate_multiple.R")
 source("../helpers/helper_match_evaluate_single.R")
 
 # load data and true population labels
-source("stability_load_data.R")
-source("stability_load_true_labels.R")
+source("load_data_stability.R")
+source("load_true_labels_stability.R")
 
 # functions to run and evaluate methods
-source("random_starts_FLOCK.R")
-source("random_starts_flowMeans.R")
-source("random_starts_flowPeaks.R")
-source("random_starts_FlowSOM_pre.R")
-source("random_starts_FlowSOM.R")
-source("random_starts_immunoClust.R")
-source("random_starts_kmeans.R")
-source("random_starts_SamSPECTRAL.R")
+source("run_FLOCK_stability.R")
+source("run_flowMeans_stability.R")
+source("run_flowPeaks_stability.R")
+source("run_FlowSOM_pre_stability.R")
+source("run_FlowSOM_stability.R")
+source("run_immunoClust_stability.R")
+source("run_kmeans_stability.R")
+source("run_SamSPECTRAL_stability.R")
 
 # directory to save results
 RESULTS_DIR <- "../../results_stability_random_starts"
@@ -41,7 +41,15 @@ RESULTS_DIR <- "../../results_stability_random_starts"
 # number of times to run each method
 n <- 30
 
-# replicate data
+
+
+
+#####################################
+### REPLICATE DATA: RANDOM STARTS ###
+#####################################
+
+# replicate data n times
+
 data <- rep(list(data), n)
 data_notransform <- rep(list(data_notransform), n)
 
@@ -56,27 +64,27 @@ data_notransform <- rep(list(data_notransform), n)
 
 seed <- 123
 
-res_random_starts_flowMeans <- bplapply(data, random_starts_flowMeans, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_random_starts_flowMeans <- bplapply(data, run_flowMeans_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : flowMeans complete\n")
 
-res_random_starts_flowPeaks <- bplapply(data, random_starts_flowPeaks, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_random_starts_flowPeaks <- bplapply(data, run_flowPeaks_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : flowPeaks complete\n")
 
-res_random_starts_FlowSOM_pre <- bplapply(data, random_starts_FlowSOM_pre, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_random_starts_FlowSOM_pre <- bplapply(data, run_FlowSOM_pre_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : FlowSOM_pre complete\n")
 
-res_random_starts_FlowSOM <- bplapply(data, random_starts_FlowSOM, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_random_starts_FlowSOM <- bplapply(data, run_FlowSOM_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : FlowSOM complete\n")
 
 # immunoClust: data set Mosmann_rare only (due to subsampling); also use non-transformed data due to automatic transform
 data_immunoClust <- lapply(data_notransform, function(l) l["Mosmann_rare"])
-res_random_starts_immunoClust <- bplapply(data_immunoClust, random_starts_immunoClust, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_random_starts_immunoClust <- bplapply(data_immunoClust, run_immunoClust_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : immunoClust complete\n")
 
-res_random_starts_kmeans <- bplapply(data, random_starts_kmeans, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_random_starts_kmeans <- bplapply(data, run_kmeans_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : kmeans complete\n")
 
-res_random_starts_SamSPECTRAL <- bplapply(data, random_starts_SamSPECTRAL, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
+res_random_starts_SamSPECTRAL <- bplapply(data, run_SamSPECTRAL_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : SamSPECTRAL complete\n")
 
 
@@ -89,7 +97,7 @@ cat("stability analysis (random starts) : SamSPECTRAL complete\n")
 # run methods multiple times in series (parallelization not possible)
 
 set.seed(seed)
-res_random_starts_FLOCK <- lapply(data, random_starts_FLOCK)
+res_random_starts_FLOCK <- lapply(data, run_FLOCK_stability)
 cat("stability analysis (random starts) : FLOCK complete\n")
 
 

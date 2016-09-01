@@ -1,19 +1,23 @@
 #########################################################################################
 # Stability analysis (multiple random starts):
-# Function to run and evaluate flowMeans once for each data set
+# Function to run and evaluate Rclusterpp once for each data set
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
-random_starts_flowMeans <- function(data) {
+run_Rclusterpp_stability <- function(data) {
   
   # parameters
   
-  # number of clusters k
+  n_cores <- 8
+  
   k <- list(
-    Levine_32dim = 40, 
-    Mosmann_rare = 40
+    Levine_32dim = 40
+  )
+  
+  method <- list(
+    Levine_32dim = "ward"
   )
   
   # run once for each data set
@@ -23,7 +27,8 @@ random_starts_flowMeans <- function(data) {
   names(out) <- names(data)
   
   for (i in 1:length(out)) {
-    out[[i]] <- flowMeans(data[[i]], Standardize = FALSE, NumC = k[[i]])
+    Rclusterpp.setThreads(n_cores)
+    out[[i]] <- Rclusterpp.hclust(data[[i]], method = method[[i]])
   }
   
   # extract cluster labels
@@ -31,7 +36,8 @@ random_starts_flowMeans <- function(data) {
   names(clus) <- names(data)
   
   for (i in 1:length(clus)) {
-    clus[[i]] <- out[[i]]@Label
+    # cut dendrogram at k
+    clus[[i]] <- cutree(out[[i]], k = k[[i]])
   }
   
   # calculate mean F1 scores / F1 scores

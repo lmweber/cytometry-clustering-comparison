@@ -1,17 +1,20 @@
 #########################################################################################
 # Stability analysis (multiple random starts):
-# Function to run and evaluate flowPeaks once for each data set
+# Function to run and evaluate FlowSOM_pre once for each data set
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
-random_starts_flowPeaks <- function(data) {
+run_FlowSOM_pre_stability <- function(data) {
   
   # parameters
   
-  # tolerance
-  tol <- 0.0001
+  # grid sizes
+  grid_size <- list(
+    Levine_32dim = 10, 
+    Mosmann_rare = 20
+  )
   
   # run once for each data set
   # note: don't set any random seeds, since we want a different random seed each time
@@ -20,7 +23,14 @@ random_starts_flowPeaks <- function(data) {
   names(out) <- names(data)
   
   for (i in 1:length(out)) {
-    out[[i]] <- flowPeaks(data[[i]], tol = tol)
+    data_i <- flowCore::flowFrame(data[[i]])  ## input data must be flowFrame
+    fSOM <- FlowSOM::ReadInput(data_i, transform = FALSE, scale = FALSE)
+    fSOM <- FlowSOM::BuildSOM(fSOM, 
+                              colsToUse = NULL,  ## use all columns since already subsetted
+                              xdim = grid_size[[i]], 
+                              ydim = grid_size[[i]])
+    #fSOM <- FlowSOM::BuildMST(fSOM)  ## not required
+    out[[i]] <- fSOM
   }
   
   # extract cluster labels
@@ -28,7 +38,7 @@ random_starts_flowPeaks <- function(data) {
   names(clus) <- names(data)
   
   for (i in 1:length(clus)) {
-    clus[[i]] <- out[[i]][["peaks.cluster"]]
+    clus[[i]] <- out[[i]]$map$mapping[, 1]
   }
   
   # calculate mean F1 scores / F1 scores

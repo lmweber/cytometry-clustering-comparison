@@ -1,24 +1,17 @@
 #########################################################################################
 # Stability analysis (multiple random starts):
-# Function to run and evaluate Rclusterpp once for each data set
+# Function to run and evaluate flowPeaks once for each data set
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
-random_starts_Rclusterpp <- function(data) {
+run_flowPeaks_stability <- function(data) {
   
   # parameters
   
-  n_cores <- 8
-  
-  k <- list(
-    Levine_32dim = 40
-  )
-  
-  method <- list(
-    Levine_32dim = "ward"
-  )
+  # tolerance
+  tol <- 0.0001
   
   # run once for each data set
   # note: don't set any random seeds, since we want a different random seed each time
@@ -27,8 +20,7 @@ random_starts_Rclusterpp <- function(data) {
   names(out) <- names(data)
   
   for (i in 1:length(out)) {
-    Rclusterpp.setThreads(n_cores)
-    out[[i]] <- Rclusterpp.hclust(data[[i]], method = method[[i]])
+    out[[i]] <- flowPeaks(data[[i]], tol = tol)
   }
   
   # extract cluster labels
@@ -36,8 +28,7 @@ random_starts_Rclusterpp <- function(data) {
   names(clus) <- names(data)
   
   for (i in 1:length(clus)) {
-    # cut dendrogram at k
-    clus[[i]] <- cutree(out[[i]], k = k[[i]])
+    clus[[i]] <- out[[i]][["peaks.cluster"]]
   }
   
   # calculate mean F1 scores / F1 scores

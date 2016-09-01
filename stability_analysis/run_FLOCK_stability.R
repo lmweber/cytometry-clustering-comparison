@@ -1,22 +1,36 @@
 #########################################################################################
 # Stability analysis (multiple random starts):
-# Function to run and evaluate immunoClust once for each data set
+# Function to run and evaluate FLOCK once for each data set
 #
 # Lukas Weber, September 2016
 #########################################################################################
 
 
-random_starts_immunoClust <- function(data) {
+# note: cannot parallelize FLOCK, since it needs to read and write from files in the
+# FLOCK program directory
+
+
+run_FLOCK_stability <- function(data) {
   
-  # run once for each data set
-  # note: don't set any random seeds, since we want a different random seed each time
+  # run from FLOCK program directory
+  CURRENT_DIR <- getwd()
+  setwd("../../../algorithms/FLOCK")
   
   out <- vector("list", length(data))
   names(out) <- names(data)
   
-  for (i in 1:length(out)) {
-    data_i <- flowCore::flowFrame(data[[i]])  ## input data must be flowFrame
-    out[[i]] <- immunoClust::cell.process(data_i, classify.all = TRUE)
+  # run once for each data set
+  
+  for (i in 1:length(data)) {
+    # save external data file
+    write.table(data[[i]], file = "FLOCK_data_file.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+    
+    # run FLOCK
+    cmd <- "./flock2 ./FLOCK_data_file.txt"
+    system(cmd)
+    
+    # read results from external results file
+    out[[i]] <- read.table("flock_results.txt", header = TRUE, sep = "\t")
   }
   
   # extract cluster labels
@@ -24,7 +38,7 @@ random_starts_immunoClust <- function(data) {
   names(clus) <- names(data)
   
   for (i in 1:length(clus)) {
-    clus[[i]] <- out[[i]]@label
+    clus[[i]] <- out[[i]][, "Population"]
   }
   
   # calculate mean F1 scores / F1 scores
@@ -39,6 +53,9 @@ random_starts_immunoClust <- function(data) {
       res[[i]] <- helper_match_evaluate_single(clus[[i]], clus_truth[[i]])
     }
   }
+  
+  # reset working directory
+  setwd(CURRENT_DIR)
   
   return(res)
 }

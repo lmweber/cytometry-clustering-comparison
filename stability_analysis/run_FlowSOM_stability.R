@@ -2,11 +2,11 @@
 # Stability analysis (multiple random starts):
 # Function to run and evaluate FlowSOM once for each data set
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
-random_starts_FlowSOM <- function(data) {
+run_FlowSOM_stability <- function(data) {
   
   # parameters
   

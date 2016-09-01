@@ -2,7 +2,7 @@
 # Stability analysis (multiple random starts):
 # Function to run and evaluate PhenoGraph once for each data set
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
@@ -13,7 +13,7 @@
 # scripts.
 
 
-random_starts_PhenoGraph <- function(data) {
+run_PhenoGraph_stability <- function(data) {
   
   py_scripts_PhenoGraph <- list(
     Levine_32dim = "run_PhenoGraph_Levine_32dim.py", 
