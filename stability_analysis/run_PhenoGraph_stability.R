@@ -1,5 +1,5 @@
 #########################################################################################
-# Stability analysis (multiple random starts):
+# Stability analysis:
 # Function to run and evaluate PhenoGraph once for each data set
 #
 # Lukas Weber, September 2016

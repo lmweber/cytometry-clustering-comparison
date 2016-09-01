@@ -1,5 +1,5 @@
 #########################################################################################
-# Stability analysis (multiple random starts):
+# Stability analysis:
 # Function to run and evaluate k-means once for each data set
 #
 # Lukas Weber, September 2016
@@ -18,9 +18,26 @@ run_kmeans_stability <- function(data) {
   
   iter.max <- 50  ## some random seeds require more iterations
   
+  # extract true population labels
+  clus_truth <- vector("list", length(data))
+  names(clus_truth) <- names(data)
+  
+  for (i in 1:length(clus_truth)) {
+    clus_truth[[i]] <- data[[i]][, "label"]
+  }
+  
+  # subset data: protein marker columns only
+  marker_cols <- list(
+    Levine_32dim = 5:36, 
+    Mosmann_rare = c(7:9, 11:21)
+  )
+  
+  for (i in 1:length(data)) {
+    data[[i]] <- data[[i]][, marker_cols[[i]]]
+  }
+  
   # run once for each data set
   # note: don't set any random seeds, since we want a different random seed each time
-  
   out <- vector("list", length(data))
   names(out) <- names(data)
   

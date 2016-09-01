@@ -2,7 +2,7 @@
 # Stability analysis:
 # R script to load data
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
@@ -38,6 +38,23 @@ for (i in 1:length(data)) {
 
 sapply(data, dim)
 sapply(data_notransform, dim)
+
+
+
+
+
+
+# extract true population labels
+
+clus_truth <- vector("list", length(data))
+names(clus_truth) <- names(data)
+
+for (i in 1:length(clus_truth)) {
+  clus_truth[[i]] <- data[[i]][, "label"]
+}
+
+sapply(clus_truth, length)
+sapply(clus_truth, table)
 
 
 # subset data: protein marker columns only
