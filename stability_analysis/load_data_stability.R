@@ -1,6 +1,5 @@
 #########################################################################################
-# Stability analysis:
-# R script to load data
+# Stability analysis: R script to load data
 #
 # Lukas Weber, September 2016
 #########################################################################################
@@ -34,41 +33,6 @@ names(data) <- names(data_notransform) <- names(files)
 for (i in 1:length(data)) {
   data[[i]] <- flowCore::exprs(flowCore::read.FCS(files[[i]], transformation = FALSE, truncate_max_range = FALSE))
   data_notransform[[i]] <- flowCore::exprs(flowCore::read.FCS(files_notransform[[i]], transformation = FALSE, truncate_max_range = FALSE))
-}
-
-sapply(data, dim)
-sapply(data_notransform, dim)
-
-
-
-
-
-
-# extract true population labels
-
-clus_truth <- vector("list", length(data))
-names(clus_truth) <- names(data)
-
-for (i in 1:length(clus_truth)) {
-  clus_truth[[i]] <- data[[i]][, "label"]
-}
-
-sapply(clus_truth, length)
-sapply(clus_truth, table)
-
-
-# subset data: protein marker columns only
-
-marker_cols <- list(
-  Levine_32dim = 5:36, 
-  Mosmann_rare = c(7:9, 11:21)
-)
-
-sapply(marker_cols, length)
-
-for (i in 1:length(data)) {
-  data[[i]] <- data[[i]][, marker_cols[[i]]]
-  data_notransform[[i]] <- data_notransform[[i]][, marker_cols[[i]]]
 }
 
 sapply(data, dim)

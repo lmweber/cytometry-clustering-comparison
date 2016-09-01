@@ -23,7 +23,6 @@ source("../helpers/helper_match_evaluate_single.R")
 
 # load data and true population labels
 source("load_data_stability.R")
-source("load_true_labels_stability.R")
 
 # functions to run and evaluate methods
 source("run_FLOCK_stability.R")

@@ -23,7 +23,6 @@ source("../helpers/helper_match_evaluate_single.R")
 
 # load data and true population labels
 source("load_data_stability.R")
-source("load_true_labels_stability.R")
 
 # functions to run and evaluate methods
 source("run_FLOCK_stability.R")
@@ -39,7 +38,7 @@ source("run_SamSPECTRAL_stability.R")
 RESULTS_DIR <- "../../results_stability_bootstrap"
 
 # number of times to run each method
-n <- 30
+n <- 5
 
 
 
@@ -51,7 +50,7 @@ n <- 30
 # replicate data n times (bootstrap resamples)
 
 fn_bootstrap <- function(d) {
-  d <- d[sample(1:nrow(d), nrow(d), replace = TRUE), ]
+  d[sample(1:nrow(d), nrow(d), replace = TRUE), ]
 }
 
 set.seed(123)
