@@ -39,7 +39,7 @@ source("run_SamSPECTRAL_stability.R")
 RESULTS_DIR <- "../../results_stability_bootstrap"
 
 # number of times to run each method
-n <- 5
+n <- 30
 
 
 
