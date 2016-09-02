@@ -9,7 +9,6 @@
 library(flowCore)
 library(pheatmap)
 library(RColorBrewer)
-library(ggplot2)
 
 # load main results (from main plots file)
 load("main_results.RData")
@@ -62,7 +61,7 @@ for (i in 1:length(data)) {
     data[[i]] <- data_main_Levine_32dim
     
   } else if (names(data)[i] %in% special_sub) {
-    # method with subsampling: re-generate original subsampled data, using same random
+    # methods with subsampling: re-generate original subsampled data, using same random
     # seed from run scripts
     set.seed(123)
     ix <- sample(1:nrow(data_main_Levine_32dim), n_sub[[names(data)[i]]])
@@ -145,7 +144,7 @@ clus_truth <- list(
   Xshift = clus_truth_Xshift
 )
 
-# select Levine_32dim
+# select Levine_32dim; remove missing methods for Levine_32dim
 clus_truth_Levine_32dim <- lapply(clus_truth, function(cl) cl[[1]])
 clus_truth_Levine_32dim <- clus_truth_Levine_32dim[!ix_remove_Levine_32dim]
 
