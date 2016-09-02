@@ -1,28 +1,21 @@
 #########################################################################################
-# R script to generate plots comparing median expression values of detected clusters and 
-# manually gated populations (heatmaps, MDS plots, t-SNE plots)
+# R script to generate plots of cluster medians (comparing median expression between
+# detected clusters and manually gated populations)
 #
-# Lukas M. Weber, March 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
+library(flowCore)
 library(pheatmap)
 library(RColorBrewer)
-library(Rtsne)
 library(ggplot2)
 
-# helper function
-source("helper_calculate_cluster_medians.R")
+# load main results (from main plots file)
+load("main_results.RData")
 
-# load results from previous steps
-source("load_results_ACCENSE.R")
-source("load_results_DensVM.R")
-source("load_results_FLOCK.R")
-source("load_results_PhenoGraph.R")
-source("load_results_Rclusterpp.R")
-source("load_results_SWIFT.R")
-source("load_results_truth.R")
-source("load_results_all_other_methods.R")
+# helper function
+source("../helpers/helper_cluster_medians.R")
 
 
 
@@ -31,236 +24,227 @@ source("load_results_all_other_methods.R")
 ### PREPARE DATA ###
 ####################
 
-# only for data sets with multiple populations of interest (Levine_2015_marrow_32, Levine_2015_marrow_13)
+# only for data set Levine_32dim
 
 
-# create data frames containing expression columns only
+# note: ACCENSE, ClusterX, DensVM, flowClust, flowMerge, immunoClust, SWIFT -- these
+# methods need special treatment due to subsampling or non-FCS file formats
 
-marker_cols_Levine_32 <- 5:36
-marker_cols_Levine_13 <- 1:13
-
-data_medians_Levine_32 <- data_truth_Levine_32[, marker_cols_Levine_32]
-data_medians_Levine_13 <- data_truth_Levine_13[, marker_cols_Levine_13]
+method_names <- names(res_all)
+special <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMerge", "immunoClust", "SWIFT")
 
 
-# lists of cluster labels
+# load main data file (for methods with standard treatment)
 
-clus_Levine_32 <- list(ACCENSE = clus_ACCENSE_Levine_32, 
-                       DensVM = clus_DensVM_Levine_32, 
-                       FLOCK = clus_FLOCK_Levine_32, 
-                       flowMeans = clus_flowMeans_Levine_32, 
-                       FlowSOM = clus_FlowSOM_Levine_32, 
-                       FlowSOM_meta = clus_FlowSOM_meta_Levine_32, 
-                       immunoClust = clus_immunoClust_Levine_32, 
-                       immunoClust_all = clus_immunoClust_all_Levine_32, 
-                       kmeans = clus_kmeans_Levine_32, 
-                       PhenoGraph = clus_PhenoGraph_Levine_32, 
-                       Rclusterpp = clus_Rclusterpp_Levine_32, 
-                       SamSPECTRAL = clus_SamSPECTRAL_Levine_32, 
-                       SWIFT = clus_SWIFT_Levine_32)
-
-clus_Levine_13 <- list(ACCENSE = clus_ACCENSE_Levine_13, 
-                       DensVM = clus_DensVM_Levine_13, 
-                       FLOCK = clus_FLOCK_Levine_13, 
-                       flowMeans = clus_flowMeans_Levine_13, 
-                       FlowSOM = clus_FlowSOM_Levine_13, 
-                       FlowSOM_meta = clus_FlowSOM_meta_Levine_13, 
-                       immunoClust = clus_immunoClust_Levine_13, 
-                       immunoClust_all = clus_immunoClust_all_Levine_13, 
-                       kmeans = clus_kmeans_Levine_13, 
-                       PhenoGraph = clus_PhenoGraph_Levine_13, 
-                       Rclusterpp = clus_Rclusterpp_Levine_13, 
-                       SamSPECTRAL = clus_SamSPECTRAL_Levine_13, 
-                       SWIFT = clus_SWIFT_Levine_13)
+file_main_Levine_32dim <- "../../../benchmark_data_sets/Levine_32dim/data/Levine_32dim.fcs"
+marker_cols_Levine_32dim <- 5:36
+data_standard_nonsub <- flowCore::exprs(flowCore::read.FCS(file_main_Levine_32dim, transformation = FALSE, truncate_max_range = FALSE))
+data_standard <- data_standard_nonsub[, marker_cols_Levine_32dim]
 
 
-n_methods_Levine_32 <- length(clus_Levine_32)
-n_methods_Levine_13 <- length(clus_Levine_13)
+# load data for each method (subsampled data for those methods with subsampling)
+
+data <- vector("list", length(method_names))
+names(data) <- method_names
+
+for (i in 1:length(data)) {
+  if (!(names(data)[i] %in% special)) {
+    data[[i]] <- data_standard
+    
+  } else if (names(data)[i] == "ACCENSE") {
+    # ACCENSE: load data from output file
+    output_file_i <- "../../results_auto/ACCENSE/accense_output_Levine_32dim.csv"
+    data[[i]] <- read.csv(output_file_i, stringsAsFactors = FALSE)
+    # note different column indices
+    marker_cols_ACCENSE <- 6:37
+    data[[i]] <- data[[i]][, marker_cols_ACCENSE]
+    # require as matrix
+    data[[i]] <- as.matrix(data[[i]])
+    
+  } else if (names(data)[i] == "SWIFT") {
+    # SWIFT: load data from output file
+    output_file_i <- "../../results_auto/SWIFT/Levine_32dim_notransform_subsampled.fcs"
+    data[[i]] <- flowCore::exprs(flowCore::read.FCS(output_file_i, transformation = FALSE, truncate_max_range = FALSE))
+    data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
+    
+  } else if (names(data)[i] == "ClusterX") {
+    # ClusterX: re-generate original subsampled data (using same random seed from run
+    # script; start with non-subsampled)
+    n_sub <- 100000
+    data[[i]] <- data_standard_nonsub
+    set.seed(123)
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
+    
+  } else if (names(data)[i] == "DensVM") {
+    # DensVM: re-generate original subsampled data (using same random seed from run
+    # script; start with non-subsampled)
+    n_sub <- 100000
+    data[[i]] <- data_standard_nonsub
+    set.seed(123)
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
+    
+  } else if (names(data)[i] == "flowClust") {
+    # flowClust: re-generate original subsampled data (using same random seed from run
+    # script; start with non-subsampled)
+    n_sub <- 10000  ## note: 10k not 100k
+    data[[i]] <- data_standard_nonsub
+    set.seed(123)
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
+    
+  } else if (names(data)[i] == "flowMerge") {
+    # flowMerge: re-generate original subsampled data (using same random seed from run
+    # script; start with non-subsampled)
+    n_sub <- 10000  ## note: 10k not 100k
+    data[[i]] <- data_standard_nonsub
+    set.seed(123)
+    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+    data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
+    
+  } else if (names(data)[i] == "immunoClust") {
+    # immunoClust: re-generate original subsampled data (using random seed from run script)
+    n_sub <- 100000
+    set.seed(123)
+    ix <- sample(1:nrow(data_standard_nonsub), n_sub)
+    data[[i]] <- data_standard[ix, ]
+  }
+}
+
+# remove missing methods for Levine_32dim
+ix_remove_Levine_32dim <- names(data) %in% c("flowClust", "flowMerge", "SPADE")
+data_Levine_32dim <- data[!ix_remove_Levine_32dim]
+
+
+# cluster labels (previously loaded)
+
+clus_methods <- list(
+  ACCENSE = clus_ACCENSE, 
+  ClusterX = clus_ClusterX, 
+  DensVM = clus_DensVM, 
+  FLOCK = clus_FLOCK, 
+  flowClust = clus_flowClust, 
+  flowMeans = clus_flowMeans, 
+  flowMerge = clus_flowMerge, 
+  flowPeaks = clus_flowPeaks, 
+  FlowSOM = clus_FlowSOM, 
+  FlowSOM_pre = clus_FlowSOM_pre, 
+  immunoClust = clus_immunoClust, 
+  kmeans = clus_kmeans, 
+  PhenoGraph = clus_PhenoGraph, 
+  Rclusterpp = clus_Rclusterpp, 
+  SamSPECTRAL = clus_SamSPECTRAL, 
+  SPADE = clus_SPADE, 
+  SWIFT = clus_SWIFT, 
+  Xshift = clus_Xshift
+)
+
+# collapse list and remove missing methods for Levine_32dim
+clus_methods_Levine_32dim <- lapply(clus_methods, function(cl) cl[[1]])
+clus_methods_Levine_32dim <- clus_methods_Levine_32dim[!ix_remove_Levine_32dim]
+
+
+# true population labels; taking subsampling into account (previously loaded)
+
+clus_truth <- list(
+  ACCENSE = clus_truth_ACCENSE, 
+  ClusterX = clus_truth_ClusterX, 
+  DensVM = clus_truth_DensVM, 
+  FLOCK = clus_truth_FLOCK, 
+  flowClust = clus_truth_flowClust, 
+  flowMeans = clus_truth_flowMeans, 
+  flowMerge = clus_truth_flowMerge, 
+  flowPeaks = clus_truth_flowPeaks, 
+  FlowSOM = clus_truth_FlowSOM, 
+  FlowSOM_truth_pre = clus_truth_FlowSOM_pre, 
+  immunoClust = clus_truth_immunoClust, 
+  kmeans = clus_truth_kmeans, 
+  PhenoGraph = clus_truth_PhenoGraph, 
+  Rclusterpp = clus_truth_Rclusterpp, 
+  SamSPECTRAL = clus_truth_SamSPECTRAL, 
+  SPADE = clus_truth_SPADE, 
+  SWIFT = clus_truth_SWIFT, 
+  Xshift = clus_truth_Xshift
+)
+
+# collapse list
+clus_truth_Levine_32dim <- lapply(clus_truth, function(cl) cl[[1]])
 
 
 
 
-#######################################
-### HEATMAPS: TRUE POPULATIONS ONLY ###
-#######################################
+##################################
+### HEATMAPS: TRUE POPULATIONS ###
+##################################
+
+# heatmaps showing true populations only
 
 # calculate cluster medians
-# note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
+# note values are already arcsinh-transformed, and each dimension will be scaled to min = 0, max = 1
 
-medians_truth_Levine_32 <- helper_calculate_cluster_medians(data_medians_Levine_32, clus_truth_Levine_32)
-medians_truth_Levine_13 <- helper_calculate_cluster_medians(data_medians_Levine_13, clus_truth_Levine_13)
+# true data and population labels: can select from any method without subsampling, e.g. k-means
+data_truth_Levine_32dim <- data_Levine_32dim[["kmeans"]]
+clus_truth_Levine_32dim <- clus_truth_Levine_32dim[["kmeans"]]
 
-rownames(medians_truth_Levine_32) <- paste0("manually_gated_", rownames(medians_truth_Levine_32))
-rownames(medians_truth_Levine_13) <- paste0("manually_gated_", rownames(medians_truth_Levine_13))
+medians_truth_Levine_32dim <- helper_cluster_medians(data_truth_Levine_32dim, clus_truth_Levine_32dim)
+
+rownames(medians_truth_Levine_32dim) <- paste0("manually_gated_", rownames(medians_truth_Levine_32dim))
 
 
 # plot heatmaps
 
+filename <- paste0("../../plots/Levine_32dim/cluster_medians/cluster_medians_heatmap_truth_Levine_32dim.pdf")
+
 set.seed(123)
-pheatmap(medians_truth_Levine_32, 
+pheatmap(medians_truth_Levine_32dim, 
          color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
          cluster_rows = TRUE, 
          cluster_cols = TRUE, 
          clustering_method = "average", 
          fontsize = 9, 
-         filename = "../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_heatmap_truth_Levine2015marrow32.pdf", 
+         filename = filename, 
          width = 8, 
          height = 3.5)
 
-set.seed(123)
-pheatmap(medians_truth_Levine_13, 
-         color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
-         cluster_rows = TRUE, 
-         cluster_cols = TRUE, 
-         clustering_method = "average", 
-         fontsize = 9, 
-         filename = "../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_heatmap_truth_Levine2015marrow13.pdf", 
-         width = 4.75, 
-         height = 5)
-
 
 
 
 ###############################################
-### HEATMAPS: EACH METHOD COMPARED TO TRUTH ###
+### HEATMAPS: CLUSTERS VS. TRUE POPULATIONS ###
 ###############################################
 
-medians_Levine_32 <- vector("list", 13)
-medians_Levine_13 <- vector("list", 13)
+# heatmaps showing clusters detected by each method vs. true populations
 
+medians_Levine_32dim <- vector("list", length(data_Levine_32dim))
+names(medians_Levine_32dim) <- names(data_Levine_32dim)
 
-
-### calculate cluster medians for ACCENSE
-
-# note ACCENSE used subsampling, so need to use data matrix with subsampled points only
-
-marker_cols_ACCENSE_Levine_32 <- 6:37
-marker_cols_ACCENSE_Levine_13 <- 2:14
-
-data_medians_ACCENSE_Levine_32 <- data_ACCENSE_Levine_32[, marker_cols_ACCENSE_Levine_32]
-data_medians_ACCENSE_Levine_13 <- data_ACCENSE_Levine_13[, marker_cols_ACCENSE_Levine_13]
-
-# calculate cluster medians
-# note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
-
-medians_ACCENSE_Levine_32 <- helper_calculate_cluster_medians(data_medians_ACCENSE_Levine_32, clus_ACCENSE_Levine_32)
-medians_ACCENSE_Levine_13 <- helper_calculate_cluster_medians(data_medians_ACCENSE_Levine_13, clus_ACCENSE_Levine_13)
-
-rownames(medians_ACCENSE_Levine_32) <- paste0("ACCENSE_", rownames(medians_ACCENSE_Levine_32))
-rownames(medians_ACCENSE_Levine_13) <- paste0("ACCENSE_", rownames(medians_ACCENSE_Levine_13))
-
-medians_Levine_32[[1]] <- medians_ACCENSE_Levine_32
-medians_Levine_13[[1]] <- medians_ACCENSE_Levine_13
-
-
-
-### calculate cluster medians for DensVM
-
-# note DensVM used subsampling, so need to use data matrix with subsampled points only
-
-file_DensVM_Levine_32_sub <- file.path(RES_DIR_DENSVM, "DensVM/Levine_2015_marrow_32/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_32_notransform.fcs")
-file_DensVM_Levine_13_sub <- file.path(RES_DIR_DENSVM, "DensVM/Levine_2015_marrow_13/cytofkit_analysis_analyzedFCS/Levine_2015_marrow_13_notransform.fcs")
-
-data_medians_DensVM_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_DensVM_Levine_32_sub, transformation = FALSE))
-data_medians_DensVM_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_DensVM_Levine_13_sub, transformation = FALSE))
-
-marker_cols_DensVM_Levine_32 <- 5:36
-marker_cols_DensVM_Levine_13 <- 1:13
-
-data_medians_DensVM_Levine_32 <- data_medians_DensVM_Levine_32[, marker_cols_DensVM_Levine_32]
-data_medians_DensVM_Levine_13 <- data_medians_DensVM_Levine_13[, marker_cols_DensVM_Levine_13]
-
-# calculate cluster medians
-# note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
-
-medians_DensVM_Levine_32 <- helper_calculate_cluster_medians(data_medians_DensVM_Levine_32, clus_DensVM_Levine_32)
-medians_DensVM_Levine_13 <- helper_calculate_cluster_medians(data_medians_DensVM_Levine_13, clus_DensVM_Levine_13)
-
-rownames(medians_DensVM_Levine_32) <- paste0("DensVM_", rownames(medians_DensVM_Levine_32))
-rownames(medians_DensVM_Levine_13) <- paste0("DensVM_", rownames(medians_DensVM_Levine_13))
-
-medians_Levine_32[[2]] <- medians_DensVM_Levine_32
-medians_Levine_13[[2]] <- medians_DensVM_Levine_13
-
-
-
-### calculate cluster medians for Rclusterpp
-
-# note Rclusterpp used subsampling, so need to use data matrix with subsampled points only
-
-file_Rclusterpp_Levine_32_sub <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Levine_2015_marrow_32_sub.fcs")
-file_Rclusterpp_Levine_13_sub <- file.path(RES_DIR_RCLUSTERPP, "Rclusterpp/Levine_2015_marrow_13_sub.fcs")
-
-data_medians_Rclusterpp_Levine_32 <- flowCore::exprs(flowCore::read.FCS(file_Rclusterpp_Levine_32_sub, transformation = FALSE))
-data_medians_Rclusterpp_Levine_13 <- flowCore::exprs(flowCore::read.FCS(file_Rclusterpp_Levine_13_sub, transformation = FALSE))
-
-marker_cols_Rclusterpp_Levine_32 <- 5:36
-marker_cols_Rclusterpp_Levine_13 <- 1:13
-
-data_medians_Rclusterpp_Levine_32 <- data_medians_Rclusterpp_Levine_32[, marker_cols_Rclusterpp_Levine_32]
-data_medians_Rclusterpp_Levine_13 <- data_medians_Rclusterpp_Levine_13[, marker_cols_Rclusterpp_Levine_13]
-
-# calculate cluster medians
-# note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
-
-medians_Rclusterpp_Levine_32 <- helper_calculate_cluster_medians(data_medians_Rclusterpp_Levine_32, clus_Rclusterpp_Levine_32)
-medians_Rclusterpp_Levine_13 <- helper_calculate_cluster_medians(data_medians_Rclusterpp_Levine_13, clus_Rclusterpp_Levine_13)
-
-rownames(medians_Rclusterpp_Levine_32) <- paste0("Rclusterpp_", rownames(medians_Rclusterpp_Levine_32))
-rownames(medians_Rclusterpp_Levine_13) <- paste0("Rclusterpp_", rownames(medians_Rclusterpp_Levine_13))
-
-medians_Levine_32[[11]] <- medians_Rclusterpp_Levine_32
-medians_Levine_13[[11]] <- medians_Rclusterpp_Levine_13
-
-
-
-### calculate cluster medians for all other methods
-
-for (i in c(3:10, 12:13)) {
-  # calculate cluster medians
-  # note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
-  medians_i <- helper_calculate_cluster_medians(data_medians_Levine_32, clus_Levine_32[[i]])
-  rownames(medians_i) <- paste0(names(clus_Levine_32)[i], "_", rownames(medians_i))
-  medians_Levine_32[[i]] <- medians_i
+for (i in 1:length(medians_Levine_32dim)) {
+  medians_i <- helper_cluster_medians(data_Levine_32dim[[i]], clus_methods_Levine_32dim[[i]])
+  rownames(medians_i) <- paste0(names(clus_methods_Levine_32dim)[i], "_", rownames(medians_i))
+  medians_Levine_32dim[[i]] <- medians_i
 }
 
-for (i in c(3:10, 12:13)) {
-  # calculate cluster medians
-  # note values are already asinh transformed, and each dimension will be scaled to min = 0, max = 1
-  medians_i <- helper_calculate_cluster_medians(data_medians_Levine_13, clus_Levine_13[[i]])
-  rownames(medians_i) <- paste0(names(clus_Levine_13)[i], "_", rownames(medians_i))
-  medians_Levine_13[[i]] <- medians_i
-}
 
-# method names
+# plot heatmaps
 
-names(medians_Levine_32) <- names(clus_Levine_32)
-names(medians_Levine_13) <- names(clus_Levine_13)
+plot_heights_Levine_32dim <- c(9, 9, 5.5, 8.5, 9.5, 6, 9.5, 14, 14, 9.5, 8.5, 9.5, 7, 14, 10)
+fontsize_row_Levine_32dim <- c(8, 8, 8, 8, 8, 7, 8, 5, 5, 8, 8, 8, 8, 1, 8)
 
-
-
-### generate plots
-
-# plot each method together with manually gated clusters
-
-plot_heights_Levine_32 <- c(9, 5.5, 8.5, 9.5, 14, 9.5, 14, 14, 9.5, 8.5, 9.5, 7, 14)
-plot_heights_Levine_13 <- c(13, 7.5, 9.5, 13, 14, 13, 14, 14, 13, 10.5, 13, 8, 14)
-
-fontsize_row_Levine_32 <- c(8, 8, 8, 8, 7, 8, 5, 5, 8, 8, 8, 8, 1)
-fontsize_row_Levine_13 <- c(8, 8, 8, 8, 6, 8, 5, 5, 8, 8, 8, 8, 2)
-
-
-for (i in 1:n_methods_Levine_32) {
+for (i in 1:length(medians_Levine_32dim)) {
   
-  data_heatmap <- rbind(medians_truth_Levine_32, medians_Levine_32[[i]])
+  data_heatmap <- rbind(medians_truth_Levine_32dim, medians_Levine_32dim[[i]])
   
-  annot_row <- data.frame(method = rep(c("manually_gated", names(medians_Levine_32)[i]), 
-                                       times = c(nrow(medians_truth_Levine_32), nrow(medians_Levine_32[[i]]))))
+  annot_row <- data.frame(method = rep(c("manually_gated", names(medians_Levine_32dim)[i]), 
+                                       times = c(nrow(medians_truth_Levine_32dim), nrow(medians_Levine_32dim[[i]]))))
   rownames(annot_row) <- rownames(data_heatmap)
   
   annot_colors <- c("red", "blue")
-  names(annot_colors) <- c("manually_gated", names(medians_Levine_32)[i])
+  names(annot_colors) <- c("manually_gated", names(medians_Levine_32dim)[i])
   annot_colors <- list(method = annot_colors)
+  
+  filename <- paste0("../../plots/Levine_32dim/cluster_medians/cluster_medians_heatmap_", 
+                     names(medians_Levine_32dim)[i], "_Levine32dim.pdf")
   
   set.seed(123)
   pheatmap(data_heatmap, 
@@ -271,232 +255,10 @@ for (i in 1:n_methods_Levine_32) {
            annotation_row = annot_row, 
            annotation_colors = annot_colors, 
            fontsize = 9, 
-           fontsize_row = fontsize_row_Levine_32[i], 
-           filename = paste0("../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_heatmap_", 
-                             names(medians_Levine_32)[i], 
-                             "_Levine2015marrow32.pdf"), 
+           fontsize_row = fontsize_row_Levine_32dim[i], 
+           filename = filename, 
            width = 9.5, 
-           height = plot_heights_Levine_32[i])
-}
-
-
-for (i in 1:n_methods_Levine_13) {
-  
-  data_heatmap <- rbind(medians_truth_Levine_13, medians_Levine_13[[i]])
-  
-  annot_row <- data.frame(method = rep(c("manually_gated", names(medians_Levine_13)[i]), 
-                                       times = c(nrow(medians_truth_Levine_13), nrow(medians_Levine_13[[i]]))))
-  rownames(annot_row) <- rownames(data_heatmap)
-  
-  annot_colors <- c("red", "blue")
-  names(annot_colors) <- c("manually_gated", names(medians_Levine_13)[i])
-  annot_colors <- list(method = annot_colors)
-  
-  set.seed(123)
-  pheatmap(data_heatmap, 
-           color = colorRampPalette(brewer.pal(9, "YlGn"))(100), 
-           cluster_rows = TRUE, 
-           cluster_cols = TRUE, 
-           clustering_method = "average", 
-           annotation_row = annot_row, 
-           annotation_colors = annot_colors, 
-           fontsize = 9, 
-           fontsize_row = fontsize_row_Levine_13[i], 
-           filename = paste0("../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_heatmap_", 
-                             names(medians_Levine_13)[i], 
-                             "_Levine2015marrow13.pdf"), 
-           width = 6.5, 
-           height = plot_heights_Levine_13[i])
-}
-
-
-
-
-#############################################
-### MULTI-DIMENSIONAL SCALING (MDS) PLOTS ###
-#############################################
-
-
-for (i in 1:n_methods_Levine_32) {
-  
-  data_mds <- rbind(medians_truth_Levine_32, medians_Levine_32[[i]])
-  
-  # calculate distance matrix (euclidean distance)
-  d <- dist(data_mds)
-  
-  # calculate MDS
-  fit_mds <- cmdscale(d, k = 2)
-  
-  # plot
-  plot_data <- as.data.frame(fit_mds)
-  colnames(plot_data) <- c("x", "y")
-  plot_data$num <- as.character(c(1:nrow(medians_truth_Levine_32), 1:nrow(medians_Levine_32[[i]])))
-  plot_data$method <- rep(c("manually_gated", names(medians_Levine_32)[i]), 
-                          times = c(nrow(medians_truth_Levine_32), nrow(medians_Levine_32[[i]])), 
-                          levels = c("manually_gated", names(medians_Levine_32)[i]))
-  filename_i = paste0("../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_MDS_", 
-                      names(medians_Levine_32)[i], 
-                      "_Levine2015marrow32.pdf")
-  
-  plot_i <- 
-    ggplot(plot_data, aes(x = x, y = y, label = num, color = method)) + 
-    geom_point(alpha = 0) + 
-    geom_text(size = 3, show.legend = FALSE) + 
-    scale_color_manual(values = c("blue", "red")) + 
-    ggtitle(paste0("MDS plot: ", names(medians_Levine_32)[i], ", Levine_2015_marrow_32")) + 
-    xlab("MDS coordinate 1") + 
-    ylab("MDS coordinate 2") + 
-    theme_bw() + 
-    theme(plot.title = element_text(size = 12), 
-          legend.position = "bottom", 
-          legend.direction = "horizontal", 
-          legend.key = element_blank(), 
-          legend.title = element_blank()) + 
-    guides(color = guide_legend(override.aes = list(alpha = 1), reverse = TRUE))
-  
-  ggplot2::ggsave(filename_i, width = 5, height = 5.5)
-  
-}
-
-
-for (i in 1:n_methods_Levine_13) {
-  
-  data_mds <- rbind(medians_truth_Levine_13, medians_Levine_13[[i]])
-  
-  # calculate distance matrix (euclidean distance)
-  d <- dist(data_mds)
-  
-  # calculate MDS
-  fit_mds <- cmdscale(d, k = 2)
-  
-  # plot
-  plot_data <- as.data.frame(fit_mds)
-  colnames(plot_data) <- c("x", "y")
-  plot_data$num <- as.character(c(1:nrow(medians_truth_Levine_13), 1:nrow(medians_Levine_13[[i]])))
-  plot_data$method <- rep(c("manually_gated", names(medians_Levine_13)[i]), 
-                          times = c(nrow(medians_truth_Levine_13), nrow(medians_Levine_13[[i]])), 
-                          levels = c("manually_gated", names(medians_Levine_13)[i]))
-  filename_i = paste0("../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_MDS_", 
-                      names(medians_Levine_13)[i], 
-                      "_Levine2015marrow13.pdf")
-  
-  plot_i <- 
-    ggplot(plot_data, aes(x = x, y = y, label = num, color = method)) + 
-    geom_point(alpha = 0) + 
-    geom_text(size = 3, show.legend = FALSE) + 
-    scale_color_manual(values = c("blue", "red")) + 
-    ggtitle(paste0("MDS plot: ", names(medians_Levine_13)[i], ", Levine_2015_marrow_13")) + 
-    xlab("MDS coordinate 1") + 
-    ylab("MDS coordinate 2") + 
-    theme_bw() + 
-    theme(plot.title = element_text(size = 12), 
-          legend.position = "bottom", 
-          legend.direction = "horizontal", 
-          legend.key = element_blank(), 
-          legend.title = element_blank()) + 
-    guides(color = guide_legend(override.aes = list(alpha = 1), reverse = TRUE))
-  
-  ggplot2::ggsave(filename_i, width = 5, height = 5.5)
-  
-}
-
-
-
-
-###################
-### T-SNE PLOTS ###
-###################
-
-
-for (i in 1:n_methods_Levine_32) {
-  
-  # prepare data for Rtsne
-  data_rtsne <- rbind(medians_truth_Levine_32, medians_Levine_32[[i]])
-  data_rtsne <- as.matrix(data_rtsne)
-  
-  # check for near-duplicate rows (need to remove if any)
-  if(any(duplicated(data_rtsne))) warning("duplicate rows")
-  
-  # run Rtsne (Barnes-Hut-SNE algorithm)
-  # note: use lower perplexity; default gives error
-  set.seed(123)
-  out_rtsne <- Rtsne(data_rtsne, pca = FALSE, verbose = FALSE, perplexity = 1)
-  
-  # plot
-  plot_data <- as.data.frame(out_rtsne$Y)
-  colnames(plot_data) <- c("x", "y")
-  plot_data$num <- as.character(c(1:nrow(medians_truth_Levine_32), 1:nrow(medians_Levine_32[[i]])))
-  plot_data$method <- rep(c("manually_gated", names(medians_Levine_32)[i]), 
-                          times = c(nrow(medians_truth_Levine_32), nrow(medians_Levine_32[[i]])), 
-                          levels = c("manually_gated", names(medians_Levine_32)[i]))
-  filename_i = paste0("../plots/Levine_2015_marrow_32/cluster_medians/cluster_medians_tSNE_", 
-                      names(medians_Levine_32)[i], 
-                      "_Levine2015marrow32.pdf")
-  
-  plot_i <- 
-    ggplot(plot_data, aes(x = x, y = y, label = num, color = method)) + 
-    geom_point(alpha = 0) + 
-    geom_text(size = 3, show.legend = FALSE) + 
-    scale_color_manual(values = c("blue", "red")) + 
-    ggtitle(paste0("t-SNE plot: ", names(medians_Levine_32)[i], ", Levine_2015_marrow_32")) + 
-    xlab("t-SNE coordinate 1") + 
-    ylab("t-SNE coordinate 2") + 
-    theme_bw() + 
-    theme(plot.title = element_text(size = 12), 
-          legend.position = "bottom", 
-          legend.direction = "horizontal", 
-          legend.key = element_blank(), 
-          legend.title = element_blank()) + 
-    guides(color = guide_legend(override.aes = list(alpha = 1), reverse = TRUE))
-  
-  ggplot2::ggsave(filename_i, width = 5, height = 5.5)
-  
-}
-
-
-for (i in 1:n_methods_Levine_13) {
-  
-  # prepare data for Rtsne
-  data_rtsne <- rbind(medians_truth_Levine_13, medians_Levine_13[[i]])
-  data_rtsne <- as.matrix(data_rtsne)
-  
-  # check for near-duplicate rows (need to remove if any)
-  if(any(duplicated(data_rtsne))) warning("duplicate rows")
-  
-  # run Rtsne (Barnes-Hut-SNE algorithm)
-  # note: use lower perplexity; default gives error
-  set.seed(123)
-  out_rtsne <- Rtsne(data_rtsne, pca = FALSE, verbose = FALSE, perplexity = 1)
-  
-  # plot
-  plot_data <- as.data.frame(out_rtsne$Y)
-  colnames(plot_data) <- c("x", "y")
-  plot_data$num <- as.character(c(1:nrow(medians_truth_Levine_13), 1:nrow(medians_Levine_13[[i]])))
-  plot_data$method <- rep(c("manually_gated", names(medians_Levine_13)[i]), 
-                          times = c(nrow(medians_truth_Levine_13), nrow(medians_Levine_13[[i]])), 
-                          levels = c("manually_gated", names(medians_Levine_13)[i]))
-  filename_i = paste0("../plots/Levine_2015_marrow_13/cluster_medians/cluster_medians_tSNE_", 
-                      names(medians_Levine_13)[i], 
-                      "_Levine2015marrow13.pdf")
-  
-  plot_i <- 
-    ggplot(plot_data, aes(x = x, y = y, label = num, color = method)) + 
-    geom_point(alpha = 0) + 
-    geom_text(size = 3, show.legend = FALSE) + 
-    scale_color_manual(values = c("blue", "red")) + 
-    ggtitle(paste0("t-SNE plot: ", names(medians_Levine_13)[i], ", Levine_2015_marrow_13")) + 
-    xlab("t-SNE coordinate 1") + 
-    ylab("t-SNE coordinate 2") + 
-    theme_bw() + 
-    theme(plot.title = element_text(size = 12), 
-          legend.position = "bottom", 
-          legend.direction = "horizontal", 
-          legend.key = element_blank(), 
-          legend.title = element_blank()) + 
-    guides(color = guide_legend(override.aes = list(alpha = 1), reverse = TRUE))
-  
-  ggplot2::ggsave(filename_i, width = 5, height = 5.5)
-  
+           height = plot_heights_Levine_32dim[i])
 }
 
 

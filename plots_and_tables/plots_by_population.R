@@ -18,7 +18,7 @@ load("main_results.RData")
 ### HEATMAPS: F1 SCORE, PRECISION, RECALL BY POPULATION ###
 ###########################################################
 
-# for data sets with multiple populations of interest (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
+# only for data sets with multiple populations (Levine_32dim, Levine_13dim, Samusik_01, Samusik_all)
 
 
 # rows (true populations) arranged by size; columns (methods) arranged in the same order as previously
