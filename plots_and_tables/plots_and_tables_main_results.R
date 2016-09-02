@@ -625,7 +625,7 @@ runtime_barplots <- vector("list", length(runtime_tidy[data_sets_multiple]))
 names(runtime_barplots) <- names(runtime_tidy)[data_sets_multiple]
 
 offsets_runtime <- list(700, 700, 850, 1000)
-ymaxs_runtime <- list(37000, 35500, 44000, 52000)
+ymaxs_runtime <- list(37000, 35500, 43500, 52000)
 
 x_legend <- list(4, 4.75, 4.75, 4.75)
 y_legend <- list(35000, 33500, 41500, 49000)
@@ -667,11 +667,11 @@ runtime_tidy_rare <- runtime_tidy[data_sets_single]
 runtime_barplots_rare <- vector("list", length(runtime_tidy_rare))
 names(runtime_barplots_rare) <- names(runtime_tidy_rare)
 
-offsets_runtime_rare <- list(950, 750)
-ymaxs_runtime_rare <- list(49500, 38500)
+offsets_runtime_rare <- list(900, 1000)
+ymaxs_runtime_rare <- list(43000, 49000)
 
 x_legend_rare <- list(4.75, 4.75)
-y_legend_rare <- list(46500, 36500)
+y_legend_rare <- list(40500, 46000)
 
 for (i in 1:2) {
   nm <- names(runtime_tidy_rare)[i]
@@ -725,7 +725,7 @@ runtime_vs_F1_tidy <- mapply(f_runtime_vs_F1_tidy, runtime_vs_F1_tidy, mean_F1, 
 runtime_scatterplots <- vector("list", length(runtime_vs_F1_tidy))
 names(runtime_scatterplots) <- names(runtime_vs_F1_tidy)
 
-ymaxs_scatter <- list(32000, 31000, 38000, 44500)
+ymaxs_scatter <- list(32000, 31000, 37500, 44500)
 
 for (i in 1:4) {
   nm <- names(runtime_vs_F1_tidy)[i]
@@ -737,7 +737,7 @@ for (i in 1:4) {
     geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
     geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
     xlim(0, 0.8) + 
-    ylim(-1000, ymaxs_scatter[[i]]) + 
+    ylim(-1500, ymaxs_scatter[[i]]) + 
     ggtitle(title) + 
     xlab("mean F1 score") + 
     ylab("runtime (seconds)") + 
@@ -767,8 +767,8 @@ runtime_vs_F1_tidy_rare <- mapply(f_runtime_vs_F1_tidy_rare, runtime_vs_F1_tidy_
 runtime_scatterplots_rare <- vector("list", length(runtime_vs_F1_tidy_rare))
 names(runtime_scatterplots_rare) <- names(runtime_vs_F1_tidy_rare)
 
-ymaxs_scatter_rare <- list(42000, 32500)
-ymins_scatter_rare <- list(-3000, -2000)
+ymaxs_scatter_rare <- list(37000, 41000)
+ymins_scatter_rare <- list(-3000, -3000)
 
 for (i in 1:2) {
   nm <- names(runtime_vs_F1_tidy_rare)[i]
