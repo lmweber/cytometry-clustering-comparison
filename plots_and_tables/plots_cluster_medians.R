@@ -31,93 +31,70 @@ source("../helpers/helper_cluster_medians.R")
 # methods need special treatment due to subsampling or non-FCS file formats
 
 method_names <- names(res_all)
-special <- c("ACCENSE", "ClusterX", "DensVM", "flowClust", "flowMerge", "immunoClust", "SWIFT")
+special_sub <- c("ClusterX", "DensVM", "flowClust", "flowMerge", "immunoClust")
+special_format <- c("ACCENSE", "SWIFT")
+
+# number of subsampled points
+n_sub <- list(
+  ClusterX = 100000, 
+  DensVM = 100000, 
+  flowClust = 10000, 
+  flowMerge = 10000, 
+  immunoClust = 100000
+)
 
 
 # load main data file (for methods with standard treatment)
 
 file_main_Levine_32dim <- "../../../benchmark_data_sets/Levine_32dim/data/Levine_32dim.fcs"
 marker_cols_Levine_32dim <- 5:36
-data_standard_nonsub <- flowCore::exprs(flowCore::read.FCS(file_main_Levine_32dim, transformation = FALSE, truncate_max_range = FALSE))
-data_standard <- data_standard_nonsub[, marker_cols_Levine_32dim]
+data_main_Levine_32dim <- flowCore::exprs(flowCore::read.FCS(file_main_Levine_32dim, transformation = FALSE, truncate_max_range = FALSE))
+data_main_Levine_32dim <- data_main_Levine_32dim[, marker_cols_Levine_32dim]
 
 
-# load data for each method (subsampled data for those methods with subsampling)
+# load data for each method
 
 data <- vector("list", length(method_names))
 names(data) <- method_names
 
 for (i in 1:length(data)) {
-  if (!(names(data)[i] %in% special)) {
-    data[[i]] <- data_standard
+  if (!(names(data)[i] %in% c(special_sub, special_format))) {
+    data[[i]] <- data_main_Levine_32dim
+    
+  } else if (names(data)[i] %in% special_sub) {
+    # method with subsampling: re-generate original subsampled data, using same random
+    # seed from run scripts
+    set.seed(123)
+    ix <- sample(1:nrow(data_main_Levine_32dim), n_sub[[names(data)[i]]])
+    data[[i]] <- data_main_Levine_32dim[ix, ]
     
   } else if (names(data)[i] == "ACCENSE") {
-    # ACCENSE: load data from output file
-    output_file_i <- "../../results_auto/ACCENSE/accense_output_Levine_32dim.csv"
-    data[[i]] <- read.csv(output_file_i, stringsAsFactors = FALSE)
-    # note different column indices
+    # ACCENSE: load data directly from output file
+    output_file <- "../../results_auto/ACCENSE/accense_output_Levine_32dim.csv"
+    data[[i]] <- read.csv(output_file, stringsAsFactors = FALSE)
+    # different column indices
     marker_cols_ACCENSE <- 6:37
     data[[i]] <- data[[i]][, marker_cols_ACCENSE]
     # require as matrix
     data[[i]] <- as.matrix(data[[i]])
     
   } else if (names(data)[i] == "SWIFT") {
-    # SWIFT: load data from output file
-    output_file_i <- "../../results_auto/SWIFT/Levine_32dim_notransform_subsampled.fcs"
-    data[[i]] <- flowCore::exprs(flowCore::read.FCS(output_file_i, transformation = FALSE, truncate_max_range = FALSE))
+    # SWIFT: load data directly from output file
+    output_file <- "../../results_auto/SWIFT/Levine_32dim_notransform_subsampled.fcs"
+    data[[i]] <- flowCore::exprs(flowCore::read.FCS(output_file, transformation = FALSE, truncate_max_range = FALSE))
     data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
-    
-  } else if (names(data)[i] == "ClusterX") {
-    # ClusterX: re-generate original subsampled data (using same random seed from run
-    # script; start with non-subsampled)
-    n_sub <- 100000
-    data[[i]] <- data_standard_nonsub
-    set.seed(123)
-    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
-    data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
-    
-  } else if (names(data)[i] == "DensVM") {
-    # DensVM: re-generate original subsampled data (using same random seed from run
-    # script; start with non-subsampled)
-    n_sub <- 100000
-    data[[i]] <- data_standard_nonsub
-    set.seed(123)
-    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
-    data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
-    
-  } else if (names(data)[i] == "flowClust") {
-    # flowClust: re-generate original subsampled data (using same random seed from run
-    # script; start with non-subsampled)
-    n_sub <- 10000  ## note: 10k not 100k
-    data[[i]] <- data_standard_nonsub
-    set.seed(123)
-    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
-    data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
-    
-  } else if (names(data)[i] == "flowMerge") {
-    # flowMerge: re-generate original subsampled data (using same random seed from run
-    # script; start with non-subsampled)
-    n_sub <- 10000  ## note: 10k not 100k
-    data[[i]] <- data_standard_nonsub
-    set.seed(123)
-    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
-    data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
-    
-  } else if (names(data)[i] == "immunoClust") {
-    # immunoClust: re-generate original subsampled data (using random seed from run script)
-    n_sub <- 100000
-    set.seed(123)
-    ix <- sample(1:nrow(data_standard_nonsub), n_sub)
-    data[[i]] <- data_standard[ix, ]
   }
 }
 
+# above is data for Levine_32dim only
+data_Levine_32dim <- data
+
 # remove missing methods for Levine_32dim
-ix_remove_Levine_32dim <- names(data) %in% c("flowClust", "flowMerge", "SPADE")
+ix_remove_Levine_32dim <- names(data_Levine_32dim) %in% c("flowClust", "flowMerge", "SPADE")
 data_Levine_32dim <- data[!ix_remove_Levine_32dim]
 
 
-# cluster labels (previously loaded)
+# retrieve cluster labels (previously loaded)
 
 clus_methods <- list(
   ACCENSE = clus_ACCENSE, 
@@ -140,12 +117,12 @@ clus_methods <- list(
   Xshift = clus_Xshift
 )
 
-# collapse list and remove missing methods for Levine_32dim
+# select Levine_32dim; remove missing methods for Levine_32dim
 clus_methods_Levine_32dim <- lapply(clus_methods, function(cl) cl[[1]])
 clus_methods_Levine_32dim <- clus_methods_Levine_32dim[!ix_remove_Levine_32dim]
 
 
-# true population labels; taking subsampling into account (previously loaded)
+# retrieve true population labels (with subsampling where required; previously loaded)
 
 clus_truth <- list(
   ACCENSE = clus_truth_ACCENSE, 
@@ -168,8 +145,9 @@ clus_truth <- list(
   Xshift = clus_truth_Xshift
 )
 
-# collapse list
+# select Levine_32dim
 clus_truth_Levine_32dim <- lapply(clus_truth, function(cl) cl[[1]])
+clus_truth_Levine_32dim <- clus_truth_Levine_32dim[!ix_remove_Levine_32dim]
 
 
 
@@ -180,21 +158,22 @@ clus_truth_Levine_32dim <- lapply(clus_truth, function(cl) cl[[1]])
 
 # heatmaps showing true populations only
 
-# calculate cluster medians
-# note values are already arcsinh-transformed, and each dimension will be scaled to min = 0, max = 1
 
-# true data and population labels: can select from any method without subsampling, e.g. k-means
+# retrieve data and true population labels (can select from any method without subsampling, e.g. k-means)
 data_truth_Levine_32dim <- data_Levine_32dim[["kmeans"]]
 clus_truth_Levine_32dim <- clus_truth_Levine_32dim[["kmeans"]]
 
-medians_truth_Levine_32dim <- helper_cluster_medians(data_truth_Levine_32dim, clus_truth_Levine_32dim)
 
+# calculate cluster medians
+# note values are already arcsinh-transformed, and each dimension will be scaled to min = 0, max = 1
+
+medians_truth_Levine_32dim <- helper_cluster_medians(data_truth_Levine_32dim, clus_truth_Levine_32dim)
 rownames(medians_truth_Levine_32dim) <- paste0("manually_gated_", rownames(medians_truth_Levine_32dim))
 
 
 # plot heatmaps
 
-filename <- paste0("../../plots/Levine_32dim/cluster_medians/cluster_medians_heatmap_truth_Levine_32dim.pdf")
+filename_truth <- paste0("../../plots/Levine_32dim/cluster_medians/cluster_medians_heatmap_truth_Levine_32dim.pdf")
 
 set.seed(123)
 pheatmap(medians_truth_Levine_32dim, 
@@ -203,7 +182,7 @@ pheatmap(medians_truth_Levine_32dim,
          cluster_cols = TRUE, 
          clustering_method = "average", 
          fontsize = 9, 
-         filename = filename, 
+         filename = filename_truth, 
          width = 8, 
          height = 3.5)
 
@@ -214,15 +193,19 @@ pheatmap(medians_truth_Levine_32dim,
 ### HEATMAPS: CLUSTERS VS. TRUE POPULATIONS ###
 ###############################################
 
-# heatmaps showing clusters detected by each method vs. true populations
+# heatmaps comparing detected clusters and true populations for each method
+
+
+# calculate cluster medians
+# note values are already arcsinh-transformed, and each dimension will be scaled to min = 0, max = 1
 
 medians_Levine_32dim <- vector("list", length(data_Levine_32dim))
 names(medians_Levine_32dim) <- names(data_Levine_32dim)
 
 for (i in 1:length(medians_Levine_32dim)) {
-  medians_i <- helper_cluster_medians(data_Levine_32dim[[i]], clus_methods_Levine_32dim[[i]])
-  rownames(medians_i) <- paste0(names(clus_methods_Levine_32dim)[i], "_", rownames(medians_i))
-  medians_Levine_32dim[[i]] <- medians_i
+  medians <- helper_cluster_medians(data_Levine_32dim[[i]], clus_methods_Levine_32dim[[i]])
+  rownames(medians) <- paste0(names(clus_methods_Levine_32dim)[i], "_", rownames(medians))
+  medians_Levine_32dim[[i]] <- medians
 }
 
 
