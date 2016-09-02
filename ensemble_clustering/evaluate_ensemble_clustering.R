@@ -35,9 +35,7 @@ files_truth <- list(
   Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
   Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
   Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
-  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
-  FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
-  FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs")
 )
 
 # extract true population labels
