@@ -325,7 +325,7 @@ names(barplots_mean_F1) <- names(mean_F1_tidy)
 for (i in 1:4) {
   nm <- names(mean_F1_tidy)[i]
   title <- paste0("Mean F1 score: ", nm)
-  filename <- paste0("../../plots/", nm, "/results_barplot_mean_F1_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/results_barplot_mean_F1_", nm, ".pdf")
   
   pl <- 
     ggplot(mean_F1_tidy[[i]], aes(x = method, y = value)) + 
@@ -375,7 +375,7 @@ names(boxplots_F1) <- names(F1_df_tidy)
 for (i in 1:4) {
   nm <- names(F1_df_tidy)[i]
   title <- paste0("F1 score: ", nm)
-  filename <- paste0("../../plots/", nm, "/results_boxplots_F1_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/results_boxplots_F1_", nm, ".pdf")
   
   pl <- 
     ggplot(F1_df_tidy[[i]], aes(x = method, y = value)) + 
@@ -432,7 +432,7 @@ names(barplots_mean_F1_pr_re) <- names(plot_data)
 for (i in 1:4) {
   nm <- names(plot_data)[i]
   title <- paste0("Mean F1 score, precision, recall: ", nm)
-  filename <- paste0("../../plots/", nm, "/results_barplot_mean_F1_pr_re_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/results_barplot_mean_F1_pr_re_", nm, ".pdf")
   
   pl <- 
     ggplot(plot_data[[i]], aes(x = method, y = value, group = variable, fill = variable)) + 
@@ -486,7 +486,7 @@ offsets_ncells <- list(600, 300, 300, 2500)
 for (i in 1:4) {
   nm <- names(n_cells_tidy)[i]
   title <- paste0("Manually gated populations: ", nm)
-  filename <- paste0("../../plots/", nm, "/results_no_of_cells_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/results_no_of_cells_", nm, ".pdf")
   
   pl <- 
     ggplot(n_cells_tidy[[i]], aes(x = population, y = value)) + 
@@ -539,7 +539,7 @@ names(barplots_F1_pr_re) <- names(plot_data_rare)
 for (i in 1:2) {
   nm <- names(plot_data_rare)[i]
   title <- paste0("Rare population: ", nm)
-  filename <- paste0("../../plots/", nm, "/results_barplot_F1_pr_re_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/results_barplot_F1_pr_re_", nm, ".pdf")
   
   pl <- 
     ggplot(plot_data_rare[[i]], aes(x = method, y = value, group = variable, fill = variable)) + 
@@ -633,7 +633,7 @@ y_legend <- list(35000, 33500, 41500, 49000)
 for (i in 1:4) {
   nm <- names(runtime_tidy)[i]
   title <- paste0("Runtime: ", nm)
-  filename <- paste0("../../plots/", nm, "/runtime_barplot_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/runtime_barplot_", nm, ".pdf")
   
   pl <- 
     ggplot(runtime_tidy[[i]], aes(x = method, y = value)) + 
@@ -676,7 +676,7 @@ y_legend_rare <- list(40500, 46000)
 for (i in 1:2) {
   nm <- names(runtime_tidy_rare)[i]
   title <- paste0("Runtime: ", nm)
-  filename <- paste0("../../plots/", nm, "/runtime_barplot_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/runtime_barplot_", nm, ".pdf")
   
   pl <- 
     ggplot(runtime_tidy_rare[[i]], aes(x = method, y = value)) + 
@@ -730,7 +730,7 @@ ymaxs_scatter <- list(32000, 31000, 37500, 44500)
 for (i in 1:4) {
   nm <- names(runtime_vs_F1_tidy)[i]
   title <- paste0("Runtime vs. mean F1: ", nm)
-  filename <- paste0("../../plots/", nm, "/runtime_scatterplot_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/runtime_scatterplot_", nm, ".pdf")
   
   pl <- 
     ggplot(runtime_vs_F1_tidy[[i]], aes(x = mean_F1, y = runtime)) + 
@@ -773,7 +773,7 @@ ymins_scatter_rare <- list(-3000, -3000)
 for (i in 1:2) {
   nm <- names(runtime_vs_F1_tidy_rare)[i]
   title <- paste0("Runtime vs. F1: ", nm)
-  filename <- paste0("../../plots/", nm, "/runtime_scatterplot_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/runtime_scatterplot_", nm, ".pdf")
   
   pl <- 
     ggplot(runtime_vs_F1_tidy_rare[[i]], aes(x = F1, y = runtime)) + 
@@ -809,7 +809,7 @@ names(multi_panel_multiple) <- names(mean_F1_tidy)
 
 for (i in 1:4) {
   nm <- names(multi_panel_multiple)[i]
-  filename <- paste0("../../plots/", nm, "/plots_multi_panel_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/plots_multi_panel_", nm, ".pdf")
   
   pl <- ggdraw() + 
     draw_plot(barplots_mean_F1[[i]], 0.05, 0.66, 0.4, 0.33) + 
@@ -835,7 +835,7 @@ names(multi_panel_single) <- names(plot_data_rare)
 
 for (i in 1:2) {
   nm <- names(multi_panel_single)[i]
-  filename <- paste0("../../plots/", nm, "/plots_multi_panel_", nm, ".pdf")
+  filename <- paste0("../../plots/", nm, "/main_plots/plots_multi_panel_", nm, ".pdf")
   
   pl <- ggdraw() + 
     draw_plot(barplots_F1_pr_re[[i]], 0.025, 0.64, 0.8, 0.35) + 
