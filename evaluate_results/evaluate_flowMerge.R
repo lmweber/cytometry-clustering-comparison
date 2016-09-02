@@ -78,6 +78,11 @@ tbl_truth <- lapply(clus_truth, table)
 tbl_truth
 sapply(tbl_truth, length)
 
+# store named objects (for other scripts)
+
+files_truth_flowMerge <- files_truth
+clus_truth_flowMerge <- clus_truth
+
 
 
 
@@ -126,8 +131,9 @@ for (i in 2:length(clus)) {
   }
 }
 
-# store named object (for ensemble clustering)
+# store named objects (for other scripts)
 
+files_flowMerge <- files_out
 clus_flowMerge <- clus
 
 

@@ -78,6 +78,11 @@ tbl_truth <- lapply(clus_truth, table)
 tbl_truth
 sapply(tbl_truth, length)
 
+# store named objects (for other scripts)
+
+files_truth_DensVM <- files_truth
+clus_truth_DensVM <- clus_truth
+
 
 
 
@@ -121,8 +126,9 @@ for (i in 1:length(clus)) {
   }
 }
 
-# store named object (for ensemble clustering)
+# store named objects (for other scripts)
 
+files_DensVM <- files_out
 clus_DensVM <- clus
 
 

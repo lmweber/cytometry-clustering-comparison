@@ -72,6 +72,11 @@ tbl_truth <- lapply(clus_truth, table)
 tbl_truth
 sapply(tbl_truth, length)
 
+# store named objects (for other scripts)
+
+files_truth_SPADE <- files_truth
+clus_truth_SPADE <- clus_truth
+
 
 
 
@@ -120,8 +125,9 @@ for (i in 2:7) {
   }
 }
 
-# store named object (for ensemble clustering)
+# store named objects (for other scripts)
 
+files_SPADE <- files_out
 clus_SPADE <- clus
 
 

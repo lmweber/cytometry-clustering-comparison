@@ -65,6 +65,11 @@ tbl_truth <- lapply(clus_truth, table)
 tbl_truth
 sapply(tbl_truth, length)
 
+# store named objects (for other scripts)
+
+files_truth_SWIFT <- files_truth
+clus_truth_SWIFT <- clus_truth
+
 
 
 
@@ -108,8 +113,9 @@ for (i in 1:length(clus)) {
   print(table(clus[[i]], clus_truth[[i]]))
 }
 
-# store named object (for ensemble clustering)
+# store named objects (for other scripts)
 
+files_SWIFT <- files_out
 clus_SWIFT <- clus
 
 

@@ -69,6 +69,11 @@ tbl_truth <- lapply(clus_truth, table)
 tbl_truth
 sapply(tbl_truth, length)
 
+# store named objects (for other scripts)
+
+files_truth_PhenoGraph <- files_truth
+clus_truth_PhenoGraph <- clus_truth
+
 
 
 
@@ -111,8 +116,9 @@ for (i in 1:length(clus)) {
   print(table(clus[[i]], clus_truth[[i]]))
 }
 
-# store named object (for ensemble clustering)
+# store named objects (for other scripts)
 
+files_PhenoGraph <- files_out
 clus_PhenoGraph <- clus
 
 

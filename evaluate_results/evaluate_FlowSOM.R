@@ -72,6 +72,11 @@ tbl_truth <- lapply(clus_truth, table)
 tbl_truth
 sapply(tbl_truth, length)
 
+# store named objects (for other scripts)
+
+files_truth_FlowSOM <- files_truth
+clus_truth_FlowSOM <- clus_truth
+
 
 
 
@@ -115,8 +120,9 @@ for (i in 1:length(clus)) {
   }
 }
 
-# store named object (for ensemble clustering)
+# store named objects (for other scripts)
 
+files_FlowSOM <- files_out
 clus_FlowSOM <- clus
 
 
