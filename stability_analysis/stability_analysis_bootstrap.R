@@ -14,7 +14,6 @@ library(BiocParallel)
 library(flowMeans)
 library(flowPeaks)
 library(FlowSOM)
-library(immunoClust)
 library(SamSPECTRAL)
 
 # helper functions to match clusters and evaluate
@@ -30,7 +29,6 @@ source("run_flowMeans_stability.R")
 source("run_flowPeaks_stability.R")
 source("run_FlowSOM_pre_stability.R")
 source("run_FlowSOM_stability.R")
-source("run_immunoClust_stability.R")
 source("run_kmeans_stability.R")
 source("run_SamSPECTRAL_stability.R")
 
@@ -82,11 +80,6 @@ cat("stability analysis (random starts) : FlowSOM_pre complete\n")
 res_bootstrap_FlowSOM <- bplapply(data, run_FlowSOM_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : FlowSOM complete\n")
 
-# immunoClust: data set Mosmann_rare only (due to subsampling); also use non-transformed data due to automatic transform
-data_immunoClust <- lapply(data_notransform, function(l) l["Mosmann_rare"])
-res_bootstrap_immunoClust <- bplapply(data_immunoClust, run_immunoClust_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
-cat("stability analysis (random starts) : immunoClust complete\n")
-
 res_bootstrap_kmeans <- bplapply(data, run_kmeans_stability, BPPARAM = MulticoreParam(workers = n, RNGseed = seed))
 cat("stability analysis (random starts) : kmeans complete\n")
 
@@ -118,21 +111,16 @@ res_bootstrap <- list(FLOCK = res_bootstrap_FLOCK,
                       flowPeaks = res_bootstrap_flowPeaks, 
                       FlowSOM_pre = res_bootstrap_FlowSOM_pre, 
                       FlowSOM = res_bootstrap_FlowSOM, 
-                      immunoClust = res_bootstrap_immunoClust, 
                       kmeans = res_bootstrap_kmeans, 
                       SamSPECTRAL = res_bootstrap_SamSPECTRAL)
-
-# remove any methods skipped for each data set
-res_Levine_32dim <- res_bootstrap[-which(names(res_bootstrap) == "immunoClust")]
-res_Mosmann_rare <- res_bootstrap
 
 
 # collapse into one data frame per data set
 
-res_Levine_32dim <- lapply(res_Levine_32dim, 
+res_Levine_32dim <- lapply(res_bootstrap, 
                            function(r) t(sapply(r, function(l) l[["Levine_32dim"]][c("mean_pr", "mean_re", "mean_F1")])))
 
-res_Mosmann_rare <- lapply(res_Mosmann_rare, 
+res_Mosmann_rare <- lapply(res_bootstrap, 
                            function(r) t(sapply(r, function(l) l[["Mosmann_rare"]][c("pr", "re", "F1")])))
 
 
