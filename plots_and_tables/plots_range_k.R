@@ -71,14 +71,16 @@ pl <-
   ggtitle("FlowSOM") + 
   theme_bw() + 
   theme(plot.title = element_text(size = 12), 
-        legend.position = c(0.80, 0.2), 
+        legend.position = "right", 
+        legend.key.size = unit(5, "mm"), 
+        #legend.position = c(0.80, 0.2), 
         legend.key = element_blank(), 
         legend.title = element_blank(), 
         legend.background = element_rect("white"))
 
 print(pl)
 
-ggplot2::ggsave("../../plots/plots_range_k/results_range_k_FlowSOM_F1.pdf", width = 6, height = 5)
+ggplot2::ggsave("../../plots/plots_range_k/results_range_k_FlowSOM_F1.pdf", width = 7.5, height = 5)
 
 
 
