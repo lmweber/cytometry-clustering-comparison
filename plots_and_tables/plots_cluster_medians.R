@@ -85,7 +85,7 @@ for (i in 1:length(data)) {
   }
 }
 
-# above is data for Levine_32dim only
+# data for Levine_32dim only
 data_Levine_32dim <- data
 
 # remove missing methods for Levine_32dim
@@ -180,7 +180,7 @@ pheatmap(medians_truth_Levine_32dim,
          cluster_rows = TRUE, 
          cluster_cols = TRUE, 
          clustering_method = "average", 
-         fontsize = 9, 
+         fontsize = 8, 
          filename = filename_truth, 
          width = 8, 
          height = 3.5)
@@ -210,8 +210,8 @@ for (i in 1:length(medians_Levine_32dim)) {
 
 # plot heatmaps
 
-plot_heights_Levine_32dim <- c(9, 9, 5.5, 8.5, 9.5, 6, 9.5, 14, 14, 9.5, 8.5, 9.5, 7, 14, 10)
-fontsize_row_Levine_32dim <- c(8, 8, 8, 8, 8, 7, 8, 5, 5, 8, 8, 8, 8, 1, 8)
+plot_heights_Levine_32dim <- c(9, 7.5, 6, 8.5, 10, 4.5, 10, 14, 14, 10, 8.75, 10, 5.75, 14, 10)
+fontsize_row_Levine_32dim <- c(8, 8,   8, 8,   8,  8,   8,  6,  6,  8,  8,    8,  8,    1,  8)
 
 for (i in 1:length(medians_Levine_32dim)) {
   
