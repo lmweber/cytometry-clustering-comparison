@@ -37,23 +37,23 @@ DIR_BOOTSTRAP <- "../../results_stability_bootstrap"
 datasets <- c("Levine_32dim", "Mosmann_rare")
 
 files_random_starts <- list(
-  #FLOCK = paste0(DIR_RANDOM_STARTS, "/FLOCK/stability_random_starts_FLOCK_", datasets, ".txt"), 
-  #flowMeans = paste0(DIR_RANDOM_STARTS, "/flowMeans/stability_random_starts_flowMeans_", datasets, ".txt"), 
+  FLOCK = paste0(DIR_RANDOM_STARTS, "/FLOCK/stability_random_starts_FLOCK_", datasets, ".txt"), 
+  flowMeans = paste0(DIR_RANDOM_STARTS, "/flowMeans/stability_random_starts_flowMeans_", datasets, ".txt"), 
   flowPeaks = paste0(DIR_RANDOM_STARTS, "/flowPeaks/stability_random_starts_flowPeaks_", datasets, ".txt"), 
   FlowSOM = paste0(DIR_RANDOM_STARTS, "/FlowSOM/stability_random_starts_flowSOM_", datasets, ".txt"), 
   FlowSOM_pre = paste0(DIR_RANDOM_STARTS, "/FlowSOM_pre/stability_random_starts_flowSOM_pre_", datasets, ".txt"), 
-  kmeans = paste0(DIR_RANDOM_STARTS, "/kmeans/stability_random_starts_kmeans_", datasets, ".txt")#, 
-  #SamSPECTRAL = paste0(DIR_RANDOM_STARTS, "/SamSPECTRAL/stability_random_starts_SamSPECTRAL_", datasets, ".txt")
+  kmeans = paste0(DIR_RANDOM_STARTS, "/kmeans/stability_random_starts_kmeans_", datasets, ".txt"), 
+  SamSPECTRAL = paste0(DIR_RANDOM_STARTS, "/SamSPECTRAL/stability_random_starts_SamSPECTRAL_", datasets, ".txt")
 )
 
 files_bootstrap <- list(
-  #FLOCK = paste0(DIR_BOOTSTRAP, "/FLOCK/stability_bootstrap_FLOCK_", datasets, ".txt"), 
-  #flowMeans = paste0(DIR_BOOTSTRAP, "/flowMeans/stability_bootstrap_flowMeans_", datasets, ".txt"), 
+  FLOCK = paste0(DIR_BOOTSTRAP, "/FLOCK/stability_bootstrap_FLOCK_", datasets, ".txt"), 
+  flowMeans = paste0(DIR_BOOTSTRAP, "/flowMeans/stability_bootstrap_flowMeans_", datasets, ".txt"), 
   flowPeaks = paste0(DIR_BOOTSTRAP, "/flowPeaks/stability_bootstrap_flowPeaks_", datasets, ".txt"), 
   FlowSOM = paste0(DIR_BOOTSTRAP, "/FlowSOM/stability_bootstrap_FlowSOM_", datasets, ".txt"), 
   FlowSOM_pre = paste0(DIR_BOOTSTRAP, "/FlowSOM_pre/stability_bootstrap_FlowSOM_pre_", datasets, ".txt"), 
-  kmeans = paste0(DIR_BOOTSTRAP, "/kmeans/stability_bootstrap_kmeans_", datasets, ".txt")#, 
-  #SamSPECTRAL = paste0(DIR_BOOTSTRAP, "/SamSPECTRAL/stability_bootstrap_SamSPECTRAL_", datasets, ".txt")
+  kmeans = paste0(DIR_BOOTSTRAP, "/kmeans/stability_bootstrap_kmeans_", datasets, ".txt"), 
+  SamSPECTRAL = paste0(DIR_BOOTSTRAP, "/SamSPECTRAL/stability_bootstrap_SamSPECTRAL_", datasets, ".txt")
 )
 
 
@@ -116,8 +116,8 @@ df_bootstrap <- fn_rearrange_data(data_bootstrap)
 
 # separate by data set; arrange clustering methods in same order as previously
 
-ord_stability_Levine_32dim <- c("FlowSOM", "FlowSOM_pre", "kmeans", "flowPeaks")
-ord_stability_Mosmann_rare <- c("FlowSOM", "FlowSOM_pre", "kmeans", "flowPeaks")
+ord_stability_Levine_32dim <- c("FlowSOM", "flowMeans", "FLOCK", "SamSPECTRAL", "FlowSOM_pre", "kmeans", "flowPeaks")
+ord_stability_Mosmann_rare <- c("FlowSOM_pre", "FlowSOM", "SamSPECTRAL", "flowMeans", "kmeans", "FLOCK", "flowPeaks")
 
 df_random_starts_Levine_32dim <- lapply(df_random_starts[[1]], function(d) d[, ord_stability_Levine_32dim])[c(3, 1, 2)]
 df_random_starts_Mosmann_rare <- lapply(df_random_starts[[2]], function(d) d[, ord_stability_Mosmann_rare])[c(3, 1, 2)]
