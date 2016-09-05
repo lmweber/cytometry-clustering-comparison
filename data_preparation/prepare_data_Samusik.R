@@ -16,7 +16,7 @@
 # Link to paper: http://www.nature.com/nmeth/journal/v13/n6/full/nmeth.3863.html
 # Link to data (.zip file): "https://web.stanford.edu/~samusik/Panorama BM 1-10.zip"
 #
-# Lukas Weber, July 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
@@ -97,7 +97,7 @@ table(population)
 # save file of population names
 write.table(
   data.frame(population = 1:length(levels(population)), name = levels(population)), 
-  file = "data/population_names.txt", 
+  file = "data/population_names_Samusik.txt", 
   quote = FALSE, 
   row.names = FALSE)
 
