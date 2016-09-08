@@ -80,7 +80,7 @@ for (i in ix_subsample) {
     data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
     # save subsampled population IDs
     true_labels_i <- data[[i]][, "label", drop = FALSE]
-    files_true_labels_i <- paste0("../../results_manual/Rclusterpp/true_labels_Rclusterpp_", 
+    files_true_labels_i <- paste0("../../results/manual/Rclusterpp/true_labels_Rclusterpp_", 
                                   names(data)[i], ".txt")
     write.table(true_labels_i, file = files_true_labels_i, row.names = FALSE, quote = FALSE, sep = "\t")
   }
@@ -229,7 +229,7 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../../results_manual/Rclusterpp/Rclusterpp_labels_", 
+files_labels <- paste0("../../results/manual/Rclusterpp/Rclusterpp_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -241,11 +241,11 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_manual/runtimes/runtime_Rclusterpp.txt", 
+write.table(runtimes, file = "../../results/manual/runtimes/runtime_Rclusterpp.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_manual/session_info/session_info_Rclusterpp.txt")
+sink(file = "../../results/manual/session_info/session_info_Rclusterpp.txt")
 print(sessionInfo())
 sink()
 

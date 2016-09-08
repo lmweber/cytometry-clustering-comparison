@@ -83,8 +83,8 @@ for (i in ix_subsample) {
     data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
     
     # save subsampled data sets in FCS format with population labels
-    files_sub_i <- paste0(c("../../results_auto/Xshift/", 
-                            "../../results_manual/Xshift/"), 
+    files_sub_i <- paste0(c("../../results/auto/Xshift/", 
+                            "../../results/manual/Xshift/"), 
                           names(data)[i], "_subsampled.fcs")
     for (f in files_sub_i) {
       flowCore::write.FCS(flowCore::flowFrame(data[[i]]), filename = f)

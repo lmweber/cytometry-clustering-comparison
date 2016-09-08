@@ -212,7 +212,7 @@ table(clus[[2]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../../results_manual/SPADE/SPADE_labels_", 
+files_labels <- paste0("../../results/manual/SPADE/SPADE_labels_", 
                        names(clus), ".txt")
 
 # note: skip data sets Levine_32dim and FlowCAP_WNV (i = 1 and 8) due to error
@@ -228,11 +228,11 @@ runtimes[[1]] <- NA
 runtimes[[8]] <- NA
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_manual/runtimes/runtime_SPADE.txt", 
+write.table(runtimes, file = "../../results/manual/runtimes/runtime_SPADE.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_manual/session_info/session_info_SPADE.txt")
+sink(file = "../../results/manual/session_info/session_info_SPADE.txt")
 print(sessionInfo())
 sink()
 

@@ -80,8 +80,8 @@ for (i in ix_subsample) {
     data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
     # save subsampled population IDs
     true_labels_i <- data[[i]][, "label", drop = FALSE]
-    files_true_labels_i <- paste0(c("../../results_auto/flowMeans/true_labels_flowMeans_", 
-                                    "../../results_manual/flowMeans/true_labels_flowMeans_"), 
+    files_true_labels_i <- paste0(c("../../results/auto/flowMeans/true_labels_flowMeans_", 
+                                    "../../results/manual/flowMeans/true_labels_flowMeans_"), 
                                   names(data)[i], ".txt")
     for (f in files_true_labels_i) {
       write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
@@ -206,7 +206,7 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../../results_auto/flowMeans/flowMeans_labels_", 
+files_labels <- paste0("../../results/auto/flowMeans/flowMeans_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -218,11 +218,11 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_auto/runtimes/runtime_flowMeans.txt", 
+write.table(runtimes, file = "../../results/auto/runtimes/runtime_flowMeans.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_auto/session_info/session_info_flowMeans.txt")
+sink(file = "../../results/auto/session_info/session_info_flowMeans.txt")
 print(sessionInfo())
 sink()
 
@@ -322,7 +322,7 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../../results_manual/flowMeans/flowMeans_labels_", 
+files_labels <- paste0("../../results/manual/flowMeans/flowMeans_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -334,11 +334,11 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_manual/runtimes/runtime_flowMeans.txt", 
+write.table(runtimes, file = "../../results/manual/runtimes/runtime_flowMeans.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_manual/session_info/session_info_flowMeans.txt")
+sink(file = "../../results/manual/session_info/session_info_flowMeans.txt")
 print(sessionInfo())
 sink()
 

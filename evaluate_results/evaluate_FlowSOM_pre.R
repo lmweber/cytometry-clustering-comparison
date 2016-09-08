@@ -15,7 +15,7 @@ source("../helpers/helper_match_evaluate_FlowCAP.R")
 source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
 # which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
-RES_DIR_FLOWSOM_PRE <- "../../results_manual/FlowSOM_pre"
+RES_DIR_FLOWSOM_PRE <- "../../results/manual/FlowSOM_pre"
 
 DATA_DIR <- "../../../benchmark_data_sets"
 

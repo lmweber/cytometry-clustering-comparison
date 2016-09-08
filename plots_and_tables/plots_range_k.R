@@ -20,7 +20,7 @@ cb_pal_black <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B
 ### LOAD RESULTS ###
 ####################
 
-RES_DIR <- "../../results_range_k"
+RES_DIR <- "../../results/range_k"
 
 datasets <- c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all", "Nilsson_rare", "Mosmann_rare")
 
@@ -80,7 +80,7 @@ pl <-
 
 print(pl)
 
-ggplot2::ggsave("../../plots/plots_range_k/results_range_k_FlowSOM_F1.pdf", width = 7.5, height = 5)
+ggplot2::ggsave("../../plots/range_k/results_range_k_FlowSOM_F1.pdf", width = 7.5, height = 5)
 
 
 

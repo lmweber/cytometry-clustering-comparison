@@ -69,7 +69,7 @@ for (i in 1:length(data)) {
     
   } else if (names(data)[i] == "ACCENSE") {
     # ACCENSE: load data directly from output file
-    output_file <- "../../results_auto/ACCENSE/accense_output_Levine_32dim.csv"
+    output_file <- "../../results/auto/ACCENSE/accense_output_Levine_32dim.csv"
     data[[i]] <- read.csv(output_file, stringsAsFactors = FALSE)
     # different column indices
     marker_cols_ACCENSE <- 6:37
@@ -79,7 +79,7 @@ for (i in 1:length(data)) {
     
   } else if (names(data)[i] == "SWIFT") {
     # SWIFT: load data directly from output file
-    output_file <- "../../results_auto/SWIFT/Levine_32dim_notransform_subsampled.fcs"
+    output_file <- "../../results/auto/SWIFT/Levine_32dim_notransform_subsampled.fcs"
     data[[i]] <- flowCore::exprs(flowCore::read.FCS(output_file, transformation = FALSE, truncate_max_range = FALSE))
     data[[i]] <- data[[i]][, marker_cols_Levine_32dim]
   }

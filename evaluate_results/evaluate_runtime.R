@@ -5,8 +5,8 @@
 #########################################################################################
 
 # Methods that were run using R scripts were timed with the "system.time()" function, 
-# with results saved as .txt files in folders "results_auto/runtime/" or 
-# "results_manual/runtime/".
+# with results saved as .txt files in folders "results/auto/runtime/" or 
+# "results/manual/runtime/".
 
 # Methods not accessible via R were timed manually using a stopwatch app or the Matlab 
 # "clock" command, with results saved in the spreadsheet 

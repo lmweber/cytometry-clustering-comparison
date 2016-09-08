@@ -13,7 +13,7 @@ source("../helpers/helper_match_evaluate_multiple.R")
 source("../helpers/helper_match_evaluate_single.R")
 
 # directory with saved results
-RES_DIR_ENSEMBLE <- "../../results_ensemble"
+RES_DIR_ENSEMBLE <- "../../results/ensemble"
 
 DATA_DIR <- "../../../benchmark_data_sets"
 

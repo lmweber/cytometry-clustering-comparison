@@ -189,7 +189,7 @@ for (i in 1:length(df_res_range_k)) {
     res_save <- data.frame(k = k_range, F1 = df_res_range_k[[i]])
   }
   
-  filename <- paste0("../../results_range_k/results_FlowSOM_range_k_", names(df_res_range_k)[i], ".txt")
+  filename <- paste0("../../results/range_k/results_FlowSOM_range_k_", names(df_res_range_k)[i], ".txt")
   
   write.table(res_save, file = filename, row.names = FALSE, quote = FALSE, sep = "\t")
 }
@@ -197,7 +197,7 @@ for (i in 1:length(df_res_range_k)) {
 
 # save session information
 
-sink(file = "../../results_range_k/session_info_FlowSOM_range_k.txt")
+sink(file = "../../results/range_k/session_info_FlowSOM_range_k.txt")
 sessionInfo()
 sink()
 

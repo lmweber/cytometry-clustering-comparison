@@ -205,7 +205,7 @@ sapply(clus, function(cl) length(table(cl)))
 setwd("../../clustering_comparison_paper/scripts/run_methods")
 
 # save cluster labels
-files_labels <- paste0("../../results_auto/FLOCK/FLOCK_labels_", 
+files_labels <- paste0("../../results/auto/FLOCK/FLOCK_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -217,11 +217,11 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_auto/runtimes/runtime_FLOCK.txt", 
+write.table(runtimes, file = "../../results/auto/runtimes/runtime_FLOCK.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_auto/session_info/session_info_FLOCK.txt")
+sink(file = "../../results/auto/session_info/session_info_FLOCK.txt")
 print(sessionInfo())
 sink()
 

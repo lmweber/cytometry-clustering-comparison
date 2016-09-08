@@ -31,8 +31,8 @@ custom_pal <- hex(polarLUV(hcl), fixup = TRUE)
 ### LOAD DATA ###
 #################
 
-DIR_RANDOM_STARTS <- "../../results_stability_random_starts"
-DIR_BOOTSTRAP <- "../../results_stability_bootstrap"
+DIR_RANDOM_STARTS <- "../../results/stability/random_starts"
+DIR_BOOTSTRAP <- "../../results/stability/bootstrap"
 
 datasets <- c("Levine_32dim", "Mosmann_rare")
 

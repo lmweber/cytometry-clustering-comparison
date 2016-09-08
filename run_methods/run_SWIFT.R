@@ -75,7 +75,7 @@ for (i in ix_subsample) {
     data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub[i]), ]
     
     # save subsampled data sets in FCS format with population labels
-    files_sub_i <- paste0("../../results_auto/SWIFT/", names(data)[i], "_notransform_subsampled.fcs")
+    files_sub_i <- paste0("../../results/auto/SWIFT/", names(data)[i], "_notransform_subsampled.fcs")
     flowCore::write.FCS(flowCore::flowFrame(data[[i]]), filename = files_sub_i)
   }
 }
@@ -109,7 +109,7 @@ sapply(marker_cols, length)
 
 for (i in c(5, 6)) {
   data[[i]] <- data[[i]][, marker_cols[[i]]]
-  files_i <- paste0("../../results_auto/SWIFT/", names(data)[i], "_notransform_markers_only.fcs")
+  files_i <- paste0("../../results/auto/SWIFT/", names(data)[i], "_notransform_markers_only.fcs")
   flowCore::write.FCS(flowCore::flowFrame(data[[i]]), filename = files_i)
 }
 

@@ -80,7 +80,7 @@ for (i in ix_subsample) {
     data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub[i]), ]
     # save subsampled population IDs
     true_labels_i <- data[[i]][, "label", drop = FALSE]
-    files_true_labels_i <- paste0("../../results_manual/flowClust/true_labels_flowClust_", 
+    files_true_labels_i <- paste0("../../results/manual/flowClust/true_labels_flowClust_", 
                                   names(data)[i], ".txt")
     for (f in files_true_labels_i) {
       write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
@@ -216,7 +216,7 @@ table(clus[[2]])
 sapply(clus, function(cl) length(table(cl)))
 
 # save cluster labels
-files_labels <- paste0("../../results_manual/flowClust/flowClust_labels_", 
+files_labels <- paste0("../../results/manual/flowClust/flowClust_labels_", 
                        names(clus), ".txt")
 
 # note: skip data set Levine_32dim
@@ -231,11 +231,11 @@ runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes[[1]] <- NA
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_manual/runtimes/runtime_flowClust.txt", 
+write.table(runtimes, file = "../../results/manual/runtimes/runtime_flowClust.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_manual/session_info/session_info_flowClust.txt")
+sink(file = "../../results/manual/session_info/session_info_flowClust.txt")
 print(sessionInfo())
 sink()
 

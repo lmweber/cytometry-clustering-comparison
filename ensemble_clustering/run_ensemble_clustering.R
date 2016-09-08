@@ -146,7 +146,7 @@ clus_consensus <- lapply(consensus, cl_class_ids)
 # save cluster labels
 
 datasets <- c("Levine_32dim", "Levine_13dim", "Samusik_01", "Samusik_all", "Nilsson_rare", "Mosmann_rare")
-files_out <- paste0("../../results_ensemble/ensemble_labels_", datasets, ".txt")
+files_out <- paste0("../../results/ensemble/ensemble_labels_", datasets, ".txt")
 
 for (i in 1:length(files_out)) {
   res <- data.frame(label = as.numeric(clus_consensus[[i]]))
@@ -156,7 +156,7 @@ for (i in 1:length(files_out)) {
 
 # save session information
 
-sink(file = "../../results_ensemble/session_info_ensemble.txt")
+sink(file = "../../results/ensemble/session_info_ensemble.txt")
 sessionInfo()
 sink()
 

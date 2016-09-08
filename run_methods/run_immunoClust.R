@@ -83,7 +83,7 @@ for (i in ix_subsample) {
     data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
     # save subsampled population IDs
     true_labels_i <- flowCore::exprs(data[[i]])[, "label", drop = FALSE]
-    files_true_labels_i <- paste0("../../results_auto/immunoClust/true_labels_immunoClust_", 
+    files_true_labels_i <- paste0("../../results/auto/immunoClust/true_labels_immunoClust_", 
                                   names(data)[i], ".txt")
     write.table(true_labels_i, file = f, row.names = FALSE, quote = FALSE, sep = "\t")
   }
@@ -202,12 +202,12 @@ table(clus[[1]])
 sapply(clus, function(cl) length(table(cl)))
 
 # plots
-#png("../../results_auto/immunoClust/plot_immunoClust_Levine_32dim.png", width = 1000, height = 1000)
+#png("../../results/auto/immunoClust/plot_immunoClust_Levine_32dim.png", width = 1000, height = 1000)
 #immunoClust::splom(out[[1]], immunoClust::trans.ApplyToData(out[[1]], data[[1]]), N = 1000)
 #dev.off()
 
 # save cluster labels
-files_labels <- paste0("../../results_auto/immunoClust/immunoClust_labels_", 
+files_labels <- paste0("../../results/auto/immunoClust/immunoClust_labels_", 
                        names(clus), ".txt")
 
 for (i in 1:length(files_labels)) {
@@ -219,11 +219,11 @@ for (i in 1:length(files_labels)) {
 runtimes <- lapply(runtimes, function(r) r["elapsed"])
 runtimes <- t(as.data.frame(runtimes, row.names = "runtime"))
 
-write.table(runtimes, file = "../../results_auto/runtimes/runtime_immunoClust.txt", 
+write.table(runtimes, file = "../../results/auto/runtimes/runtime_immunoClust.txt", 
             quote = FALSE, sep = "\t")
 
 # save session information
-sink(file = "../../results_auto/session_info/session_info_immunoClust.txt")
+sink(file = "../../results/auto/session_info/session_info_immunoClust.txt")
 print(sessionInfo())
 sink()
 

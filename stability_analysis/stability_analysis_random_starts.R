@@ -33,7 +33,7 @@ source("run_kmeans_stability.R")
 source("run_SamSPECTRAL_stability.R")
 
 # directory to save results
-RESULTS_DIR <- "../../results_stability_random_starts"
+RESULTS_DIR <- "../../results/stability/random_starts"
 
 # number of times to run each method
 n <- 30
