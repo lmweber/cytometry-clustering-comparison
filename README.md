@@ -2,7 +2,7 @@
 
 This repository contains R scripts to reproduce the analyses and figures in our paper comparing clustering methods for high-dimensional flow cytometry and mass cytometry (CyTOF) data.
 
-A preprint of the paper is available from [bioRxiv](http://biorxiv.org/content/early/2016/04/07/047613).
+A preprint of the paper is available from [bioRxiv](http://biorxiv.org/content/early/2016/09/08/047613) (latest version posted on September 8, 2016).
 
 
 ## Overview
@@ -17,7 +17,7 @@ Several other methods also performed well, including X-shift, PhenoGraph, Rclust
 
 ## FlowSOM and Rtsne example code
 
-FlowSOM [(van Gassen et al. 2015)](http://www.ncbi.nlm.nih.gov/pubmed/25573116) is available as a [Bioconductor package](http://bioconductor.org/packages/release/bioc/html/FlowSOM.html) for the R programming language.
+FlowSOM [(van Gassen et al., 2015)](http://www.ncbi.nlm.nih.gov/pubmed/25573116) is available as a [Bioconductor package](http://bioconductor.org/packages/release/bioc/html/FlowSOM.html) for the R programming language.
 
 A worked example showing how to use FlowSOM for clustering and [Rtsne](https://github.com/jkrijthe/Rtsne) for visualization is available in the [FlowSOM-Rtsne-example](https://github.com/lmweber/FlowSOM-Rtsne-example) repository.
 
