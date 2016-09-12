@@ -37,12 +37,12 @@ is_rare <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
 # this method; see parameters spreadsheet)
 
 files_truth <- list(
-  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
-  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
-  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
-  Samusik_all  = file.path(RES_DIR_XSHIFT, "Samusik_all_subsampled.fcs"), 
-  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
-  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs")
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim_notransform.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim_notransform.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01_notransform.fcs"), 
+  Samusik_all  = file.path(RES_DIR_XSHIFT, "Samusik_all_notransform_subsampled.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare_notransform.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare_notransform.fcs")
 )
 
 # extract true population labels

@@ -35,6 +35,11 @@
 # labels correctly after subsampling. Use code below to subsample data sets and save true
 # population labels instead.
 
+# Note: use non-transformed data sets, since it is better to let X-shift apply the 
+# arcsinh transform internally (otherwise noise threshold is applied to the 
+# pre-transformed data, which ends up removing more points than intended).
+
+
 library(flowCore)
 
 # load data
@@ -42,34 +47,20 @@ library(flowCore)
 DATA_DIR <- "../../../benchmark_data_sets"
 
 files <- list(
-  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim.fcs"), 
-  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim.fcs"), 
-  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01.fcs"), 
-  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all.fcs"), 
-  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare.fcs"), 
-  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare.fcs"), 
-  FlowCAP_ND   = file.path(DATA_DIR, "FlowCAP_ND/data/FlowCAP_ND.fcs"), 
-  FlowCAP_WNV  = file.path(DATA_DIR, "FlowCAP_WNV/data/FlowCAP_WNV.fcs")
+  Levine_32dim = file.path(DATA_DIR, "Levine_32dim/data/Levine_32dim_notransform.fcs"), 
+  Levine_13dim = file.path(DATA_DIR, "Levine_13dim/data/Levine_13dim_notransform.fcs"), 
+  Samusik_01   = file.path(DATA_DIR, "Samusik/data/Samusik_01_notransform.fcs"), 
+  Samusik_all  = file.path(DATA_DIR, "Samusik/data/Samusik_all_notransform.fcs"), 
+  Nilsson_rare = file.path(DATA_DIR, "Nilsson_rare/data/Nilsson_rare_notransform.fcs"), 
+  Mosmann_rare = file.path(DATA_DIR, "Mosmann_rare/data/Mosmann_rare_notransform.fcs")
 )
-
-is_FlowCAP <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)
 
 data <- vector("list", length(files))
 names(data) <- names(files)
 
 for (i in 1:length(data)) {
   f <- files[[i]]
-  
-  if (!is_FlowCAP[i]) {
-    data[[i]] <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
-    
-  } else {
-    smp <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
-    smp <- smp[, "sample"]
-    d <- flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE)
-    d <- flowCore::split(d, smp)
-    data[[i]] <- lapply(d, function(s) flowCore::exprs(s))
-  }
+  data[[i]] <- flowCore::exprs(flowCore::read.FCS(f, transformation = FALSE, truncate_max_range = FALSE))
 }
 
 # subsampling for data sets with excessive runtime (> 6 hrs on laptop)
@@ -78,17 +69,15 @@ ix_subsample <- 4
 n_sub <- 250000
 
 for (i in ix_subsample) {
-  if (!is_FlowCAP[i]) {
-    set.seed(123)
-    data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
-    
-    # save subsampled data sets in FCS format with population labels
-    files_sub_i <- paste0(c("../../results/auto/Xshift/", 
-                            "../../results/manual/Xshift/"), 
-                          names(data)[i], "_subsampled.fcs")
-    for (f in files_sub_i) {
-      flowCore::write.FCS(flowCore::flowFrame(data[[i]]), filename = f)
-    }
+  set.seed(123)
+  data[[i]] <- data[[i]][sample(1:nrow(data[[i]]), n_sub), ]
+  
+  # save subsampled data sets in FCS format with population labels
+  files_sub_i <- paste0(c("../../results/auto/Xshift/", 
+                          "../../results/manual/Xshift/"), 
+                        names(data)[i], "_notransform_subsampled.fcs")
+  for (f in files_sub_i) {
+    flowCore::write.FCS(flowCore::flowFrame(data[[i]]), filename = f)
   }
 }
 
