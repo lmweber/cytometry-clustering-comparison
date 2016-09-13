@@ -17,7 +17,7 @@ Several other methods also performed well, including X-shift, PhenoGraph, Rclust
 
 ## FlowSOM and Rtsne example code
 
-FlowSOM [(van Gassen et al., 2015)](http://www.ncbi.nlm.nih.gov/pubmed/25573116) is available as a [Bioconductor package](http://bioconductor.org/packages/release/bioc/html/FlowSOM.html) for the R programming language.
+FlowSOM [(Van Gassen et al., 2015)](http://www.ncbi.nlm.nih.gov/pubmed/25573116) is available as a [Bioconductor package](http://bioconductor.org/packages/release/bioc/html/FlowSOM.html) for the R programming language.
 
 A worked example showing how to use FlowSOM for clustering and [Rtsne](https://github.com/jkrijthe/Rtsne) for visualization is available in the [FlowSOM-Rtsne-example](https://github.com/lmweber/FlowSOM-Rtsne-example) repository.
 
