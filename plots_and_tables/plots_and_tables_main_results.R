@@ -736,8 +736,8 @@ for (i in 1:4) {
     ggplot(runtime_vs_F1_tidy[[i]], aes(x = mean_F1, y = runtime)) + 
     geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
     geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
-    xlim(0, 0.8) + 
-    ylim(-1500, ymaxs_scatter[[i]]) + 
+    xlim(0, 0.81) + 
+    ylim(-2000, ymaxs_scatter[[i]]) + 
     ggtitle(title) + 
     xlab("mean F1 score") + 
     ylab("runtime (seconds)") + 
@@ -779,7 +779,7 @@ for (i in 1:2) {
     ggplot(runtime_vs_F1_tidy_rare[[i]], aes(x = F1, y = runtime)) + 
     geom_point(shape = 4, size = 2, stroke = 1, color = "darkorchid4") + 
     geom_text_repel(aes(label = method), size = 2.5, box.padding = unit(0.3, "lines")) + 
-    xlim(0, 0.8) + 
+    xlim(0, 0.81) + 
     ylim(ymins_scatter_rare[[i]], ymaxs_scatter_rare[[i]]) + 
     ggtitle(title) + 
     xlab("F1 score") + 

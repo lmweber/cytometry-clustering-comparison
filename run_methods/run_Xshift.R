@@ -66,7 +66,7 @@ for (i in 1:length(data)) {
 # subsampling for data sets with excessive runtime (> 6 hrs on laptop)
 
 ix_subsample <- 4
-n_sub <- 250000
+n_sub <- 300000
 
 for (i in ix_subsample) {
   set.seed(123)

@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load and evaluate results for X-shift
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 
@@ -15,7 +15,7 @@ source("../helpers/helper_match_evaluate_FlowCAP.R")
 source("../helpers/helper_match_evaluate_FlowCAP_alternate.R")
 
 # which set of results to use: automatic or manual number of clusters (see parameters spreadsheet)
-RES_DIR_XSHIFT <- "../../results/manual/Xshift"
+RES_DIR_XSHIFT <- "../../results/auto/Xshift"
 
 DATA_DIR <- "../../../benchmark_data_sets"
 
@@ -80,12 +80,12 @@ clus_truth_Xshift <- clus_truth
 # load cluster labels
 
 files_out <- list(
-  Levine_32dim = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Levine_32dim_145.0.txt"), 
-  Levine_13dim = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Levine_13dim_150.0.txt"), 
-  Samusik_01   = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Samusik_01_130.0.txt"), 
-  Samusik_all  = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Samusik_all_150.0.txt"), 
-  Nilsson_rare = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Nilsson_rare_40.0.txt"), 
-  Mosmann_rare = file.path(RES_DIR_XSHIFT, "Xshift_results_manual_Mosmann_rare_105.0.txt")
+  Levine_32dim = file.path(RES_DIR_XSHIFT, "Xshift_results_auto_Levine_32dim_90.0.txt"), 
+  Levine_13dim = file.path(RES_DIR_XSHIFT, "Xshift_results_auto_Levine_13dim_20.0.txt"), 
+  Samusik_01   = file.path(RES_DIR_XSHIFT, "Xshift_results_auto_Samusik_01_20.0.txt"), 
+  Samusik_all  = file.path(RES_DIR_XSHIFT, "Xshift_results_auto_Samusik_all_20.0.txt"), 
+  Nilsson_rare = file.path(RES_DIR_XSHIFT, "Xshift_results_auto_Nilsson_rare_60.0.txt"), 
+  Mosmann_rare = file.path(RES_DIR_XSHIFT, "Xshift_results_auto_Mosmann_rare_20.0.txt")
 )
 
 clus <- vector("list", length(files_out))

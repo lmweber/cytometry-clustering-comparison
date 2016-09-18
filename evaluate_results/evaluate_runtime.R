@@ -1,7 +1,7 @@
 #########################################################################################
 # R script to load runtimes
 #
-# Lukas Weber, August 2016
+# Lukas Weber, September 2016
 #########################################################################################
 
 # Methods that were run using R scripts were timed with the "system.time()" function, 
@@ -59,12 +59,12 @@ res_runtime[["Samusik_all"]][["SWIFT"]]  <- (2 * 3600) + (50 * 60) + 8
 res_runtime[["Nilsson_rare"]][["SWIFT"]] <- (11 * 60) + 26
 res_runtime[["Mosmann_rare"]][["SWIFT"]] <- (34 * 60) + 34
 
-res_runtime[["Levine_32dim"]][["Xshift"]] <- (4 * 3600) + (43 * 60) + 50
-res_runtime[["Levine_13dim"]][["Xshift"]] <- (58 * 60) + 27
-res_runtime[["Samusik_01"]][["Xshift"]]   <- (28 * 60) + 16
-res_runtime[["Samusik_all"]][["Xshift"]]  <- (4 * 3600) + (24 * 60) + 52
-res_runtime[["Nilsson_rare"]][["Xshift"]] <- (4 * 60) + 47
-res_runtime[["Mosmann_rare"]][["Xshift"]] <- (4 * 3600) + (11 * 60) + 15
+res_runtime[["Levine_32dim"]][["Xshift"]] <- (4 * 3600) + (45 * 60) + 26
+res_runtime[["Levine_13dim"]][["Xshift"]] <- (48 * 60) + 17
+res_runtime[["Samusik_01"]][["Xshift"]]   <- (24 * 60) + 54
+res_runtime[["Samusik_all"]][["Xshift"]]  <- (3 * 3600) + (48 * 60) + 27
+res_runtime[["Nilsson_rare"]][["Xshift"]] <- (4 * 60) + 37
+res_runtime[["Mosmann_rare"]][["Xshift"]] <- (3 * 3600) + (18 * 60) + 20
 
 
 
