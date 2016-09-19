@@ -14,8 +14,9 @@ other attached packages:
 [1] clue_0.3-51     flowCore_1.38.2 xtable_1.8-2    lubridate_1.6.0 ggrepel_0.5     cowplot_0.6.2   reshape2_1.4.1  ggplot2_2.1.0  
 
 loaded via a namespace (and not attached):
- [1] graph_1.50.0        Rcpp_0.12.7         cluster_2.0.4       magrittr_1.5        BiocGenerics_0.18.0 munsell_0.4.3       colorspace_1.2-6    lattice_0.20-34     rrcov_1.4-3        
-[10] pcaPP_1.9-60        stringr_1.1.0       plyr_1.8.4          tools_3.3.1         parallel_3.3.1      grid_3.3.1          Biobase_2.32.0      gtable_0.2.0        corpcor_1.6.8      
-[19] matrixStats_0.50.2  digest_0.6.10       robustbase_0.92-6   labeling_0.3        stringi_1.1.1       DEoptimR_1.0-6      scales_0.4.0        stats4_3.3.1        mvtnorm_1.0-5      
+ [1] graph_1.50.0        Rcpp_0.12.7         cluster_2.0.4       magrittr_1.5        BiocGenerics_0.18.0 munsell_0.4.3       colorspace_1.2-6    lattice_0.20-34    
+ [9] rrcov_1.4-3         pcaPP_1.9-60        stringr_1.1.0       plyr_1.8.4          tools_3.3.1         parallel_3.3.1      grid_3.3.1          Biobase_2.32.0     
+[17] gtable_0.2.0        corpcor_1.6.8       matrixStats_0.50.2  digest_0.6.10       robustbase_0.92-6   labeling_0.3        stringi_1.1.1       DEoptimR_1.0-6     
+[25] scales_0.4.0        stats4_3.3.1        mvtnorm_1.0-5      
 
 > sink()
