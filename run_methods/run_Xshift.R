@@ -1,6 +1,9 @@
 # How to run X-shift
 
-# Not available in R, so follow steps below instead.
+# Not available in R, so follow steps below for graphical interface.
+# (Note: as of October 2016, a command-line version is also available from: 
+# https://github.com/nolanlab/vortex/releases)
+
 # Instructions also available at: http://web.stanford.edu/~samusik/vortex/
 
 # Requires: Standalone application "VorteX"
