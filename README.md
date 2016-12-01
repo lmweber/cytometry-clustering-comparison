@@ -2,7 +2,7 @@
 
 This repository contains R scripts to reproduce the analyses and figures in our paper comparing clustering methods for high-dimensional flow cytometry and mass cytometry (CyTOF) data.
 
-A preprint of the paper is available from [bioRxiv](http://biorxiv.org/content/early/2016/09/08/047613) (latest version posted on September 8, 2016).
+A preprint of the paper is available from [bioRxiv](http://biorxiv.org/content/early/2016/11/10/047613) (latest version posted on November 10, 2016).
 
 
 ## Overview
