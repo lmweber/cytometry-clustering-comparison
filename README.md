@@ -2,7 +2,9 @@
 
 This repository contains R scripts to reproduce the analyses and figures in our paper comparing clustering methods for high-dimensional flow cytometry and mass cytometry (CyTOF) data.
 
-A preprint of the paper is available from [bioRxiv](http://biorxiv.org/content/early/2016/11/10/047613) (latest version posted on November 10, 2016).
+- Weber L.M. and Robinson M.D. (2016) *Comparison of clustering methods for high-dimensional single-cell flow and mass cytometry data.* Cytometry Part A. [Open access available here.](http://onlinelibrary.wiley.com/doi/10.1002/cyto.a.23030/full)
+
+Supplementary files (Supporting Information PDF and Supporting Information Table S1) are available via the journal link above, or from the [supplementary_files](supplementary_files/) directory (latest version: November 18, 2016).
 
 
 
@@ -46,6 +48,10 @@ R scripts are organized into the following subdirectories. All scripts contain c
 - [range_k](range_k/): run and evaluate FlowSOM over range of values k (number of clusters)
 - [run_methods](run_methods/): scripts to run all methods (or instructions to run graphical interfaces, where required)
 - [stability_analysis](stability_analysis/): run and evaluate methods for stability analysis
+
+A copy of the supplementary files from the published paper is also included.
+
+- [supplementary_files](supplementary_files/): Supporting Information PDF and Supporting Information Table S1 (latest version: November 18, 2016)
 
 
 
