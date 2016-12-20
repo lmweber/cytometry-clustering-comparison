@@ -51,7 +51,7 @@ R scripts are organized into the following subdirectories. All scripts contain c
 
 A copy of the supplementary files from the published paper is also included.
 
-- [supplementary_files](supplementary_files/): Supporting Information PDF and Supporting Information Table S1 (latest version: November 18, 2016)
+- [supplementary_files](supplementary_files/): supplementary files from paper (latest version: November 18, 2016)
 
 
 
