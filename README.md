@@ -2,7 +2,7 @@
 
 This repository contains R scripts to reproduce the analyses and figures in our paper comparing clustering methods for high-dimensional flow cytometry and mass cytometry (CyTOF) data.
 
-- Weber L.M. and Robinson M.D. (2016) *Comparison of clustering methods for high-dimensional single-cell flow and mass cytometry data.* Cytometry Part A, 89A: 1084--1096. [Open access available here.](http://onlinelibrary.wiley.com/doi/10.1002/cyto.a.23030/full)
+- Weber L.M. and Robinson M.D. (2016) *Comparison of clustering methods for high-dimensional single-cell flow and mass cytometry data.* Cytometry Part A, 89A: 1084–1096. [Open access available here.](http://onlinelibrary.wiley.com/doi/10.1002/cyto.a.23030/full)
 
 Supplementary files (Supporting Information PDF and Supporting Information Table S1) are available via the journal link above, or from the [supplementary_files](supplementary_files/) directory (latest version: November 18, 2016).
 
