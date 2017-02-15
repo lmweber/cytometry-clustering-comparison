@@ -2,9 +2,9 @@
 
 This repository contains R scripts to reproduce the analyses and figures in our paper comparing clustering methods for high-dimensional flow cytometry and mass cytometry (CyTOF) data.
 
-- Weber L.M. and Robinson M.D. (2016) *Comparison of clustering methods for high-dimensional single-cell flow and mass cytometry data.* Cytometry Part A, 89A: 1084–1096. [Open access available here.](http://onlinelibrary.wiley.com/doi/10.1002/cyto.a.23030/full)
+- Weber L.M. and Robinson M.D. (2016) *Comparison of clustering methods for high-dimensional single-cell flow and mass cytometry data.* Cytometry Part A, 89A: 1084–1096. [Open access available here](http://onlinelibrary.wiley.com/doi/10.1002/cyto.a.23030/full).
 
-Supplementary files (Supporting Information PDF and Supporting Information Table S1) are available via the journal link above, or from the [supplementary_files](supplementary_files/) directory (latest version: November 18, 2016).
+    Note: Supplementary files (Supporting Information PDF and Supporting Information Table S1) are available via the journal link above, or from the [supplementary_files](supplementary_files/) directory (latest version: November 18, 2016).
 
 
 
@@ -32,7 +32,11 @@ A worked example showing how to use FlowSOM for clustering and [Rtsne](https://g
 
 ## Updates
 
-Updated results for new clustering algorithms will be published on this website.
+Updated results for new clustering algorithms or new reference data sets will be published on this website.
+
+The following updates are currently available:
+
+- densityCut: New clustering method [(Ding et al., 2016)](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btw227). R scripts and a summary report are included in the [updates/densityCut](updates/densityCut/) directory.
 
 
 
@@ -49,9 +53,13 @@ R scripts are organized into the following subdirectories. All scripts contain c
 - [run_methods](run_methods/): scripts to run all methods (or instructions to run graphical interfaces, where required)
 - [stability_analysis](stability_analysis/): run and evaluate methods for stability analysis
 
-A copy of the supplementary files from the published paper is also included.
+Supplementary files from the published paper are included in the following directory:
 
 - [supplementary_files](supplementary_files/): supplementary files from paper (latest version: November 18, 2016)
+
+R scripts and summary reports for updated results are included in the following directory:
+
+- [updates](updates/): updated results for new clustering methods or new reference data sets
 
 
 

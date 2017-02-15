@@ -1,0 +1,22 @@
+
+> print(sessionInfo())
+R version 3.3.2 (2016-10-31)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.3
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] clue_0.3-53     flowCore_1.40.3 xtable_1.8-2    lubridate_1.6.0 ggrepel_0.6.5   cowplot_0.7.0   reshape2_1.4.2  ggplot2_2.2.1  
+
+loaded via a namespace (and not attached):
+ [1] graph_1.52.0        Rcpp_0.12.9         cluster_2.0.5       magrittr_1.5        BiocGenerics_0.20.0 munsell_0.4.3       colorspace_1.3-2    lattice_0.20-34    
+ [9] rrcov_1.4-3         pcaPP_1.9-61        stringr_1.1.0       plyr_1.8.4          tools_3.3.2         parallel_3.3.2      grid_3.3.2          Biobase_2.34.0     
+[17] gtable_0.2.0        corpcor_1.6.8       matrixStats_0.51.0  digest_0.6.12       lazyeval_0.2.0      assertthat_0.1      tibble_1.2          robustbase_0.92-7  
+[25] labeling_0.3        stringi_1.1.2       DEoptimR_1.0-8      scales_0.4.1        stats4_3.3.2        mvtnorm_1.0-5      
+
+> sink()
